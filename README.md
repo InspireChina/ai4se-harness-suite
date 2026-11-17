@@ -116,6 +116,9 @@ ba-grill-me → ba-write-spec → pm-estimate
 | 核心领域模型 | architecture 只维护核心聚合 + 关键字段；全量 as-built 在 facts | [core-domain-model](example-project/docs/architecture/business/core-domain-model.md) · [facts domain-model](example-project/docs/facts/domain-model.md) |
 | 代码打样 | 迭代内用独立 Vite 原型先把交互与页面打通，规格与验收对齐后再进实现 | [iteration1 原型](example-project/docs/features/iteration1/prototypes/README.md) |
 | 事实文档 | 实现后校准 `docs/facts/`（API、库表、全量领域、实现专题） | [`ba-gen-facts`](agile-team-sdd/skills/ba-gen-facts-template/SKILL.md) · [facts](example-project/docs/facts/README.md) |
+| 全栈端到端 Loop 开发 | Plan 确认后由 `dev-build` 编排实现 → 自测 → UI 评审 → 代码评审，失败修 bug 回环直至可合并 | [`dev-build`](agile-team-sdd/skills/dev-build-template/SKILL.md) · [流程指南](team-workflow-guide/index.html) |
+| 团队上下文共享 | BA / DEV / QA 等角色的产出物（规格、Plan、用例、事实文档、架构）都进代码仓库，换人 clone 即可接上 | [`example-project/docs/`](example-project/docs/README.md) · [Agent as Code](harness-installer/) |
+| Mono repo | 统一仓库承载前后端、文档与 harness；客观条件限制时可用 submodule 拼出等价布局 | [`example-project/`](example-project/)（containers + docs + skills 同仓） |
 
 ## 快速开始
 
