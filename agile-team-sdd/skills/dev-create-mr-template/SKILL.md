@@ -103,7 +103,7 @@ glab mr create --target-branch {{TARGET_BRANCH}} --title "feat(appointment): 支
 
 ## 关联
 
-- 需求：`{{FEATURES_DIR}}/appointment.md`
+- 需求：`{{FEATURES_DIR}}/iteration1/BKG-booking/spec.md`
 - 规则：R-CANCEL-003
 - 用例：TC-013
 

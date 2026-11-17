@@ -1,15 +1,22 @@
 ---
 name: dev-plan
-description: 在编写任何代码之前在 docs/plans/ 中创建开发计划。当开始新功能、重构或任何非简单变更时使用。
+description: 在编写任何代码之前为对应 feature 创建开发计划（plan.md）。当开始新功能、重构或任何非简单变更时使用。
 ---
 
 # 开发：制定计划
 
-在实现前在 `docs/plans/` 中创建计划。
+在实现前为需求写技术方案，并与规格放在同一 feature 目录。
 
-## 模板
+## 输出位置
 
-使用 `docs/plans/_template.md` 作为模板，包含以下核心章节：
+| 场景 | 路径 |
+|---|---|
+| 有明确 feature | `docs/features/<迭代>/<CODE>-<slug>/plan.md`（首份）或 `plan-{slug}.md`（后续） |
+| 无关联 feature 的横切改造 | `docs/features/_chores/plan-{slug}.md` |
+
+模板：`docs/features/_template/plan.md`。
+
+## 模板核心章节
 
 1. 文档说明（背景、目标）
 2. 领域模型（PlantUML）
@@ -24,7 +31,7 @@ description: 在编写任何代码之前在 docs/plans/ 中创建开发计划。
 11. 修改清单（代码、接口、数据库变更）
 12. 验证步骤
 13. 风险与回滚
-14. 实施后需更新的 design 文档
+14. 实施后需更新的事实文档
 
 ## 规则
 
@@ -32,4 +39,4 @@ description: 在编写任何代码之前在 docs/plans/ 中创建开发计划。
 - 包含每个需要变更的文件的路径
 - 参考现有模式（assembler、converter、service）以保持一致性
 - 考虑文档同步：本次变更是否会影响 `docs/facts/` 中的文件？
-- **plan 一旦定稿就不修改**，同一资源的二次改造新建 `YYYYMMDD-{slug}.md`
+- **plan 一旦定稿就不修改**；同一 feature 的二次改造新建 `plan-{slug}.md`

@@ -120,5 +120,5 @@ description: 拷问需求，把模糊的一句话需求逼成可验收的规格�
 
 ## 交给下一步
 
-澄清纪要完成后，用 `ba-write-spec` 把它落成 `{{FEATURES_DIR}}/{模块}.md`。
+澄清纪要完成后，用 `ba-write-spec` 把它落成 `{{FEATURES_DIR}}/<迭代>/<CODE>-<slug>/spec.md`。
 如果还有阻塞性待确认项，**不要**开始写规格。

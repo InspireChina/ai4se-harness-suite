@@ -1,6 +1,6 @@
 ---
 name: ba-write-spec-template
-description: 编写需求规格说明书（字段表、业务规则、权限矩阵、验收标准）。当需求已澄清，需要把需求落成 docs/features/ 下的规格文档时使用。
+description: 编写需求规格说明书（字段表、业务规则、权限矩阵、验收标准）。当需求已澄清，需要把需求落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时使用。
 ---
 
 <!-- TEMPLATE-ONLY -->
@@ -19,11 +19,13 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 
 ## 输出位置
 
-`{{FEATURES_DIR}}/{模块}.md`
+`{{FEATURES_DIR}}/<迭代>/<CODE>-<slug>/spec.md`
 
-- 命名用模块名（`auth.md`、`appointment.md`），不要用日期
-- 一个模块一份，不要把多个模块塞进一个文件
-- 更新已有模块时基于当前版本改，写明基线版本与目标版本
+- 文件夹名用 **JIRA 风格大写编码** + slug（如 `ACC-account`、`BKG-booking`）
+- 规格文件固定为目录内的 `spec.md`
+- 从 `{{SPEC_TEMPLATE}}` 复制起步；同目录可放 `plan.md` / `plan-{slug}.md`
+- 一个能力一个文件夹，不要把多个模块塞进一份 spec
+- 更新已有模块时基于当前 `spec.md` 改，写明基线版本与目标版本
 
 ## 各章节怎么写
 

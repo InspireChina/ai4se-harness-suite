@@ -4,7 +4,7 @@
 #
 # "跑哪些任务"不在这里 —— 队列定义在
 #   .overnight-runner/queue/<队列名>/queue.yaml
-# 用 `overnight-runner --queue <名字> add docs/plans/xxx.md` 追加。
+# 用 `overnight-runner --queue <名字> add docs/features/_chores/plan-xxx.md` 追加。
 runner:
   agent:
     command: opencode

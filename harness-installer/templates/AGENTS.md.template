@@ -171,10 +171,12 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 
 ```
 {{DOCS_DIR}}/
-├── features/               # 需求规格（过程文档）
-│   └── _template.md
-├── plans/                  # 技术方案（过程文档）
-│   └── _template.md
+├── features/               # 需求规格 + 技术方案（过程文档）
+│   ├── _template/          # spec.md + plan.md
+│   ├── _chores/            # 无关联 feature 的 plan
+│   └── <迭代>/<CODE>-<slug>/
+│       ├── spec.md
+│       └── plan.md
 ├── facts/                  # 事实文档
 │   ├── api.yaml
 │   ├── db-schema.md
@@ -217,7 +219,7 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 
 每轮需求开发必须按以下顺序执行，严禁跳过或调换步骤：
 
-1. **Plan 等待确认**：在 `{{PLANS_DIR}}/` 下根据模板创建 Plan，包含技术方案与任务拆分，等待人工确认后再继续。
+1. **Plan 等待确认**：在对应 feature 目录写 `plan.md`（或多份 `plan-{slug}.md`）；横切方案放 `{{CHORES_DIR}}/`。等待人工确认后再继续。
 2. **编写 QA 测试用例**：在 `{{E2E_CASES_DIR}}/` 下编写本轮需求的 E2E 测试用例（文本格式，编号 `TC-xxx`），由 QA 主导判定。**先写文本用例，再写自动化**。
 3. **编写开发自测（API 测试）**：根据 Plan 在 `{{BACKEND_DIR}}/src/test/` 中编写集成测试（TDD 红牌阶段）。
 4. **编写实现**：编写单元测试 + 实现代码，通过后端编译。

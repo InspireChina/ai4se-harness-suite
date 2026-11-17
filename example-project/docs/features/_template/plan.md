@@ -2,13 +2,13 @@
 
 >日期： YYYY-MM-DD
 >
->关联需求：docs/features/{file}.md
+>关联需求：docs/features/<迭代>/<CODE>-<slug>/spec.md
 >
 >设计 design：docs/design/topics/{资源}-{操作}.md（实施后会写到原design文件）
 >
 >
 >
->**plan一旦定稿就不修改。** 同一资源的二次改造新建 `YYYY-MM-DD-{slug}.md`，不修改原计划文件
+>**plan一旦定稿就不修改。** 同一资源的二次改造新建 `plan-{slug}.md`（与 spec 同目录；横切放 `_chores/`），不修改原计划文件
 
 
 

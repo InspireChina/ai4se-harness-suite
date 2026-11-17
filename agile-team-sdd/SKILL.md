@@ -17,14 +17,14 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时，写规格之前 |
-| `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准） | 需求已澄清，落成 `docs/features/` |
+| `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准） | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md` |
 | `ba-gen-facts` | 从代码生成/校准事实文档（API、库表、领域模型） | 实现变了，`docs/facts/` 与代码不一致 |
 
 ### 开发
 
 | Skill | 作用 | 触发时机 |
 |---|---|---|
-| `dev-plan` | 在 `docs/plans/` 先写技术方案再动手 | 新功能 / 重构 / 非简单变更 |
+| `dev-plan` | 在 feature 目录写 `plan.md` 再动手 | 新功能 / 重构 / 非简单变更 |
 | `dev-build` | 按四层 DDD 约定实现功能 | Plan 已确认，进入实现 |
 | `dev-self-test` | 运行并修复开发自测 | 实现完成、交给 QA 之前 |
 | `dev-code-review` | 按项目规范做代码评审 | 提交前自查，或评审别人的 MR |
@@ -137,7 +137,8 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 ├── e2e-run.sh           ← {{E2E_RUNNER}}
 └── docs/
     ├── features/        ← {{FEATURES_DIR}}
-    ├── plans/           ← {{PLANS_DIR}}
+    │   ├── _chores/     ← {{CHORES_DIR}} / {{PLANS_DIR}}
+    │   └── _template/   ← {{SPEC_TEMPLATE}} / {{PLAN_TEMPLATE}}
     ├── facts/           ← {{FACTS_DIR}}
     │   ├── business/    ← {{BUSINESS_FACTS_DIR}}
     │   └── tech-topic/  ← {{TECH_TOPIC_DIR}}

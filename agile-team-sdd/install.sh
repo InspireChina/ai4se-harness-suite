@@ -93,7 +93,8 @@ if [ "$PATH_MODE" = "relative" ]; then
 fi
 
 FEATURES_DIR="${FEATURES_DIR:-$DOCS_DIR/features}"
-PLANS_DIR="${PLANS_DIR:-$DOCS_DIR/plans}"
+CHORES_DIR="${CHORES_DIR:-$FEATURES_DIR/_chores}"
+PLANS_DIR="${PLANS_DIR:-$CHORES_DIR}"
 FACTS_DIR="${FACTS_DIR:-$DOCS_DIR/facts}"
 BUSINESS_FACTS_DIR="${BUSINESS_FACTS_DIR:-$FACTS_DIR/business}"
 TECH_TOPIC_DIR="${TECH_TOPIC_DIR:-$FACTS_DIR/tech-topic}"
@@ -142,7 +143,8 @@ rel_to_project() {
 PAIRS=(
   "TEST_CMD_BACKEND=$TEST_CMD_BACKEND"
   "TEST_CMD_FRONTEND=$TEST_CMD_FRONTEND"
-  "SPEC_TEMPLATE=$(proj_path "$FEATURES_DIR/_template.md")"
+  "SPEC_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/spec.md")"
+  "PLAN_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/plan.md")"
   "DOMAIN_MODEL_DOC=$(proj_path "$FACTS_DIR/domain-model.md")"
   "API_SPEC=$(proj_path "$FACTS_DIR/api.yaml")"
   "DB_SCHEMA_DOC=$(proj_path "$FACTS_DIR/db-schema.md")"
@@ -155,6 +157,7 @@ PAIRS=(
   "E2E_CASES_DIR=$(proj_path "$E2E_CASES_DIR")"
   "TEST_CASES_DIR=$(proj_path "$TEST_CASES_DIR")"
   "STANDARDS_DIR=$(proj_path "$STANDARDS_DIR")"
+  "CHORES_DIR=$(proj_path "$CHORES_DIR")"
   "FEATURES_DIR=$(proj_path "$FEATURES_DIR")"
   "PLANS_DIR=$(proj_path "$PLANS_DIR")"
   "BUSINESS_FACTS_DIR=$(proj_path "$BUSINESS_FACTS_DIR")"

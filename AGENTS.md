@@ -165,7 +165,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
   "name": "dev-plan",
   "description": "在实现前写技术方案（Plan），等待人工确认",
   "when": "新功能、重构或任何非简单变更，动手写代码之前",
-  "produces": ["docs/plans/YYYYMMDD-{slug}.md"],
+  "produces": ["docs/features/<迭代>/<CODE>-<slug>/plan.md"],
   "dependsOn": []
 }
 ```
@@ -252,9 +252,9 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ```
 用户的一句话需求
   → ba-grill-me（拷问）
-  → ba-write-spec（需求规格 docs/features/）
+  → ba-write-spec（需求规格 docs/features/<CODE>-<slug>/spec.md）
   → pm-estimate（估算）
-  → ┬─ dev-plan（技术方案 docs/plans/，人工确认 ← 编码前强制闸门）
+  → ┬─ dev-plan（技术方案 feature/plan.md 或 _chores/，人工确认 ← 编码前强制闸门）
     └─ qa-write-cases（QA 文本用例，与 Plan 并行；规格确认后即可开始）
   → 两边都就绪后 → dev-build（实现）
   → dev-self-test（开发自测）

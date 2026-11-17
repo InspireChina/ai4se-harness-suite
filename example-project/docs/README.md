@@ -4,15 +4,16 @@
 
 | 类别 | 目录 | 性质 | 生命周期 |
 |---|---|---|---|
-| 过程文档 | `features/`、`plans/` | 会随需求演进 | 随需求创建，**定稿后不再修改** |
+| 过程文档 | `features/`（含 `spec.md` / `plan*.md`） | 会随需求演进 | 随需求创建，**定稿后不再修改** |
 | 事实文档 | `facts/`、`standards/` | 描述系统当前真实状态 | 随代码同步更新 |
 
 ## 目录
 
 | 目录 | 内容 | 谁来写 |
 |---|---|---|
-| `features/` | 需求规格说明书：背景、字段表、业务规则、权限、验收标准 | 产品 / BA |
-| `plans/` | 技术方案：领域模型、DDL、API、时序图、任务拆分、风险 | 架构师 / 负责人 |
+| `features/` | 每个能力一个 JIRA 风格文件夹：`spec.md` + `plan.md` / `plan-{slug}.md` | 产品 / BA / 开发 |
+| `features/_chores/` | 无关联 feature 的横切技术方案 | 架构师 / 负责人 |
+| `features/_template/` | `spec.md`、`plan.md` 模板 | 架构师 |
 | `facts/` | 技术事实：API、库表、领域模型 | 全员，随代码同步 |
 | `facts/business/` | 业务事实：流程等 | BA / 开发 |
 | `facts/tech-topic/` | 技术专题 / ADR / 实现说明 | 需要时新建 |
@@ -34,9 +35,9 @@
 
 ## 写作约定
 
-- 需求规格与 Plan **定稿后不改**；同一资源的二次改造新建文件（`YYYYMMDD-{slug}.md`）。
+- 需求规格与 Plan **定稿后不改**；同一 feature 的二次改造新建 `plan-{slug}.md`。
 - 事实文档必须与代码一致；改了代码就要改文档。
-- 新建需求先复制 `_template.md` 再改，不要从零写。
+- 新建需求：复制 `features/_template/` 为 `features/<迭代>/<CODE>-<slug>/`，再改 `spec.md` / `plan.md`。
 
 ## 同步检查点
 

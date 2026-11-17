@@ -20,8 +20,9 @@
 | `{{FRONTEND_DIR}}` | 前端模块目录 | `apps/frontend` | `FRONTEND_DIR` |
 | `{{E2E_DIR}}` | E2E 测试目录 | `e2e` | `E2E_DIR` |
 | `{{DOCS_DIR}}` | 文档根目录 | `docs` | `DOCS_DIR` |
-| `{{FEATURES_DIR}}` | 需求规格目录 | `docs/features` | `FEATURES_DIR` |
-| `{{PLANS_DIR}}` | 技术方案（Plan）目录 | `docs/plans` | `PLANS_DIR` |
+| `{{FEATURES_DIR}}` | 需求与方案根目录（feature 文件夹） | `docs/features` | `FEATURES_DIR` |
+| `{{CHORES_DIR}}` | 无关联 feature 的横切 plan 目录 | `docs/features/_chores` | `CHORES_DIR` |
+| `{{PLANS_DIR}}` | 同 `CHORES_DIR`（兼容旧名） | `docs/features/_chores` | `PLANS_DIR` |
 | `{{FACTS_DIR}}` | 事实文档目录 | `docs/facts` | `FACTS_DIR` |
 | `{{BUSINESS_FACTS_DIR}}` | 业务事实目录 | `docs/facts/business` | `BUSINESS_FACTS_DIR` |
 | `{{TECH_TOPIC_DIR}}` | 技术专题目录 | `docs/facts/tech-topic` | `TECH_TOPIC_DIR` |
@@ -32,7 +33,8 @@
 | `{{SMOKING_CASES_DIR}}` | QA 冒烟用例目录 | `docs/test-cases/smoking-cases` | `SMOKING_CASES_DIR` |
 | `{{DEV_SELF_CASES_DIR}}` | 开发自测用例索引目录 | `docs/test-cases/dev-self-cases` | `DEV_SELF_CASES_DIR` |
 | `{{RELEASES_DIR}}` | 发布清单目录 | `docs/releases` | `RELEASES_DIR` |
-| `{{SPEC_TEMPLATE}}` | 需求规格模板 | `docs/features/_template.md` | — |
+| `{{SPEC_TEMPLATE}}` | 需求规格模板 | `docs/features/_template/spec.md` | — |
+| `{{PLAN_TEMPLATE}}` | 技术方案模板 | `docs/features/_template/plan.md` | — |
 | `{{DOMAIN_MODEL_DOC}}` | 领域模型文档 | `docs/facts/domain-model.md` | — |
 | `{{API_SPEC}}` | API 定义 | `docs/facts/api.yaml` | — |
 | `{{DB_SCHEMA_DOC}}` | 数据库规格 | `docs/facts/db-schema.md` | — |
@@ -49,8 +51,8 @@
 
 | 模式 | 渲染结果 | 何时用 |
 |---|---|---|
-| `absolute`（默认） | `/abs/path/to/project/docs/plans/` | skill 在任意 cwd 下都要能用 |
-| `relative` | `docs/plans/` | 项目会随仓库分发给其他人（可移植） |
+| `absolute`（默认） | `/abs/path/to/project/docs/features/_chores/` | skill 在任意 cwd 下都要能用 |
+| `relative` | `docs/features/_chores/` | 项目会随仓库分发给其他人（可移植） |
 
 ```bash
 PATH_MODE=relative ./install.sh ../my-project

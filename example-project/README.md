@@ -106,8 +106,7 @@ Client → Vue 前端 (:5173) → /api 代理 → Spring Boot 后端 (:8080) →
 
 详见 [`docs/`](docs/) 目录：
 
-- **需求规格**：`docs/features/iteration1/` — 咨询师预约平台样例（v0.1；独立 Vite 原型：`prototypes/`，`npm run dev` :5174）
-- **技术方案**：`docs/plans/` — 技术实现方案与任务拆分
-- **设计文档**：`docs/facts/` — API 定义、数据库设计、领域模型、技术主题
+- **需求与方案**：`docs/features/` — JIRA 风格 feature 文件夹（`spec.md` + `plan*.md`；横切见 `_chores/`）
+- **事实文档**：`docs/facts/` — API 定义、数据库设计、领域模型、技术主题
 - **代码规范**：`docs/standards/` — 架构、命名、安全、分层等规范及代码模板
 - **测试用例**：`docs/test-cases/{e2e,manual,smoking,dev-self}-cases/`

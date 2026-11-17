@@ -1,9 +1,9 @@
 queue:
-  - id: 20261106-20261106-businessrule-datadictionary-api-tests
-    plan: docs/plans/20261106-businessrule-datadictionary-api-tests.md
+  - id: 20261106-businessrule-datadictionary-api-tests
+    plan: docs/features/_chores/plan-20261106-businessrule-datadictionary-api-tests.md
     priority: 10
     role: DEV
-  - id: 20261106-20261106-fix-public-endpoints-and-error-doc
-    plan: docs/plans/20261106-fix-public-endpoints-and-error-doc.md
+  - id: 20261106-fix-public-endpoints-and-error-doc
+    plan: docs/features/_chores/plan-20261106-fix-public-endpoints-and-error-doc.md
     priority: 10
     role: DEV

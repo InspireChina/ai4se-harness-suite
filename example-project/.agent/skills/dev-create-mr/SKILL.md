@@ -99,7 +99,7 @@ glab mr create --target-branch main --title "feat(appointment): 支持取消预�
 
 ## 关联
 
-- 需求：`docs/features/appointment.md`
+- 需求：`docs/features/iteration1/BKG-booking/spec.md`
 - 规则：R-CANCEL-003
 - 用例：TC-013
 

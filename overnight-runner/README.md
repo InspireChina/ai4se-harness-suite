@@ -79,8 +79,8 @@ Windows 用 `CREATE_NEW_PROCESS_GROUP` —— 全是标准库。
 OR=.overnight-runner/overnight-runner
 
 $OR init                                   # 初始化配置
-$OR add docs/plans/20261103-feature-a.md  # 追加 plan（相对项目根）
-$OR add docs/plans/xxx.md --role QA --priority 20
+$OR add docs/features/20261103-feature-a.md  # 追加 plan（相对项目根）
+$OR add docs/features/xxx.md --role QA --priority 20
 $OR list                                   # 看队列
 $OR status                                 # 看状态
 $OR queues                                 # 看所有队列
@@ -97,8 +97,8 @@ $OR decisions --json                       # 决策记录（JSON）
 所有子命令都支持全局参数 `--queue <名字>`（默认 `default`）：
 
 ```bash
-$OR --queue alice add docs/plans/alice-feature.md   # 排到 alice 队列
-$OR --queue bob   add docs/plans/bob-feature.md     # 排到 bob 队列
+$OR --queue alice add docs/features/alice-feature.md   # 排到 alice 队列
+$OR --queue bob   add docs/features/bob-feature.md     # 排到 bob 队列
 $OR queues                                         # 一屏看清有几条队列、各自什么状态
 $OR --queue alice run                              # 跑 alice 队列
 ```

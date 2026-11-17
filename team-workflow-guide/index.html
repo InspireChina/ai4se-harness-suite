@@ -552,7 +552,7 @@
           <td>一句话需求 / 访谈材料</td>
           <td>
             <ul>
-              <li><code>docs/features/iteration[n]/*.md</code></li>
+              <li><code>docs/features/iteration[n]/&lt;CODE&gt;-&lt;slug&gt;/spec.md</code></li>
               <li><code>docs/features/iteration[n]/prototypes/</code> 原型图</li>
               <li>编号 <code>R-xxx</code> / <code>AC-xxx</code></li>
             </ul>
@@ -631,7 +631,7 @@
           </td>
           <td>
             <ul>
-              <li><code>docs/plans/YYYYMMDD-*.md</code></li>
+              <li><code>docs/features/.../plan.md</code> 或 <code>_chores/plan-*.md</code></li>
               <li>业务代码 + 开发自测</li>
               <li>更新后的事实文档、MR / PR</li>
             </ul>
@@ -803,7 +803,7 @@
 
   <h3>2.3 可进入迭代中 DoR</h3>
   <ul class="check">
-    <li>本迭规格已确认（<code>docs/features/iteration[n]/*.md</code>，R / AC 齐）</li>
+    <li>本迭规格已确认（<code>docs/features/iteration[n]/&lt;CODE&gt;-&lt;slug&gt;/spec.md</code>，R / AC 齐）</li>
     <li>本迭原型图已输出（<code>docs/features/iteration[n]/prototypes/</code>）</li>
     <li>TRD 已人工确认</li>
     <li>本迭 TC 文本用例齐，且映射到 AC/R</li>
@@ -964,13 +964,13 @@
     <thead><tr><th>步骤</th><th>阶段</th><th>skill</th><th>产出</th></tr></thead>
     <tbody>
       <tr><td>拷问</td><td>§2</td><td><code>ba-grill-me</code></td><td>澄清纪要</td></tr>
-      <tr><td>写规格 + 原型</td><td>§2</td><td><code>ba-write-spec</code></td><td><code>docs/features/iteration[n]/*.md</code> + <code>prototypes/</code></td></tr>
+      <tr><td>写规格 + 原型</td><td>§2</td><td><code>ba-write-spec</code></td><td><code>docs/features/iteration[n]/&lt;CODE&gt;-&lt;slug&gt;/spec.md</code> + <code>prototypes/</code></td></tr>
       <tr><td>估算</td><td>§2</td><td><code>pm-estimate</code></td><td>点数与人日</td></tr>
       <tr><td>高阶技术方案</td><td>§2</td><td>自定义 / TRD</td><td>TRD（人工确认）</td></tr>
       <tr><td>QA 文本用例</td><td>§2 并行</td><td><code>qa-write-cases</code></td><td><code>docs/test-cases/e2e-cases/</code></td></tr>
       <tr><td>手动 / 冒烟</td><td>§3</td><td><code>qa-write-manual-plan</code></td><td><code>docs/test-cases/manual-cases/</code> · <code>smoking-cases/</code></td></tr>
       <tr><td>开发自测索引</td><td>§3</td><td><code>dev-build</code></td><td><code>docs/test-cases/dev-self-cases/</code>（可选）</td></tr>
-      <tr><td>写 Plan</td><td>§3</td><td><code>dev-plan</code></td><td><code>docs/plans/</code>（人工确认）</td></tr>
+      <tr><td>写 Plan</td><td>§3</td><td><code>dev-plan</code></td><td>feature <code>plan.md</code> / <code>_chores/</code>（人工确认）</td></tr>
       <tr><td>实现（含自测循环）</td><td>§3</td><td><code>dev-build</code></td><td>代码 + 自测通过</td></tr>
       <tr><td>评审 / 更新事实文档</td><td>§3</td><td><code>dev-code-review</code> / <code>ba-gen-facts</code></td><td>意见 + 事实文档</td></tr>
       <tr><td>开 MR</td><td>§3</td><td><code>dev-create-mr</code></td><td>MR / PR</td></tr>

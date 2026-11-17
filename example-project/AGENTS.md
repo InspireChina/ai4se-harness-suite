@@ -257,23 +257,21 @@ cd e2e && npm run test:dev # 只跑开发自测用例
 
 ```
 docs/
-├── features/               # 需求规格（过程文档）
-│   ├── _template.md        # 需求规格模板
-│   └── iteration1/         # 咨询师预约平台样例（骨架）
-│       ├── README.md       # 迭代索引
-│       ├── account.md
-│       ├── consultant-discovery.md
-│       ├── booking.md
-│       ├── consultant-onboarding.md
-│       ├── consultant-schedule.md
-│       ├── consultant-fulfillment.md
-│       ├── settlement.md
-│       ├── admin-ops.md
-│       ├── platform-capability.md
+├── features/               # 需求规格 + 技术方案（过程文档）
+│   ├── _template/          # spec.md + plan.md 模板
+│   ├── _chores/            # 无关联 feature 的横切 plan
+│   └── iteration1/         # 咨询师预约平台样例
+│       ├── README.md
+│       ├── ACC-account/spec.md
+│       ├── BKG-booking/spec.md
+│       ├── CDC-consultant-discovery/spec.md
+│       ├── COB-consultant-onboarding/spec.md
+│       ├── CSC-consultant-schedule/spec.md
+│       ├── CFL-consultant-fulfillment/spec.md
+│       ├── SET-settlement/spec.md
+│       ├── ADM-admin-ops/spec.md
+│       ├── PLT-platform-capability/spec.md
 │       └── prototypes/     # 独立 Vite 原型 demo（Element Plus，:5174）
-├── plans/                  # 技术方案（过程文档）
-│   ├── _template.md        # 技术方案模板
-│   └── 20260619-project-plan.md
 ├── facts/                  # 事实文档
 │   ├── api.yaml            # API 接口定义
 │   ├── db-schema.md        # 数据库规格
@@ -345,7 +343,7 @@ docs/
 
 每轮需求开发必须按以下顺序执行，严禁跳过或调换步骤：
 
-1. **Plan 等待确认**：在 `docs/plans/` 下根据模版创建 Plan，包含技术方案与任务拆分，等待人工确认后再继续。
+1. **Plan 等待确认**：在对应 feature 目录（`docs/features/<迭代>/<CODE>-<slug>/`）写 `plan.md`（或多份 `plan-{slug}.md`）；无关联 feature 的横切方案放 `docs/features/_chores/`。等待人工确认后再继续。
 2. **编写 QA 测试用例**：在 `docs/test-cases/e2e-cases/` 下编写本轮需求的 E2E 测试用例（文本格式，编号 `TC-xxx`），由 QA 主导判定。**先写文本用例，再写自动化**。
 3. **编写开发自测（API 测试）**：根据 Plan 在 `apps/backend/src/test/` 中编写 RestAssured 集成测试（API 级别），运行成功但断言失败（TDD 红牌阶段）。
 4. **编写实现**：编写单元测试 + 实现代码（后端 application/domain/adapter 层），通过 `mvn compile` 编译。

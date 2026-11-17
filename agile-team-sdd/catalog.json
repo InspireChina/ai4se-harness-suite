@@ -12,9 +12,9 @@
     {
       "name": "ba-write-spec",
       "description": "编写需求规格说明书（字段表、业务规则、权限、验收标准）",
-      "when": "需求已澄清，需要落成 docs/features/ 下的规格文档时",
+      "when": "需求已澄清，需要落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时",
       "produces": [
-        "docs/features/{模块}.md"
+        "docs/features/<迭代>/<CODE>-<slug>/spec.md"
       ],
       "dependsOn": [
         "ba-grill-me"
@@ -36,7 +36,7 @@
       "description": "在实现前写技术方案（Plan），等待人工确认",
       "when": "新功能、重构或任何非简单变更，动手写代码之前",
       "produces": [
-        "docs/plans/YYYYMMDD-{slug}.md"
+        "docs/features/<迭代>/<CODE>-<slug>/plan.md 或 docs/features/_chores/plan-{slug}.md"
       ],
       "dependsOn": []
     },

@@ -1,7 +1,7 @@
 # 需求规格说明书：<需求名称>
 
 > 文档类型：需求规格 / Feature Specification  
-> 适用目录：`docs/features/`  
+> 适用目录：`docs/features/<迭代>/<CODE>-<slug>/spec.md`  
 > 需求类型：NEW / UPDATE  
 > 版本：v0.1  
 > 作者：<BA/产品/负责人>  
