@@ -2,7 +2,8 @@
 
 > 状态：**v0.1**（字段、规则、验收与原型已完成）  
 > 日期：2026-11-16  
-> 原型：独立 Vite Demo（Element Plus），见 [`prototypes/`](./prototypes/)（端口 5174）
+> 原型：独立 Vite Demo（Element Plus），见 [`prototypes/`](./prototypes/)（端口 5174）  
+> **实现**：业务代码已清空为工程骨架；请按各 feature 的 plan 重新落地（见 `_chores/plan-20261117-purge-demo-impl-for-iteration1.md`）。
 
 ## 1. 产品概述
 

@@ -14,10 +14,7 @@ http.interceptors.request.use(cfg => {
 
 http.interceptors.response.use(
   r => r,
-  e => {
-    if (e.response?.status === 401) { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/login' }
-    return Promise.reject(e)
-  }
+  e => Promise.reject(e)
 )
 
 export default http

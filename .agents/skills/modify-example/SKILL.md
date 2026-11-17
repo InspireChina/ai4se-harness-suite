@@ -68,7 +68,7 @@ PATH_MODE=relative ./agile-team-sdd/install.sh example-project --force
 ./overnight-runner/scripts/install.sh example-project --force
 ```
 
-确认 `example-project/.agent/skills/` 无残留 `{{...}}`、路径与新约定一致。
+确认 `example-project/.agents/skills/` 无残留 `{{...}}`、路径与新约定一致。
 
 ### 6. 验证与自检
 

@@ -41,7 +41,7 @@ team-harness-suite/
 ```
 使用者 ──安装──▶ 目标项目 ──▶ opencode 加载 skill
                                   │
-                                  ├─ agile-team-sdd      → 目标项目/.agent/skills/
+                                  ├─ agile-team-sdd      → 目标项目/.agents/skills/
                                   ├─ harness-installer   → 目标项目/AGENTS.md + docs/
                                   ├─ tool-chain-installer→ 目标项目/.mcp.json + opencode.jsonc
                                   └─ overnight-runner    → 目标项目/.overnight-runner/
@@ -99,7 +99,7 @@ description: <一句话说明"做什么"+"什么时候用"，第三人称，前�
 ```
 agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-plan-template）
         ↓ install.sh
-<目标项目>/.agent/skills/dev-plan/SKILL.md           （frontmatter: name: dev-plan）
+<目标项目>/.agents/skills/dev-plan/SKILL.md           （frontmatter: name: dev-plan）
 ```
 
 **原因**：模板本身也要能被 opencode 扫描到，但不能和已安装的同名 skill 冲突。
@@ -222,7 +222,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | 先 `--dry-run` | 预览要做什么，再真跑 |
 | 原子写 | 配置文件用「临时文件 + rename」，避免读到写了一半的内容 |
 | 不写绝对路径到产物 | 安装到目标项目的文件里 **不能** 出现安装机的路径 |
-| 不碰目标项目的业务代码 | 只写自己约定的文件（`.agent/skills/`、`docs/`、配置文件…） |
+| 不碰目标项目的业务代码 | 只写自己约定的文件（`.agents/skills/`、`docs/`、配置文件…） |
 | 密钥不落盘 | 需要密钥的配置写 `{env:VAR}` 引用，真值由使用者注入 |
 
 ## 7. 错误处理
@@ -275,7 +275,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 模板 skills/<name>-template/SKILL.md
    │ install.sh（渲染占位符 + 去 -template 后缀 + 删 TEMPLATE-ONLY 块）
    ▼
-已安装 <目标项目>/.agent/skills/<name>/SKILL.md
+已安装 <目标项目>/.agents/skills/<name>/SKILL.md
    │ opencode 重启后加载
    ▼
 可被触发

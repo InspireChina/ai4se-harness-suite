@@ -101,7 +101,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 ```bash
 cd example-project
 cat AGENTS.md          # 一份填满的工程规范范本
-ls .agent/skills/      # 已安装的 16 个 SDD skills
+ls .agents/skills/      # 已安装的 16 个 SDD skills
 ```
 
 ### 装到自己的新项目
@@ -110,7 +110,7 @@ ls .agent/skills/      # 已安装的 16 个 SDD skills
 # 1. 铺 harness：生成 AGENTS.md + docs/ 骨架
 ./harness-installer/scripts/init-harness.sh ../my-project
 
-# 2. 装 SDD skills（渲染占位符 → 写进 .agent/skills/）
+# 2. 装 SDD skills（渲染占位符 → 写进 .agents/skills/）
 ./agile-team-sdd/install.sh ../my-project
 
 #    也可以只装某一组 / 某几个

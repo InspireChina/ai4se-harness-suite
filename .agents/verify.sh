@@ -138,7 +138,7 @@ listed = {s['name'] for g in catalog.values() for s in g}
 tpl_root = pathlib.Path('agile-team-sdd/skills')
 templates = {p.name.replace('-template', '') for p in tpl_root.iterdir() if p.is_dir()}
 
-installed_root = pathlib.Path('example-project/.agent/skills')
+installed_root = pathlib.Path('example-project/.agents/skills')
 installed = {p.name for p in installed_root.iterdir() if p.is_dir()} if installed_root.exists() else set()
 
 if listed != templates:
@@ -186,7 +186,7 @@ if [ -n "$PY" ]; then
   "$PY" - <<'PYEOF'
 import pathlib, re, sys
 
-root = pathlib.Path('example-project/.agent/skills')
+root = pathlib.Path('example-project/.agents/skills')
 bad = []
 files = sorted(root.rglob('*.md')) if root.exists() else []
 for f in files:

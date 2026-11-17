@@ -37,7 +37,7 @@ description: 初始化项目的工程 harness —— 生成/补齐 AGENTS.md（�
 1. **探测项目结构**：找后端（有 `pom.xml`/`build.gradle`）、前端（有 `package.json`）、E2E 目录
 2. **渲染 `AGENTS.md`**：把模板里的 `{{...}}` 占位符替换成探测结果，写入 `<项目>/AGENTS.md`
 3. **铺 `docs/` 骨架**：复制 `templates/docs/**` 到 `<项目>/docs/**`
-4. **确保 `opencode.jsonc`**：不存在则创建（注册 `.agent/skills` 路径）
+4. **确保 `opencode.jsonc`**：不存在则创建（注册 `.agents/skills` 路径）
 
 ## 生成后必须做的事
 

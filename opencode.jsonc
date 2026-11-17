@@ -8,7 +8,7 @@
       "harness-installer",
       "tool-chain-installer",
       "overnight-runner",
-      "example-project/.agent/skills"
+      "example-project/.agents/skills"
     ]
   }
 }

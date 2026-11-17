@@ -14,7 +14,7 @@
 | `{{PROJECT_NAME}}` | 项目名 | 根目录目录名 | `PROJECT_NAME` |
 | `{{HARNESS_ROOT}}` | harness 套件源码根目录（`pm-retro` 回写用） | 安装脚本所在套件的根 | `HARNESS_ROOT` |
 | `{{AGENTS_FILE}}` | 工程规范文件 | `AGENTS.md` | `AGENTS_FILE` |
-| `{{SKILLS_DIR}}` | skills 安装目录 | `.agent/skills` | `SKILLS_DIR` |
+| `{{SKILLS_DIR}}` | skills 安装目录 | `.agents/skills` | `SKILLS_DIR` |
 | `{{MCP_CONFIG_FILE}}` | MCP 配置文件 | `.mcp.json` | `MCP_CONFIG_FILE` |
 | `{{BACKEND_DIR}}` | 后端模块目录 | `apps/backend` | `BACKEND_DIR` |
 | `{{FRONTEND_DIR}}` | 前端模块目录 | `apps/frontend` | `FRONTEND_DIR` |

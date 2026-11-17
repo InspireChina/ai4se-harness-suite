@@ -95,7 +95,7 @@ PATH_MODE=relative ./agile-team-sdd/install.sh example-project --force
 
 - 改完模板不 `--force` 重装 example，样例 skills 继续说旧路径
 - 把 example 当安装器的输出随便 `--force` 冲掉手写 AGENTS，却不在 Plan 里声明
-- 只改 `example-project/.agent/skills/` 已安装副本，不改 `*-template`（下次安装会盖回去）
+- 只改 `example-project/.agents/skills/` 已安装副本，不改 `*-template`（下次安装会盖回去）
 - 跨模块直接 import 代码
 
 ## 相关

@@ -108,8 +108,8 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 脚本会做五件事：
 
 1. 把 `skills/<name>-template/**` 渲染（替换 `{{...}}` 占位符、删除 TEMPLATE-ONLY 标记块、把 `name` 去掉 `-template` 后缀）
-2. 整个模板目录写入 `<目标项目>/.agent/skills/<name>/`（附属文件如 `baseline.md` 一并渲染）
-3. 在目标项目的 `opencode.jsonc` 里注册 `skills.paths = [".agent/skills"]`（已存在则不覆盖）
+2. 整个模板目录写入 `<目标项目>/.agents/skills/<name>/`（附属文件如 `baseline.md` 一并渲染）
+3. 在目标项目的 `opencode.jsonc` 里注册 `skills.paths = [".agents/skills"]`（已存在则不覆盖）
 4. 检查是否还有未替换的占位符并报警
 5. 输出安装/跳过清单
 
@@ -117,8 +117,8 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 
 安装后确认：
 
-- 目标项目 `.agent/skills/` 下每个 `SKILL.md` 里 **不再有** `{{...}}`
-- 目标项目 `opencode.jsonc` 的 `skills.paths` 指向 `.agent/skills`
+- 目标项目 `.agents/skills/` 下每个 `SKILL.md` 里 **不再有** `{{...}}`
+- 目标项目 `opencode.jsonc` 的 `skills.paths` 指向 `.agents/skills`
 - 提示用户 **重启 opencode** 后 skill 才会生效
 
 ## 路径约定
@@ -128,7 +128,7 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 ```
 <项目根>/
 ├── AGENTS.md            ← {{AGENTS_FILE}}
-├── .agent/skills/       ← {{SKILLS_DIR}}
+├── .agents/skills/       ← {{SKILLS_DIR}}
 ├── .mcp.json            ← {{MCP_CONFIG_FILE}}
 ├── apps/
 │   ├── backend/         ← {{BACKEND_DIR}}

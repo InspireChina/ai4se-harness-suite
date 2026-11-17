@@ -116,45 +116,22 @@ DTO 约定：
 
 ## 8. 领域设计：聚合与规则
 
-当前定义的聚合：
+> **现状（空壳）**：旧示例聚合已清除。目标模型以 `docs/features/iteration1/` 为准，按 feature plan 重建后回写本节与 `docs/facts/domain-model.md`。
 
-- `User`：用户（email + password + role + status）
-- `Consultant`：咨询师（name + title + specialties + status）
-- `Appointment`：预约（user + consultant + date + time + status）
-- `Branch`：网点（name + address + phone + status）
+业务规则引擎（`domain/businessrule/`）— **框架保留、规则未注册**：
 
-业务规则引擎（`domain/businessrule/`）：
+- `IBusinessRule` 接口：`getRuleName()` / `getDescription()`
+- `BusinessRuleConfig` + `BusinessRuleProvider`；注册入口 `BusinessRuleRegistration`（当前为空）
+- 规则 YAML 目录：`resources/business-rules/`（可按 feature 新增）
 
-- `IBusinessRule` 接口：getCode() / getDescription() / getCategory()
-- 规则以枚举实现 `IBusinessRule`（`AppointmentRule`、`AuthRule`）
-- 规则配置 YAML 文件位于 `resources/business-rules/`
-- `BusinessRuleController` 提供 GET 查询接口
+数据字典（`domain/datadictionary/`）— **框架保留、类型未注册**：
 
-数据字典（`domain/datadictionary/`）：
-
-- `Description` 接口：枚举实现，提供 getCode() / getDescription()
-- 5 个注册字典类型：USER_ROLE / USER_STATUS / APPOINTMENT_STATUS / CONSULTANT_STATUS / BRANCH_STATUS
-- `DemoDataDictionaryType` 完成注册
-- `DataDictionaryController` 提供 GET 查询接口
+- `Description` / `DataDictionaryType` / `DataDictionaryUtil`
+- 实现 feature 时新增枚举并回写 `docs/facts/tech-topic/data-dict.md`
 
 ## 9. 预约状态机
 
-```
-                        ┌──────────┐
-                  ┌────►│ CANCELLED │◄────┐
-                  │     └──────────┘     │
-  ┌─────────┐     │     ┌──────────┐     │
-  │ PENDING │─────┼────►│CONFIRMED │────►│ COMPLETED
-  └─────────┘     │     └──────────┘     │
-                  │                      │
-                  └──────────────────────┘
-```
-
-- PENDING：初始状态
-- CONFIRMED：管理员确认
-- COMPLETED：完成（终态）
-- CANCELLED：从任意非终态取消
-- 状态变更由 domain 层 `Appointment.canCancel()` 等守卫方法控制
+> 旧示例状态机已清除。以 `docs/features/iteration1/BKG-booking`（及相关）spec §9 为准，实现后回写 `docs/facts/tech-topic/state-machine.md`。
 
 ## 10. 测试规范
 

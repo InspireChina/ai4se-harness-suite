@@ -25,7 +25,7 @@ description: 在 example-project 上下文中开发或改约定；结束时若�
 | 可以改 | 默认不要改（除非用户确认更新 harness） |
 |---|---|
 | `example-project/**` | `agile-team-sdd/`、`harness-installer/`、`tool-chain-installer/`、`overnight-runner/`（套件源） |
-| 样例内 `.agent/skills/`（仅作本地验证时可改，须知重装会覆盖） | 根 `AGENTS.md` 里套件级约定（可提建议，不擅自改） |
+| 样例内 `.agents/skills/`（仅作本地验证时可改，须知重装会覆盖） | 根 `AGENTS.md` 里套件级约定（可提建议，不擅自改） |
 
 本仓库自身的 Plan 仍写在 `.agents/plan/`（若改动触及 harness 仓库规范）。  
 example 业务 Plan 写在 `example-project/docs/features/.../plan.md` 或 `_chores/`。
@@ -36,7 +36,7 @@ example 业务 Plan 写在 `example-project/docs/features/.../plan.md` 或 `_cho
 
 - 路径、命令、自测都以 `example-project/` 为根（如 `apps/backend`、`docs/features/`、`.overnight-runner/`）
 - 读 `example-project/AGENTS.md` 与相关 docs，按其规范执行
-- 需要安装态 skill 时，以 `example-project/.agent/skills/` 为准
+- 需要安装态 skill 时，以 `example-project/.agents/skills/` 为准
 
 ### 2. 执行用户任务
 
@@ -54,7 +54,7 @@ example 业务 Plan 写在 `example-project/docs/features/.../plan.md` 或 `_cho
 | 文档骨架变了 | `docs/` 下新目录、facts/business、`_chores` 语义 |
 | 流程/检查清单变了 | `example-project/AGENTS.md` 与模板 `AGENTS.md.template` 明显不一致 |
 | 安装默认值会错 | 新默认路径、端口、测试命令，现有 `placeholders.md` / `install.sh` 对不上 |
-| skill 行为以样例为准改过 | 只改了 `.agent/skills/` 已安装副本，模板仍是旧的 |
+| skill 行为以样例为准改过 | 只改了 `.agents/skills/` 已安装副本，模板仍是旧的 |
 
 **未命中**：正常收尾（验证、文档同步、提交说明），不必提 harness。
 

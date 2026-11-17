@@ -3,8 +3,6 @@ server:
 spring:
   application:
     name: consultation-backend
-  config:
-    import: "classpath:/business-rules/appointment.yml,classpath:/business-rules/auth.yml"
   datasource:
     url: jdbc:mysql://localhost:3306/consultation?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
@@ -26,3 +24,6 @@ mybatis-plus:
 jwt:
   secret: <your-jwt-secret>
   expiration: 86400000
+business-rules:
+  public-endpoints:
+    - /api/v1/health

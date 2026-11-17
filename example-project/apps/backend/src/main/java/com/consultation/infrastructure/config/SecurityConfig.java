@@ -4,7 +4,6 @@ import com.consultation.infrastructure.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,13 +24,7 @@ public class SecurityConfig {
         http.csrf(c -> c.disable())
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(a -> a
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/home/**").permitAll()
-                .requestMatchers("/api/v1/data-dictionaries/**").permitAll()
-                .requestMatchers("/api/v1/business-rules/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/consultants", "/api/v1/consultants/*/slots").permitAll()
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/v1/health").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

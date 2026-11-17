@@ -45,3 +45,5 @@ venv/
 .env
 .env.local
 **/src/main/resources/application.yml
+
+.tmp

@@ -83,13 +83,13 @@ PATH_MODE=relative ./agile-team-sdd/install.sh ../my-project
 安装后目标项目会得到：
 
 ```
-<目标项目>/.agent/skills/<name>/SKILL.md
+<目标项目>/.agents/skills/<name>/SKILL.md
 ```
 
 以及 `opencode.jsonc` 中新增的：
 
 ```json
-{ "skills": { "paths": [".agent/skills"] } }
+{ "skills": { "paths": [".agents/skills"] } }
 ```
 
 ## 目录约定
