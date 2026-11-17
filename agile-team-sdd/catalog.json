@@ -34,7 +34,7 @@
   "dev": [
     {
       "name": "dev-plan",
-      "description": "在实现前写技术方案（Plan），等待人工确认",
+      "description": "在实现前写技术方案（Plan，含粗实施步骤），等待人工确认",
       "when": "新功能、重构或任何非简单变更，动手写代码之前",
       "produces": [
         "docs/features/<迭代>/<CODE>-<slug>/plan.md 或 docs/features/_chores/plan-{slug}.md"
@@ -52,10 +52,11 @@
     },
     {
       "name": "dev-build",
-      "description": "按四层 DDD 约定实现功能",
+      "description": "按四层 DDD 约定实现功能，并维护 plan 同目录的细化进度文件",
       "when": "Plan 已确认，进入实现阶段",
       "produces": [
-        "代码变更"
+        "代码变更",
+        "docs/features/<迭代>/<CODE>-<slug>/{planStem}-progress.md"
       ],
       "dependsOn": [
         "dev-plan"

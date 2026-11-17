@@ -37,7 +37,7 @@ agile-team-sdd/
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
-| | `dev-build` | 按四层 DDD 约定实现 |
+| | `dev-build` | 按四层 DDD 约定实现，并维护细化进度文件 |
 | | `dev-self-test` | 运行并修复开发自测 |
 | | `dev-code-review` | 按项目规范做代码评审 |
 | | `dev-ui-review` | 用 chrome-devtools-mcp 做界面评审 |

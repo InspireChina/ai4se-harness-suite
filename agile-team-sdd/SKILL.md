@@ -24,8 +24,8 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 
 | Skill | 作用 | 触发时机 |
 |---|---|---|
-| `dev-plan` | 在 feature 目录写 `plan.md` 再动手 | 新功能 / 重构 / 非简单变更 |
-| `dev-build` | 按四层 DDD 约定实现功能 | Plan 已确认，进入实现 |
+| `dev-plan` | 在 feature 目录写 `plan.md`（含粗实施步骤）再动手 | 新功能 / 重构 / 非简单变更 |
+| `dev-build` | 按四层 DDD 约定实现，并维护细化 `*-progress.md` | Plan 已确认，进入实现 |
 | `dev-self-test` | 运行并修复开发自测 | 实现完成、交给 QA 之前 |
 | `dev-code-review` | 按项目规范做代码评审 | 提交前自查，或评审别人的 MR |
 | `dev-ui-review` | 用 chrome-devtools-mcp 做界面评审 | 前端需要实机检查 |

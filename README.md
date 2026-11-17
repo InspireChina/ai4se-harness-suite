@@ -29,7 +29,7 @@
 | **SDD 技能套件** | [`agile-team-sdd/`](agile-team-sdd/) | 团队统一的开发流程 skill，17 个覆盖 BA→TL→PM→开发→QA→发布→复盘全流程。模板带占位符，可安装到任意项目 | skill + 安装脚本 |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/) | 为任意项目铺好工程底座：`AGENTS.md`（架构与工程规范）+ `docs/` 文档骨架 + `opencode.jsonc` | skill + 模板 + 脚本 |
 | **工具链安装器** | [`tool-chain-installer/`](tool-chain-installer/) | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态 | skill + 工具清单 + 脚本 |
-| **团队工作流指南** | [`team-workflow-guide/index.html`](team-workflow-guide/index.html) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门 | 文档 |
+| **团队工作流指南** | [`https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/`](team-workflow-guide/index.html) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门 | 文档 |
 | **持续运行面板** | [`overnight-runner/`](overnight-runner/) | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，**多队列**各自独立，决策全程留痕（白天弹窗问你、夜里自动决策） | skill + Python 实现 |
 | **参考实现** | [`example-project/`](example-project/) | 一份完整、可跑、已填满规范的全栈参考项目（Vue 3 + Spring Boot + DDD 四层），用来对照与教学 | 示例项目 |
 
@@ -61,7 +61,7 @@
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
-| | `dev-build` | 按四层 DDD 约定实现 |
+| | `dev-build` | 按四层 DDD 约定实现，并维护细化进度文件 |
 | | `dev-self-test` | 运行并修复开发自测 |
 | | `dev-code-review` | 按项目规范做代码评审 |
 | | `dev-ui-review` | 用 chrome-devtools-mcp 做界面评审 |

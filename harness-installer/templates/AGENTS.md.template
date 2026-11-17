@@ -177,7 +177,8 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 │   └── <迭代>/<CODE>-<slug>/
 │       ├── spec.md
 │       ├── glossary.md     # 本 feature 双语术语表
-│       └── plan.md
+│       ├── plan.md         # 含粗实施步骤
+│       └── plan-progress.md  # dev-build 细化进度
 ├── facts/                  # 事实文档
 │   ├── api.yaml
 │   ├── db-schema.md
