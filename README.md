@@ -67,11 +67,11 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | **TL** | `tl-arch-plan` | 项目准备写/更新 `docs/architecture/`（C4、ADR 一句话表、与业务侧） |
 | | `tl-arch-sync-back` | 技术侧对齐：ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
-| **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
-| | `dev-build` | 全栈编排：实现 + 自测 / UI 评审 / 代码评审 |
-| | `dev-self-test` | 开发自测（由 build 编排，可单跑） |
+| **Dev** | `dev-plan` | 写技术方案（含 DST 自测 + 界面对照基线），等待确认 |
+| | `dev-build` | 全栈编排：实现 + 自测/UI 落盘修到绿 + 代码评审 |
+| | `dev-self-test` | 真实本地环境按 DST 自测并落盘 |
 | | `dev-code-review` | 代码评审（由 build 编排，可单跑） |
-| | `dev-ui-review` | chrome-devtools-mcp 界面评审（由 build 编排） |
+| | `dev-ui-review` | 原型对照字段/控件与截图并落盘 |
 | | `dev-release-plan` | 整理迭代上线准备清单 |
 | | `dev-create-mr` | 创建 Merge Request / Pull Request |
 | **QA** | `qa-write-cases` | 编写 QA 用例（`TC-xxx` 文本 + 自动化） |
@@ -116,7 +116,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 | 核心领域模型 | architecture 只维护核心聚合 + 关键字段；全量 as-built 在 facts | [core-domain-model](example-project/docs/architecture/business/core-domain-model.md) · [facts domain-model](example-project/docs/facts/domain-model.md) |
 | 代码打样 | 迭代内用独立 Vite 原型先把交互与页面打通，规格与验收对齐后再进实现 | [iteration1 原型](example-project/docs/features/iteration1/prototypes/README.md) |
 | 事实文档 | 实现后校准 `docs/facts/`（API、库表、全量领域、实现专题） | [`ba-gen-facts`](agile-team-sdd/skills/ba-gen-facts-template/SKILL.md) · [facts](example-project/docs/facts/README.md) |
-| 全栈端到端 Loop 开发 | Plan 确认后由 `dev-build` 编排实现 → 自测 → UI 评审 → 代码评审，失败修 bug 回环直至可合并 | [`dev-build`](agile-team-sdd/skills/dev-build-template/SKILL.md) · [流程指南](team-workflow-guide/index.html) |
+| 全栈端到端 Loop 开发 | Plan（含 DST）确认后 `dev-build`：实现 → 真实环境自测落盘 → 原型 UI 对照落盘 → 代码评审，以记录修到绿 | [`dev-build`](agile-team-sdd/skills/dev-build-template/SKILL.md) · [流程指南](team-workflow-guide/index.html) |
 | 团队上下文共享 | BA / DEV / QA 等角色的产出物（规格、Plan、用例、事实文档、架构）都进代码仓库，换人 clone 即可接上 | [`example-project/docs/`](example-project/docs/README.md) · [Agent as Code](harness-installer/) |
 | Mono repo | 统一仓库承载前后端、文档与 harness；客观条件限制时可用 submodule 拼出等价布局 | [`example-project/`](example-project/)（containers + docs + skills 同仓） |
 

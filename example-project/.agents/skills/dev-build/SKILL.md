@@ -1,6 +1,6 @@
 ---
 name: dev-build
-description: 全栈实现编排：按 Plan 写前后端、维护细化进度，并依次调用自测、界面评审、代码评审；失败则修 bug 回环。当 Plan 已确认、进入实现时使用。
+description: 全栈实现编排：按 Plan 写前后端、维护 progress，并依次调用自测与 UI 评审（落盘记录）及代码评审；以记录为准修到通过。当 Plan 已确认、进入实现时使用。
 ---
 
 # 开发：构建实现（全栈编排）
@@ -10,46 +10,45 @@ description: 全栈实现编排：按 Plan 写前后端、维护细化进度，�
 按 `AGENTS.md` 架构约定实现，并 **依次执行** 下列依赖 skill（读其已安装正文并照做，不要跳步）：
 
 ```
-① 实现（本 skill）→ ② dev-self-test → ③ dev-ui-review（有 UI 时）→ ④ dev-code-review
-         ↑____________ 失败 / 评审问题：修 bug 后从对应步骤重跑 _____________↓
+① 实现 → ② dev-self-test → ③ dev-ui-review（有 UI 时）→ ④ dev-code-review
+    ↑_____ 失败：以 *-self-test.md / *-ui-review.md 为准修 bug 后从对应步重跑 _____↓
 ```
 
-| 阶段 | 调用 | 目的 |
-|---|---|---|
-| 实现 | 本 skill | 前后端按 Plan + progress 落地 |
-| 自测 | `dev-self-test` | 单元/集成/构建/E2E 自测；失败则改实现再测 |
-| 界面 | `dev-ui-review` | chrome-devtools-mcp 实机看结构/视觉/交互/控制台/网络 |
-| 评审 | `dev-code-review` | 对照 `AGENTS` / standards / facts 自查 diff |
-| 调试（按需） | `dev-debug` | 自测或 UI 卡住时用 chrome-mcp 查根因，再回到自测/实现 |
+| 阶段 | 调用 | 目的 | 通过判据 |
+|---|---|---|---|
+| 实现 | 本 skill | 前后端按 Plan + progress 落地 | progress 实现项勾完 |
+| 自测 | `dev-self-test` | **真实本地环境** + 按 DST 执行并落盘 | `{planStem}-self-test.md` 状态=通过 |
+| 界面 | `dev-ui-review` | 原型对照、字段/控件与截图、落盘 | `{planStem}-ui-review.md` 状态=通过（或无 UI 已注明跳过） |
+| 评审 | `dev-code-review` | 对照 AGENTS / standards / facts | 评审结论通过 |
+| 调试（按需） | `dev-debug` | 自测或 UI 卡住时查根因 | 回到自测/UI |
 
-**硬性**：未跑通自测不得宣称 build 完成；有前端改动时不得跳过 `dev-ui-review`；`dev-code-review` 通过前不得进入 `dev-create-mr`。
+**硬性**：
+
+- 未写出并通过 `*-self-test.md` 不得宣称 build 完成
+- 有前端改动时不得跳过 `dev-ui-review`；须有 `*-ui-review.md` 通过（或合法跳过说明）
+- **口头「应该过了」无效**，以记录文件为准
+- `dev-code-review` 通过前不得进入 `dev-create-mr`
 
 ## 进度文件（硬性）
 
-与正在执行的 plan **同目录**，文件名 = plan 去 `.md` + `-progress.md`：
-
-| plan | progress |
-|---|---|
-| `plan.md` | `plan-progress.md` |
-| `plan-{slug}.md` | `plan-{slug}-progress.md` |
+与正在执行的 plan **同目录**，文件名 = plan 去 `.md` + `-progress.md`。
 
 ### 开工前
 
-1. 读 plan 的 **「实施步骤（粗）」**（约 5～10 条）
-2. 对照修改清单、验证步骤、事实/design 更新，把粗步骤 **细化** 为可勾选细项
-3. 在 checklist **末尾追加编排阶段**（若尚无）：
+1. 读 plan 的 **「实施步骤（粗）」** 与 **DST / 界面对照基线**
+2. 细化 checklist；末尾追加编排阶段：
 
 ```markdown
 ### 编排
 - [ ] 实现（前后端）
-- [ ] dev-self-test
-- [ ] dev-ui-review（无 UI 改动可注明跳过）
+- [ ] dev-self-test → 产物 `{planStem}-self-test.md` 通过
+- [ ] dev-ui-review → 产物 `{planStem}-ui-review.md` 通过（无 UI 注明跳过）
 - [ ] dev-code-review
 ```
 
-4. 创建或重置对应 `*-progress.md`（总状态：进行中）
+3. 创建或重置 `*-progress.md`（总状态：进行中）
 
-**不要**把细项回写进 plan（plan 定稿不改）。
+**不要**把细项回写进 plan。
 
 ### 格式
 
@@ -68,8 +67,8 @@ description: 全栈实现编排：按 Plan 写前后端、维护细化进度，�
 
 ### 编排
 - [ ] 实现（前后端）
-- [ ] dev-self-test
-- [ ] dev-ui-review
+- [ ] dev-self-test（./plan-self-test.md）
+- [ ] dev-ui-review（./plan-ui-review.md）
 - [ ] dev-code-review
 
 ## 备注
@@ -79,17 +78,16 @@ description: 全栈实现编排：按 Plan 写前后端、维护细化进度，�
 
 ### 执行中
 
-- 每完成一个细项或编排阶段：**立刻**勾选并刷新「更新」时间
-- 当前项可标 `← 进行中`；受阻写备注并改总状态
-- 全部完成后（含编排四步）：总状态「已完成」
+- 每完成细项或编排阶段：立刻勾选并刷新「更新」时间
+- 全部完成后（含编排）：总状态「已完成」
 
 ## ① 实现
 
 ### 后端
 
-- `containers/backend/adapter/rest/` — Controller：仅做协议转换，不含业务逻辑
-- `containers/backend/application/service/` — AppService：用例编排，`@Transactional`
-- `containers/backend/domain/` — 聚合、值对象、领域服务：业务不变量
+- `containers/backend/adapter/rest/` — Controller：仅协议转换
+- `containers/backend/application/service/` — AppService：`@Transactional`
+- `containers/backend/domain/` — 聚合、值对象、领域服务
 - `containers/backend/infrastructure/` — 持久化、安全、配置
 
 层依赖：adapter → application → domain ← infrastructure
@@ -97,58 +95,45 @@ description: 全栈实现编排：按 Plan 写前后端、维护细化进度，�
 ### 前端
 
 - Vue 3 Composition API + `<script setup>`
-- Pinia store 管理认证状态，位于 `containers/frontend/src/stores/auth.ts`
-- 视图位于 `containers/frontend/src/views/user/` 或 `containers/frontend/src/views/admin/`
-- Axios 拦截器处理 JWT 和 401 跳转
+- 按项目约定放置 views / stores；JWT 与 401 处理齐全
 
-实现细项勾完后，进入 ②。
+实现细项勾完后进入 ②。
 
 ## ② 自测 — 调用 `dev-self-test`
 
-完整按已安装的 `dev-self-test` skill 执行（由快到慢：后端单测 → 集成 → 前端构建/单测 → E2E 自测）。
+完整按已安装的 `dev-self-test` 执行：
 
-- 失败：按该 skill 的失败分类改 **实现**（或测试隔离），**禁止**改断言迁就实现、删用例、改 QA 用例
-- 环境/浏览器深层问题：可切 `dev-debug`（chrome-devtools-mcp），修好后回到 `dev-self-test`
-- 自测绿：勾选 progress「dev-self-test」，进入 ③
-
-快速命令（细节以 `dev-self-test` 为准）：
-
-```bash
-cd containers/backend && mvn test
-cd containers/frontend && npm run build
-```
+- **先起真实本地环境**，再按 plan DST 跑；写出 `{planStem}-self-test.md`
+- 失败：改实现或环境 → 重跑 → 更新记录；禁止改断言迁就、删用例、改 QA 用例
+- 深层问题可切 `dev-debug`，再回到自测
+- 记录状态=通过后，勾选 progress「dev-self-test」，进入 ③
 
 ## ③ 界面评审 — 调用 `dev-ui-review`（有 UI 时）
 
-本次若改了前端页面 / 交互：完整按 `dev-ui-review`（chrome-devtools-mcp：结构 → 视觉 → 控制台/网络 → 交互）。
-
-- 无 UI 改动：在 progress 注明跳过原因并勾选
-- 发现问题：修代码 → ② 自测 → 再 ③
-- 通过：勾选「dev-ui-review」
+- 启动原型（若有）+ 实现环境；按界面对照基线做字段/控件与截图对比；写出 `{planStem}-ui-review.md`
+- 无 UI：progress 注明跳过原因并勾选
+- 失败：修前端 →（必要时 ②）→ 再 ③，直到记录通过
+- 通过后勾选「dev-ui-review」
 
 ## ④ 代码评审 — 调用 `dev-code-review`
-
-完整按 `dev-code-review`（先读 `AGENTS.md` / `docs/standards` / `docs/facts`，再看 diff）。
 
 - 有必须修的问题：改代码 → ②（必要时 ③）→ 再 ④
 - 通过：勾选「dev-code-review」
 
 ## 文档同步
 
-编排通过后检查是否需要更新：
+编排通过后检查：
 
-- `docs/facts/api.yaml` — API 变更
-- `docs/facts/db-schema.md` — 数据库变更
-- `docs/facts/tech-topic/businessrule.md` — 业务规则变更
-- `docs/facts/tech-topic/data-dict.md` — 数据字典变更
+- `docs/facts/api.yaml`、`db-schema.md`
+- `docs/facts/tech-topic/businessrule.md`、`data-dict.md`
+- 可选：`docs/test-cases/dev-self-cases/` 索引
 
-事实校准可用 `ba-gen-facts`（不阻塞 build 闭环，但合并前应处理）。
+可用 `ba-gen-facts`（不阻塞 build 闭环，合并前应处理）。
 
 ## 自检清单
 
-- [ ] progress 已写，粗步骤已细化，编排四步已勾选（或注明合法跳过）
-- [ ] `dev-self-test` 已按 skill 跑通
-- [ ] 有 UI 时 `dev-ui-review` 已按 skill 跑通；否则已注明跳过
-- [ ] `dev-code-review` 已按 skill 自查通过
-- [ ] 代码符合四层依赖；未在 adapter 写业务逻辑
-- [ ] 需要的事实文档已同步或已列入后续任务
+- [ ] progress 已写，编排项已勾选（或合法跳过）
+- [ ] `{planStem}-self-test.md` 存在且状态=通过
+- [ ] 有 UI 时 `{planStem}-ui-review.md` 存在且状态=通过；否则已注明跳过
+- [ ] `dev-code-review` 自查通过
+- [ ] 代码符合四层依赖；事实文档已同步或已列入后续

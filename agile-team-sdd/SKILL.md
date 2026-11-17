@@ -25,11 +25,11 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
 
 | Skill | 作用 | 触发时机 |
 |---|---|---|
-| `dev-plan` | 在 feature 目录写 `plan.md`（含粗实施步骤）再动手 | 新功能 / 重构 / 非简单变更 |
-| `dev-build` | 全栈编排：实现 + 依次调用自测 / UI 评审 / 代码评审 | Plan 已确认，进入实现 |
-| `dev-self-test` | 运行并修复开发自测（build 编排调用，也可单跑） | 实现后 / build 编排中 |
+| `dev-plan` | 写 `plan.md`（粗步骤 + **DST 自测用例** + 有 UI 时界面对照基线） | 新功能 / 重构 / 非简单变更 |
+| `dev-build` | 全栈编排：实现 → 自测/UI（**落盘记录修到绿**）→ 代码评审 | Plan 已确认，进入实现 |
+| `dev-self-test` | **真实本地环境** + 按 DST 执行并写 `*-self-test.md` | 实现后 / build 编排中 |
 | `dev-code-review` | 按项目规范做代码评审（build 编排调用，也可单跑） | build 编排中 / 审他人 MR |
-| `dev-ui-review` | chrome-devtools-mcp 界面评审（build 编排调用） | 有 UI 改动时 / build 编排中 |
+| `dev-ui-review` | 原型对照字段/控件与截图，写 `*-ui-review.md` | 有 UI 改动时 / build 编排中 |
 | `dev-release-plan` | 整理当前迭代上线准备清单 | 迭代收尾，准备发版 |
 | `dev-create-mr` | 创建 Merge Request / Pull Request | 自测通过，准备提交评审 |
 

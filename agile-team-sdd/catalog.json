@@ -44,7 +44,7 @@
   "dev": [
     {
       "name": "dev-plan",
-      "description": "在实现前写技术方案（Plan，含粗实施步骤），等待人工确认",
+      "description": "在实现前写技术方案（Plan，含粗实施步骤与 DST 自测用例、有 UI 时界面对照基线），等待人工确认",
       "when": "新功能、重构或任何非简单变更，动手写代码之前",
       "produces": [
         "docs/features/<迭代>/<CODE>-<slug>/plan.md 或 docs/features/_chores/plan-{slug}.md"
@@ -62,12 +62,14 @@
     },
     {
       "name": "dev-build",
-      "description": "全栈实现编排：写前后端、维护 progress，并依次调用自测、界面评审、代码评审",
+      "description": "全栈实现编排：写前后端、维护 progress，按记录文件闭环自测与 UI 评审直至通过，再代码评审",
       "when": "Plan 已确认，进入实现阶段",
       "produces": [
         "代码变更",
         "docs/features/<迭代>/<CODE>-<slug>/{planStem}-progress.md",
-        "自测通过 + 评审自查通过"
+        "{planStem}-self-test.md",
+        "{planStem}-ui-review.md（有 UI 时）",
+        "自测/UI/评审通过"
       ],
       "dependsOn": [
         "dev-plan"
@@ -75,10 +77,10 @@
     },
     {
       "name": "dev-self-test",
-      "description": "运行并修复开发自测（单元/集成/E2E 自测）；通常由 dev-build 编排调用",
+      "description": "启动真实本地环境，按 Plan 的 DST 执行自测并落盘；通常由 dev-build 编排调用",
       "when": "实现完成后、交给 QA 之前，需要自证代码按 Plan 工作；或在 build 编排中执行",
       "produces": [
-        "测试报告"
+        "docs/features/<迭代>/<CODE>-<slug>/{planStem}-self-test.md"
       ],
       "dependsOn": []
     },
@@ -93,10 +95,11 @@
     },
     {
       "name": "dev-ui-review",
-      "description": "用 chrome-devtools-mcp 做界面与交互评审；通常由 dev-build 编排调用",
-      "when": "前端界面需要实机检查视觉、响应式、报错时；或在 build 编排中执行",
+      "description": "启动原型与实现环境，按界面对照基线做字段/控件与截图对比并落盘；通常由 dev-build 编排调用",
+      "when": "有前端改动需对照原型/规格实机检查时；或在 build 编排中执行",
       "produces": [
-        "评审意见 + 截图证据"
+        "docs/features/<迭代>/<CODE>-<slug>/{planStem}-ui-review.md",
+        "ui-review-artifacts/ 截图路径"
       ],
       "dependsOn": []
     },

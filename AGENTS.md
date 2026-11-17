@@ -259,7 +259,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
   → ┬─ tl-high-level-design（迭代 high-level-design.md，人工确认 ← Plan 前强制闸门）
     └─ qa-write-cases（QA 文本用例，与 HLD 并行；规格确认后即可开始）
   → HLD 确认后 → dev-plan（技术方案 feature/plan.md 或 _chores/，人工确认 ← 编码前强制闸门）
-  → Plan 确认后 → dev-build（全栈编排：实现 → self-test → ui-review → code-review；失败修 bug 回环）
+  → Plan 确认后 → dev-build（实现 → self-test 真实环境+DST 落盘 → ui-review 原型对照落盘 → code-review；以记录为准修到绿）
   → ba-gen-facts（事实文档 docs/facts/ 同步）
   → tl-arch-sync-back / ba-arch-sync-back（architecture ↔ 实现/规格漂移时）
   → dev-create-mr
