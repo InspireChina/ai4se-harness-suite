@@ -145,6 +145,7 @@ PAIRS=(
   "TEST_CMD_FRONTEND=$TEST_CMD_FRONTEND"
   "SPEC_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/spec.md")"
   "PLAN_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/plan.md")"
+  "GLOSSARY_FILE=$(proj_path "$FEATURES_DIR/glossary.md")"
   "DOMAIN_MODEL_DOC=$(proj_path "$FACTS_DIR/domain-model.md")"
   "API_SPEC=$(proj_path "$FACTS_DIR/api.yaml")"
   "DB_SCHEMA_DOC=$(proj_path "$FACTS_DIR/db-schema.md")"

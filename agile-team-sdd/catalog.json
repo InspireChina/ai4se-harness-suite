@@ -11,11 +11,11 @@
     },
     {
       "name": "ba-write-spec",
-      "description": "编写需求规格说明书（字段表、业务规则、权限、验收标准、双语术语表）",
+      "description": "编写需求规格说明书（字段表、业务规则、权限、验收标准），并维护项目级双语术语表",
       "when": "需求已澄清，需要落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时",
       "produces": [
         "docs/features/<迭代>/<CODE>-<slug>/spec.md",
-        "docs/features/<迭代>/<CODE>-<slug>/glossary.md"
+        "docs/features/glossary.md"
       ],
       "dependsOn": [
         "ba-grill-me"

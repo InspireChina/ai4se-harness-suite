@@ -1,6 +1,6 @@
 ---
 name: ba-write-spec-template
-description: 编写需求规格说明书（字段表、业务规则、权限矩阵、验收标准、双语术语表 glossary.md）。当需求已澄清，需要把需求落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时使用。
+description: 编写需求规格说明书（字段表、业务规则、权限矩阵、验收标准），并维护项目级双语术语表。当需求已澄清，需要把需求落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时使用。
 ---
 
 <!-- TEMPLATE-ONLY -->
@@ -16,17 +16,18 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 - 需求已经过 `ba-grill-me` 澄清，阻塞项都有结论
 - 已读过 `{{SPEC_TEMPLATE}}`（规格模板）与 `{{AGENTS_FILE}}`
 - 已查过 `{{FACTS_DIR}}/` 下的事实文档，避免和现状冲突
+- 已读过项目级术语表 `{{GLOSSARY_FILE}}`
 
 ## 输出位置
 
-`{{FEATURES_DIR}}/<迭代>/<CODE>-<slug>/spec.md`  
-同目录还必须产出 `glossary.md`（本 feature 双语术语表）。
+`{{FEATURES_DIR}}/<迭代>/<CODE>-<slug>/spec.md`
 
 - 文件夹名用 **JIRA 风格大写编码** + slug（如 `ACC-account`、`BKG-booking`）
-- 规格文件固定为目录内的 `spec.md`；术语表固定为同目录 `glossary.md`
-- 从 `{{SPEC_TEMPLATE}}` 复制起步；同目录可放 `plan.md` / `plan-{slug}.md` 与 `glossary.md` 骨架
+- 规格文件固定为目录内的 `spec.md`
+- 从 `{{SPEC_TEMPLATE}}` 复制起步；同目录可放 `plan.md` / `plan-{slug}.md`
 - 一个能力一个文件夹，不要把多个模块塞进一份 spec
-- 更新已有模块时基于当前 `spec.md` 改，写明基线版本与目标版本；同步维护术语表
+- 更新已有模块时基于当前 `spec.md` 改，写明基线版本与目标版本
+- **术语表不按 feature 拆分**：新增/变更术语写入项目级 `{{GLOSSARY_FILE}}`
 
 ## 各章节怎么写
 
@@ -36,18 +37,18 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 - 目标：做完之后什么变了
 - 范围：**明确写出"不做什么"** —— 这一节最容易被跳过，也最容易吵架
 
-### 术语表 `glossary.md`
+### 项目术语表 `{{GLOSSARY_FILE}}`
 
-与 `spec.md` 同目录，表头固定：
+全项目一份，表头固定：
 
 | 中文 | 英文 | 说明（可选） |
 |---|---|---|
 | 备注 | remark | |
 
-- 从 §2.3 业务对象、§5 字段表、角色/状态提炼本 feature 统一语言（Ubiquitous Language）
+- 从本 feature 的 §2.3 业务对象、§5 字段表、角色/状态提炼术语，**追加或更新**到项目术语表（去重，不另建 feature 目录下的 glossary）
 - 英文用简洁业务词（如 `Account`、`BookingOrder`），不强制代码标识
-- `spec.md` §2 附近加一行引用同目录术语表（文案：`术语表见` + 指向 `glossary.md` 的相对链接）
-- 无新增术语时可保留表头 +「无」一行
+- `spec.md` §2 附近引用项目术语表（相对路径指向 `{{GLOSSARY_FILE}}`，例如 feature 目录下写「术语表见」+ 链到 `../../glossary.md`）
+- 本轮无新增术语时不必改术语表，但仍须在 spec 中保留引用
 
 ### §2~3 功能与权限
 
@@ -121,7 +122,7 @@ AC-001：正常创建
 
 ## 自检清单
 
-- [ ] 术语表 `glossary.md` 已写，中英对照，且 `spec.md` 已引用
+- [ ] `spec.md` 已引用项目术语表；本轮新术语已写入 `{{GLOSSARY_FILE}}`（中英对照）
 - [ ] 每条规则有编号、适用场景、条件、动作
 - [ ] 每条验收标准有编号，且可测
 - [ ] 字段表里枚举值写全

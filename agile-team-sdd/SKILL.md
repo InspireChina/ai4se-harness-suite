@@ -17,7 +17,7 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时，写规格之前 |
-| `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准、双语术语表） | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md` + `glossary.md` |
+| `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准），维护项目级术语表 | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md`；术语写入 `docs/features/glossary.md` |
 | `ba-gen-facts` | 从代码生成/校准事实文档（API、库表、领域模型） | 实现变了，`docs/facts/` 与代码不一致 |
 
 ### 开发

@@ -35,6 +35,7 @@
 | `{{RELEASES_DIR}}` | 发布清单目录 | `docs/releases` | `RELEASES_DIR` |
 | `{{SPEC_TEMPLATE}}` | 需求规格模板 | `docs/features/_template/spec.md` | — |
 | `{{PLAN_TEMPLATE}}` | 技术方案模板 | `docs/features/_template/plan.md` | — |
+| `{{GLOSSARY_FILE}}` | 项目级双语术语表 | `docs/features/glossary.md` | — |
 | `{{DOMAIN_MODEL_DOC}}` | 领域模型文档 | `docs/facts/domain-model.md` | — |
 | `{{API_SPEC}}` | API 定义 | `docs/facts/api.yaml` | — |
 | `{{DB_SCHEMA_DOC}}` | 数据库规格 | `docs/facts/db-schema.md` | — |
