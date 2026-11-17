@@ -31,7 +31,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | 模块               | 目录                                                                                   | 目的                                                                                            | 形态                |
 | ---------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ----------------- |
 | **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，21 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
-| **Harness 初始化器** | [`harness-installer/`](harness-installer/)                                           | 为任意项目铺好工程底座：`AGENTS.md`（架构与工程规范）+ `docs/` 文档骨架                                                | skill + 模板 + 脚本   |
+| **Harness 初始化器** | [`harness-installer/`](harness-installer/)                                           | 为任意项目铺好工程底座：`AGENTS.md` + `docs/`（含 `architecture/` 高阶意图骨架、features / facts / standards） | skill + 模板 + 脚本   |
 | **工具链安装器**       | [`tool-chain-installer/`](tool-chain-installer/)                                     | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态                            | skill + 工具清单 + 脚本 |
 | **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门                                       | 文档                |
 | **持续运行面板**       | [`overnight-runner/`](overnight-runner/)                                             | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，**多队列**各自独立，决策全程留痕（白天弹窗问你、夜里自动决策）     | skill + Python 实现 |
@@ -47,7 +47,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
         │                       │                       │
  harness-installer       agile-team-sdd       tool-chain-installer
   AGENTS.md 规范          21 个 SDD skill        MCP 工具链
-  docs/ 文档骨架          BA·Dev·QA·PM 全流程
+  docs/ 含 architecture   BA·TL·Dev·QA·PM 全流程
         │                       │                       │
         └───────────────────────┼───────────────────────┘
                                 │
@@ -61,9 +61,12 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | 组 | Skill | 作用 |
 |---|---|---|
 | **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
-| | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准 |
+| | `ba-write-spec` | 编写需求规格；维护项目级术语表（`docs/architecture/business/glossary.md`） |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
-| **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
+| | `ba-arch-sync-back` | 业务侧对齐：术语 / 核心领域 / 产品 ↔ features 与 facts |
+| **TL** | `tl-arch-plan` | 项目准备写/更新 `docs/architecture/`（C4、ADR 一句话表、与业务侧） |
+| | `tl-arch-sync-back` | 技术侧对齐：ADR/C4 ↔ 实现与 facts 专题 |
+| | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
 | | `dev-build` | 全栈编排：实现 + 自测 / UI 评审 / 代码评审 |
 | | `dev-self-test` | 开发自测（由 build 编排，可单跑） |
@@ -81,6 +84,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 流程串起来：
 
 ```
+项目准备：tl-arch-plan（BA/TL）→ docs/architecture/
 ba-grill-me → ba-write-spec → pm-estimate
                     ↓
         ┌───────────┴───────────┐
@@ -91,7 +95,7 @@ ba-grill-me → ba-write-spec → pm-estimate
               dev-plan（人工确认）→ dev-build
                     │  编排 self-test → ui-review → code-review
                     ↓
-              ba-gen-facts / dev-create-mr
+     ba-gen-facts / arch sync-back / dev-create-mr
                     ↓
       qa-run-e2e / qa-write-manual-plan   ← 合并闸门
                     ↓
@@ -104,12 +108,14 @@ ba-grill-me → ba-write-spec → pm-estimate
 |---|---|---|
 | 团队级 SDD 框架 | 适合团队协作和拓展修改的 SDD 框架；纯 skill 驱动，与具体 agent 无关 | [`agile-team-sdd/`](agile-team-sdd/) |
 | 夜间任务 | 把一串 plan 交给 coding agent 无人值守跑：多队列、看门狗重试、决策全程留痕（白天可弹窗、夜里自动兜底） | skill [`overnight-runner`](agile-team-sdd/skills/overnight-runner-template/SKILL.md) · 运行时 [`overnight-runner/`](overnight-runner/) |
-| 团队流程手册 | 人怎么配合：总览矩阵、角色手册、测试归属与闸门；规范硬约束仍在各项目 `AGENTS.md` | [`team-workflow-guide/`](team-workflow-guide/index.html) |
+| 团队流程手册 | 人怎么配合：总览矩阵、项目准备（含架构设计）→ 迭代前 → 迭代中；角色、测试归属与闸门 | [`team-workflow-guide/`](team-workflow-guide/index.html) |
 | Agent as Code | 所有 Harness（skills、AGENTS、docs 骨架、MCP、overnight-runner）可安装进代码仓库，换机器 clone 即可用 | [`harness-installer/`](harness-installer/) · [`tool-chain-installer/`](tool-chain-installer/) |
-| 高阶设计 | 项目级 `docs/architecture/`（C4/ADR）+ 迭代 HLD；确认后再开 feature Plan | [`tl-arch-plan`](agile-team-sdd/skills/tl-arch-plan-template/SKILL.md) · [`tl-high-level-design`](agile-team-sdd/skills/tl-high-level-design-template/SKILL.md) · [architecture 样例](example-project/docs/architecture/README.md) |
-| ADR | 跨迭代技术取舍写成一句话决策表；写法在 standards，正文落在 `docs/architecture/tech/adr.md` | [ADR 规范](example-project/docs/standards/adr.md) · [ADR 表](example-project/docs/architecture/tech/adr.md) |
+| 文档三分法 | `architecture/` 高阶意图 · `features/` 过程 · `facts/` as-built | [architecture](example-project/docs/architecture/README.md) · [docs 总览](example-project/docs/README.md) |
+| 高阶设计 | 项目级 C4 / ADR 一句话表 / 核心领域模型 + 迭代 HLD；确认后再开 feature Plan | [`tl-arch-plan`](agile-team-sdd/skills/tl-arch-plan-template/SKILL.md) · [`tl-high-level-design`](agile-team-sdd/skills/tl-high-level-design-template/SKILL.md) |
+| ADR | 跨迭代取舍写成一句话决策表（非长文） | [ADR 规范](example-project/docs/standards/adr.md) · [ADR 表](example-project/docs/architecture/tech/adr.md) |
+| 核心领域模型 | architecture 只维护核心聚合 + 关键字段；全量 as-built 在 facts | [core-domain-model](example-project/docs/architecture/business/core-domain-model.md) · [facts domain-model](example-project/docs/facts/domain-model.md) |
 | 代码打样 | 迭代内用独立 Vite 原型先把交互与页面打通，规格与验收对齐后再进实现 | [iteration1 原型](example-project/docs/features/iteration1/prototypes/README.md) |
-| 事实文档 | 实现后校准 `docs/facts/`，形成可靠知识库（API、库表、领域、专题） | [`ba-gen-facts`](agile-team-sdd/skills/ba-gen-facts-template/SKILL.md) · [facts](example-project/docs/facts/README.md) |
+| 事实文档 | 实现后校准 `docs/facts/`（API、库表、全量领域、实现专题） | [`ba-gen-facts`](agile-team-sdd/skills/ba-gen-facts-template/SKILL.md) · [facts](example-project/docs/facts/README.md) |
 
 ## 快速开始
 
@@ -136,9 +142,13 @@ ls .agents/skills/      # 已安装的 21 个 SDD skills
 
 # 3. 装 MCP 工具链
 node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browser --group context
+
+# 4. 项目准备：填 docs/architecture/（C4、ADR、术语/产品/核心领域、迭代规划）
+#    对 Agent 说：用 tl-arch-plan（BA 协作）写高阶架构
 ```
 
-第 1 步之后，**必须有人补全** `AGENTS.md` **里的** `TODO` **段落** —— 规范不填满，装出来的只是空壳。
+第 1 步之后，**必须有人补全** `AGENTS.md` **里的** `TODO` **段落** —— 规范不填满，装出来的只是空壳。  
+进迭代前，`docs/architecture/` 应可读（可与装机并行，但 HLD / Plan 之前须齐）。
 
 ## 设计原则
 
@@ -147,7 +157,8 @@ node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browse
 | **模板 + 安装，而非拷贝** | 同一套能力能装到不同技术栈的项目；占位符保证路径真实可用 |
 | **配置进仓库，不进个人机器** | MCP、skills、脚本都写进项目配置，换机器 clone 就能跑 |
 | **规范是事实，不靠口头** | `AGENTS.md` / `docs/standards/` 是唯一权威，冲突以文件为准 |
-| **AI 执行，人决策** | Plan 的人工确认是唯一强制闸门；范围、需求、规范的变更必须人拍板 |
+| **意图 / 过程 / as-built 分开** | `architecture/` 写目标，`features/` 写本迭过程，`facts/` 跟代码 |
+| **AI 执行，人决策** | 迭代 HLD 与 feature Plan 两道人工确认闸门；范围、需求、规范变更必须人拍板 |
 | **幂等可重入** | 所有安装脚本可重复执行，默认不覆盖已有文件 |
 
 ## 目录结构
