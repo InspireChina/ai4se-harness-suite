@@ -15,7 +15,7 @@
       "when": "需求已澄清，需要落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时",
       "produces": [
         "docs/features/<迭代>/<CODE>-<slug>/spec.md",
-        "docs/features/glossary.md"
+        "docs/architecture/business/glossary.md"
       ],
       "dependsOn": [
         "ba-grill-me"
@@ -27,6 +27,16 @@
       "when": "实现发生变化后，docs/facts/ 与代码不一致时",
       "produces": [
         "docs/facts/**"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "ba-arch-sync-back",
+      "description": "业务侧回写对齐：术语表、领域模型意图、产品概念与 features / facts as-built",
+      "when": "规格或实现导致统一语言或领域结构相对 docs/architecture/business/ 漂移时",
+      "produces": [
+        "docs/architecture/business/**",
+        "docs/facts/domain-model.md"
       ],
       "dependsOn": []
     }
@@ -171,6 +181,27 @@
     }
   ],
   "tl": [
+    {
+      "name": "tl-arch-plan",
+      "description": "编写或更新项目级高阶架构 docs/architecture/（C4、ADR、与业务侧对齐）",
+      "when": "项目准备阶段定技术边界，或跨迭代架构需落盘时",
+      "produces": [
+        "docs/architecture/**"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "tl-arch-sync-back",
+      "description": "技术侧回写对齐：architecture ADR/C4 与实现、facts 非 ADR 专题",
+      "when": "实现推翻或细化了跨迭代技术取舍时",
+      "produces": [
+        "docs/architecture/tech/**",
+        "docs/facts/tech-topic/**"
+      ],
+      "dependsOn": [
+        "tl-arch-plan"
+      ]
+    },
     {
       "name": "tl-high-level-design",
       "description": "为当前迭代编写高阶技术设计（HLD / TRD），等待人工确认",

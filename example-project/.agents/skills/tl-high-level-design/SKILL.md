@@ -11,7 +11,7 @@ description: 为当前迭代编写高阶技术设计（HLD / TRD）到 docs/feat
 
 - 本迭代各 feature 的 `spec.md` 已齐备（或至少范围稳定）
 - 已读 `docs/standards/architecture.md`、`docs/standards/adr.md`
-- 已扫过 `docs/facts/tech-topic/` 既有 ADR，避免重复或冲突决策
+- 已读 `docs/architecture/`（C4 / 产品边界）；已扫过 `docs/architecture/tech/adr.md` 既有 ADR，避免重复或冲突决策
 
 ## 输出位置
 
@@ -34,16 +34,17 @@ description: 为当前迭代编写高阶技术设计（HLD / TRD）到 docs/feat
 - **等人确认**：状态未变为已确认前，禁止对该迭代执行 `dev-plan` 写实现方案或编码
 - 可与 `qa-write-cases` **并行**（规格确认后即可写 QA 用例）
 - 不要把单 feature 的表结构 / API 细节写进 HLD——那些属于 feature `plan.md`
-- 跨迭代长期取舍按 `docs/standards/adr.md` 撰写，接受后落到 `docs/facts/tech-topic/NNN-slug.md`
+- 跨迭代长期取舍按 `docs/standards/adr.md`，接受后在 `docs/architecture/tech/adr.md` 追加一句话
 - 路径不要写死成某个机器的绝对路径
 
 ## 与 Plan / ADR 的关系
 
 | 文档 | 谁写 | 何时 |
 |---|---|---|
+| `docs/architecture/` | TL/BA（`tl-arch-plan`） | 项目准备；跨迭代意图 |
 | `high-level-design.md` | TL（本 skill） | 迭代前；确认后才开 Plan |
 | feature `plan.md` / `_chores/` | DEV（`dev-plan`） | HLD 已确认 |
-| `docs/facts/tech-topic/NNN-*.md` | TL / 架构 | 跨迭代决策接受后 |
+| `docs/architecture/tech/adr.md` | TL / 架构 | 跨迭代决策接受后（一句话表） |
 
 ## 自检
 

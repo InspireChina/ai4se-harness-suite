@@ -1,21 +1,21 @@
 # 需求与方案（Features）
 
-每个业务能力是一个 **JIRA 风格编码文件夹**：
+每个业务能力是一个 **JIRA 风格编码文件夹**，规格与技术方案放在一起：
 
 ```
 docs/features/
-├── glossary.md          # 项目级双语术语表（统一语言）
-├── _template/           # spec.md + plan.md
-├── _chores/             # 无关联 feature 的 plan-{slug}.md
+├── _template/             # 模板：spec.md + plan.md
+├── _chores/               # 无关联 feature 的横切 plan
+│   └── plan-{slug}.md
 └── <迭代>/
-    ├── high-level-design.md   # 迭代高阶技术设计（HLD / TRD，人工确认）
+    ├── README.md
+    ├── high-level-design.md
     └── <CODE>-<slug>/
-        ├── spec.md            # 引用 ../../glossary.md
-        ├── plan.md            # 粗实施步骤；HLD 确认后再写
-        ├── plan-progress.md   # dev-build 细化进度（随实现更新）
-        └── plan-{slug}.md     # 对应 plan-{slug}-progress.md
+        ├── spec.md            # 引用 architecture/business/glossary.md
+        ├── plan.md
+        └── plan-progress.md
 ```
 
-约定：每个迭代目录应有 `high-level-design.md`；**确认前不得写 feature Plan**。  
-项目级 `glossary.md`（中文 | 英文 | 说明）一份；`spec.md` 在 §2 附近引用之。  
-Plan 只写粗「实施步骤」；`dev-build` 写同目录 `{planStem}-progress.md` 细 checklist 并勾选。
+项目级术语表在 [`../architecture/business/glossary.md`](../architecture/business/glossary.md)。  
+项目级架构意图在 [`../architecture/`](../architecture/)。  
+约定：每个迭代目录应有 `high-level-design.md`；**确认前不得写 feature Plan**。

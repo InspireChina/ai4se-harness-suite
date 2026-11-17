@@ -1,6 +1,8 @@
-# 技术专题（Tech Topic）
+# 技术专题（非 ADR）
 
-每个文件解决 **一个** 技术问题：为什么这么做、怎么做、放弃了什么。
+实现说明、错误码、安全、数据字典等 **as-built 专题**。
+
+跨迭代 **架构决策（ADR）** 落在 [`../../architecture/tech/adr.md`](../../architecture/tech/adr.md)。
 
 ## 已有专题
 

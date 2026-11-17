@@ -1,9 +1,10 @@
 # 文档体系
 
-本目录是项目的 **单一信息源**。文档分两类：
+本目录是项目的 **单一信息源**。文档分三类：
 
 | 类别 | 目录 | 性质 | 生命周期 |
 |---|---|---|---|
+| 高阶意图 | `architecture/` | 产品/领域/C4/跨迭代 ADR | 项目准备产出；演进时 sync-back |
 | 过程文档 | `features/`（含 `spec.md` / `plan*.md`） | 会随需求演进 | 随需求创建，**定稿后不再修改** |
 | 事实文档 | `facts/`、`standards/` | 描述系统当前真实状态 | 随代码同步更新 |
 
@@ -11,12 +12,13 @@
 
 | 目录 | 内容 | 谁来写 |
 |---|---|---|
+| `architecture/` | C4、ADR、术语表、产品/领域意图、迭代规划 | BA / TL（项目准备 + arch skills） |
 | `features/` | 每个能力一个 JIRA 风格文件夹：`spec.md` + `plan.md`；迭代目录含 `high-level-design.md` | 产品 / BA / TL / 开发 |
 | `features/_chores/` | 无关联 feature 的横切技术方案 | 架构师 / 负责人 |
 | `features/_template/` | `spec.md`、`plan.md` 模板 | 架构师 |
-| `facts/` | 技术事实：API、库表、领域模型 | 全员，随代码同步 |
+| `facts/` | 技术事实：API、库表、领域模型（as-built） | 全员，随代码同步 |
 | `facts/business/` | 业务事实：流程等 | BA / 开发 |
-| `facts/tech-topic/` | 技术专题 / ADR 正文 / 实现说明（写法见 `standards/adr.md`） | 需要时新建 |
+| `facts/tech-topic/` | 实现专题（非 ADR；写法见 `standards/adr.md` 与 architecture ADR） | 需要时新建 |
 | `standards/` | 代码规范（事实）：架构、命名、分层、安全、API、错误、测试、ADR 写法 | 架构师 |
 | `standards/templates/` | 代码模版 / snippet / ADR 模板 | 架构师 |
 | `test-cases/` | 测试用例文本基线（见下） | QA / 开发 |
@@ -37,8 +39,9 @@
 
 - 需求规格与 Plan **定稿后不改**；同一 feature 的二次改造新建 `plan-{slug}.md`。
 - 事实文档必须与代码一致；改了代码就要改文档。
-- 新建需求：复制 `features/_template/` 为 `features/<迭代>/<CODE>-<slug>/`，再改 `spec.md` / `plan.md`；新术语写入 `features/glossary.md`。
+- 新建需求：复制 `features/_template/` 为 `features/<迭代>/<CODE>-<slug>/`，再改 `spec.md` / `plan.md`；新术语写入 `architecture/business/glossary.md`。
 - 每个迭代应有 `features/<迭代>/high-level-design.md`；**确认前不得写 feature Plan**。
+- 跨迭代 ADR 落在 `architecture/tech/adr.md`；`standards/adr.md` 只约定写法。
 
 ## 同步检查点
 
@@ -46,6 +49,7 @@
 
 - [ ] 本次变更是否影响 `facts/api.yaml`？
 - [ ] 本次变更是否影响 `facts/db-schema.md`？
+- [ ] 本次变更是否影响 `facts/domain-model.md`（as-built）或 `architecture/business/`？
 - [ ] 本次变更是否影响 `facts/tech-topic/businessrule.md`？
 - [ ] 本次变更是否影响 `facts/tech-topic/data-dict.md`？
 - [ ] 本次变更是否影响 `facts/business/`？

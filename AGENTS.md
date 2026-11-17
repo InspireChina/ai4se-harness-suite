@@ -27,7 +27,7 @@
 ```
 team-harness-suite/
 ├── .agents/              # 本仓库自用：verify.sh + plan/ + skills/
-├── agile-team-sdd/       # SDD 技能套件（18 个 skill 模板 + 安装器）
+├── agile-team-sdd/       # SDD 技能套件（21 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
@@ -129,7 +129,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ┌──▼──────────┐ ┌▼───────────┐ ┌▼──────────────────┐
 │harness-     │ │agile-team- │ │tool-chain-        │
 │installer/   │ │sdd/       │ │installer/         │
-│AGENTS.md    │ │18 个 skill │ │MCP 工具链          │
+│AGENTS.md    │ │21 个 skill │ │MCP 工具链          │
 │docs/ 骨架    │ │模板 + 安装器│ │                   │
 └─────────────┘ └┬───────────┘ └──────────────────┘
                  │ 装进
@@ -251,15 +251,17 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ### 数据流
 
 ```
+项目准备：tl-arch-plan（BA/TL）→ docs/architecture/（C4、ADR、术语、领域意图、迭代规划）
 用户的一句话需求
   → ba-grill-me（拷问）
-  → ba-write-spec（需求规格 docs/features/<迭代>/<CODE>-<slug>/spec.md）
+  → ba-write-spec（需求规格 docs/features/<迭代>/<CODE>-<slug>/spec.md；术语 → architecture/business/glossary.md）
   → pm-estimate（估算）
   → ┬─ tl-high-level-design（迭代 high-level-design.md，人工确认 ← Plan 前强制闸门）
     └─ qa-write-cases（QA 文本用例，与 HLD 并行；规格确认后即可开始）
   → HLD 确认后 → dev-plan（技术方案 feature/plan.md 或 _chores/，人工确认 ← 编码前强制闸门）
   → Plan 确认后 → dev-build（全栈编排：实现 → self-test → ui-review → code-review；失败修 bug 回环）
   → ba-gen-facts（事实文档 docs/facts/ 同步）
+  → tl-arch-sync-back / ba-arch-sync-back（architecture ↔ 实现/规格漂移时）
   → dev-create-mr
   → qa-run-e2e / qa-write-manual-plan（QA 验收，合并闸门）
   → dev-release-plan（上线清单 docs/releases/）

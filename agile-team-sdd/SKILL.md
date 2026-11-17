@@ -1,6 +1,6 @@
 ---
 name: agile-team-sdd
-description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
+description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
 ---
 
 # Agile Team SDD：安装技能套件
@@ -8,7 +8,7 @@ description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/�
 本目录是 **SDD（Spec-Driven Development）技能套件的模板源**。
 `skills/` 下每个子目录是一份带占位符的 `SKILL.md`，需要先渲染成目标项目的真实路径，再安装过去。
 
-## 技能清单（18 个）
+## 技能清单（21 个）
 
 完整元数据见 [`catalog.json`](catalog.json)。
 
@@ -17,8 +17,9 @@ description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时，写规格之前 |
-| `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准），维护项目级术语表 | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md`；术语写入 `docs/features/glossary.md` |
+| `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准），维护项目级术语表 | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md`；术语写入 `docs/architecture/business/glossary.md` |
 | `ba-gen-facts` | 从代码生成/校准事实文档（API、库表、领域模型） | 实现变了，`docs/facts/` 与代码不一致 |
+| `ba-arch-sync-back` | 业务侧回写对齐术语/领域意图/产品 ↔ features 与 facts | 统一语言或领域结构相对 architecture 漂移时 |
 
 ### 开发
 
@@ -44,6 +45,8 @@ description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/�
 
 | Skill | 作用 | 触发时机 |
 |---|---|---|
+| `tl-arch-plan` | 写/更新项目级 `docs/architecture/`（C4、ADR） | 项目准备定技术边界，或跨迭代架构落盘 |
+| `tl-arch-sync-back` | 技术侧对齐 ADR/C4 ↔ 实现与 facts 专题 | 实现推翻或细化跨迭代取舍时 |
 | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD） | 规格齐备、写 feature Plan 之前 |
 
 ### PM
@@ -62,6 +65,7 @@ description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/�
 ### 全流程串起来
 
 ```
+项目准备：tl-arch-plan（+ BA）→ docs/architecture/
 需求
  └─ ba-grill-me ──▶ ba-write-spec ──▶ pm-estimate
                                           │
@@ -72,7 +76,7 @@ description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/�
                                       │  编排：self-test → ui-review → code-review
                                       │  （失败修 bug 回环）
                                       ▼
-                                 ba-gen-facts / dev-create-mr
+                                 ba-gen-facts / arch sync-back / dev-create-mr
                                                           │
                                      qa-write-manual-plan / qa-run-e2e
                                                           │

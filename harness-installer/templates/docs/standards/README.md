@@ -16,11 +16,11 @@
 | `test.md` | 测试规范：分层、命名、覆盖要求、数据准备 |
 | `business-rule.md` | 业务规则规范：规则 ID、定义位置、配置方式 |
 | `data-dictionary.md` | 数据字典规范：枚举定义、注册方式、取值含义 |
-| `adr.md` | 架构决策记录（ADR）写法；正文落在 `docs/facts/tech-topic/` |
+| `adr.md` | 架构决策记录（ADR）写法；正文落在 `docs/architecture/tech/adr.md` |
 | `templates/` | 代码模版 / snippet / ADR 模板，供复制 |
 
 ## 使用方式
 
 - 写新代码前先读对应规范文件。
 - 实现与规范冲突时：要么改代码，要么改规范并说明理由，不允许默默违反。
-- 跨迭代技术取舍按 [`adr.md`](./adr.md) 写决策，接受后落到 `docs/facts/tech-topic/`。
+- 跨迭代技术取舍按 [`adr.md`](./adr.md) 写决策，接受后落到 `docs/architecture/tech/adr.md`。

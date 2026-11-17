@@ -553,13 +553,13 @@
       </thead>
       <tbody>
         <tr>
-          <th class="phase setup" rowspan="2" scope="rowgroup"><span class="phase-label">项目准备</span></th>
+          <th class="phase setup" rowspan="3" scope="rowgroup"><span class="phase-label">项目准备</span></th>
           <td class="role">TL<small>装机与定规</small></td>
           <td>
             <ul>
               <li>初始化 harness 与 docs 骨架</li>
               <li>安装 SDD skill 与 MCP 工具链</li>
-              <li>定架构边界、标准与 CI 闸门</li>
+              <li>定标准与 CI 闸门</li>
             </ul>
           </td>
           <td>
@@ -582,6 +582,28 @@
           </td>
         </tr>
         <tr>
+          <td class="role">BA / TL<small>架构设计</small></td>
+          <td>
+            <ul>
+              <li>产品边界、术语与领域意图</li>
+              <li>C4 上下文/容器与跨迭代 ADR</li>
+              <li>迭代规划对齐</li>
+            </ul>
+          </td>
+          <td>
+            <div class="tool-new"><code>tl-arch-plan</code></div>
+            <div><code>ba-arch-sync-back</code>（后续对齐）</div>
+            <div><code>tl-arch-sync-back</code>（后续对齐）</div>
+          </td>
+          <td>业务目标、技术选型、干系人约束</td>
+          <td>
+            <ul>
+              <li><code>docs/architecture/</code></li>
+              <li>C4 · ADR 一句话表 · glossary · product · core-domain-model · iterations</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
           <td class="role">BA / PM<small>定方向</small></td>
           <td>
             <ul>
@@ -591,7 +613,7 @@
           </td>
           <td>—</td>
           <td>业务背景、干系人预期</td>
-          <td>迭代目标一页纸</td>
+          <td>迭代目标一页纸（写入 <code>docs/architecture/business/iterations.md</code>）</td>
         </tr>
 
         <tr>
@@ -759,8 +781,8 @@
 
 <section id="setup">
   <h2>1. 项目准备</h2>
-  <p class="goal">目标：项目「可被 harness 管理」——规范、目录、工具齐。</p>
-  <p><strong>协作口诀</strong>：TL 装机与定规矩，QA 定闸门，BA 定方向。规矩未定不进迭代。</p>
+  <p class="goal">目标：项目「可被 harness 管理」——规范、目录、工具齐；高阶架构意图落盘。</p>
+  <p><strong>协作口诀</strong>：TL 装机与定规矩，BA/TL 落 <code>docs/architecture/</code>，QA 定闸门，BA/PM 定方向。规矩与架构未定不进迭代。</p>
 
   <h3>1.1 谁做什么</h3>
   <table class="data">
@@ -769,9 +791,10 @@
       <tr><td>初始化 AGENTS.md + docs/</td><td>TL</td><td><code>AGENTS.md</code>、<code>docs/**</code></td></tr>
       <tr><td>安装 SDD skill</td><td>TL</td><td><code>.agents/skills/</code></td></tr>
       <tr><td>安装 MCP</td><td>TL</td><td><code>.mcp.json</code> / <code>opencode.jsonc</code></td></tr>
-      <tr><td>定架构与标准</td><td>TL</td><td><code>docs/standards/</code>、<code>docs/facts/</code></td></tr>
+      <tr><td>定标准与事实骨架</td><td>TL</td><td><code>docs/standards/</code>、<code>docs/facts/</code></td></tr>
+      <tr><td>架构设计（产品/领域/C4/ADR）</td><td>BA / TL</td><td><code>docs/architecture/</code></td></tr>
       <tr><td>定测试闸门</td><td>QA + TL</td><td><code>test:qa</code> 进 CI</td></tr>
-      <tr><td>业务目标与首迭范围</td><td>BA / PM</td><td>迭代目标一页纸</td></tr>
+      <tr><td>业务目标与首迭范围</td><td>BA / PM</td><td><code>docs/architecture/business/iterations.md</code></td></tr>
     </tbody>
   </table>
 
@@ -791,6 +814,9 @@
     <li>
       <strong>（可选）装 overnight-runner</strong> — 需要夜跑 Plan 时，再让 Agent 安装并写好队列配置。
     </li>
+    <li>
+      <strong>架构设计</strong> — 对 Agent 说：用 <code>tl-arch-plan</code>（BA 协作）填写 <code>docs/architecture/</code>（C4、ADR、术语/产品/领域意图、迭代规划）。可与定标准并行，但<strong>进迭代前须齐</strong>。
+    </li>
   </ol>
   <div class="callout">装完 skill / MCP 后必须<strong>重启 opencode</strong>（或等价 IDE Agent），配置才生效。不要跳步：先有 <code>AGENTS.md</code> 与 <code>docs/</code>，再装 skills，路径才指向真实目录。</div>
 
@@ -799,6 +825,7 @@
     <li><code>AGENTS.md</code> 关键 TODO 已填</li>
     <li>skill + MCP 可用</li>
     <li>文档树与测试归属约定写清</li>
+    <li><code>docs/architecture/</code> 已有可读的 C4 / 术语或产品边界 / 首迭规划（可与装机并行，但进迭代前须齐）</li>
     <li>团队对齐三条铁律（规范先于代码 / 测试先于实现 / 文档同批次）</li>
   </ul>
 </section>

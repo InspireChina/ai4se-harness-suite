@@ -65,7 +65,7 @@
 - [x] `docs/facts/api.yaml`
 - [x] `docs/facts/db-schema.md`
 - [x] `docs/facts/domain-model.md`
-- [x] `docs/facts/tech-topic/security.md` / `data-dict.md` / `004-jwt-stateless-auth.md` / `error-code.md`
+- [x] `docs/facts/tech-topic/security.md` / `data-dict.md` / `error-code.md`；ADR-004 见 `docs/architecture/tech/adr.md`
 - [x] `AGENTS.md` §8 聚合简述
 
 ### 8. 验证与上线准备

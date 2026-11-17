@@ -47,7 +47,7 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 
 - 从本 feature 的 §2.3 业务对象、§5 字段表、角色/状态提炼术语，**追加或更新**到项目术语表（去重，不另建 feature 目录下的 glossary）
 - 英文用简洁业务词（如 `Account`、`BookingOrder`），不强制代码标识
-- `spec.md` §2 附近引用项目术语表（相对路径指向 `{{GLOSSARY_FILE}}`，例如 feature 目录下写「术语表见」+ 链到 `../../glossary.md`）
+- `spec.md` §2 附近引用项目术语表（相对路径指向 `{{GLOSSARY_FILE}}`，例如 feature 目录下链到 `../../../architecture/business/glossary.md`）
 - 本轮无新增术语时不必改术语表，但仍须在 spec 中保留引用
 
 ### §2~3 功能与权限

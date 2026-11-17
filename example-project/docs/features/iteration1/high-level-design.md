@@ -52,11 +52,11 @@
 
 | 决策 | 依据 |
 |---|---|
-| 四层 DDD 单体 | [ADR-001](../../facts/tech-topic/001-4-layer-ddd.md) |
-| UUID 字符串主键 | [ADR-002](../../facts/tech-topic/002-uuid-string-pk.md) |
-| MyBatis-Plus | [ADR-003](../../facts/tech-topic/003-mybatis-plus-vs-jpa.md) |
-| JWT 无状态鉴权 | [ADR-004](../../facts/tech-topic/004-jwt-stateless-auth.md) |
-| ThreadLocal 用户上下文 | [ADR-005](../../facts/tech-topic/005-threadlocal-usercontext.md) |
+| 四层 DDD 单体 | [ADR-001](../../architecture/tech/adr.md) |
+| UUID 字符串主键 | [ADR-002](../../architecture/tech/adr.md) |
+| MyBatis-Plus | [ADR-003](../../architecture/tech/adr.md) |
+| JWT 无状态鉴权 | [ADR-004](../../architecture/tech/adr.md) |
+| ThreadLocal 用户上下文 | [ADR-005](../../architecture/tech/adr.md) |
 
 工程布局：`containers/backend`（Spring Boot）+ `containers/frontend`（Vue 3）；本迭代原型仅在 `prototypes/`，**不**并入业务前端直至对应 Plan 确认。
 

@@ -1,7 +1,8 @@
-# 领域模型
+# 领域模型（as-built）
 
-> 当前已实现 ACC（账号与个人中心）。  
-> 其余 feature 按 `docs/features/iteration1/`（COB～PLT）继续落地后回写本文档。
+> **as-built**：与当前代码一致的领域结构。  
+> **Core 意图**（核心聚合+关键字段）见 [`../architecture/business/core-domain-model.md`](../architecture/business/core-domain-model.md)；漂移时用 `ba-arch-sync-back` 对齐。  
+> 当前已实现 ACC（账号与个人中心）；其余 feature 按 `docs/features/iteration1/` 落地后回写。
 
 ## 聚合根
 

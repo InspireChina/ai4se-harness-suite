@@ -56,7 +56,7 @@ NEW
 
 ## 2. 功能说明
 
-术语表见 [项目术语表](../../glossary.md)。
+术语表见 [项目术语表](../../../architecture/business/glossary.md)。
 
 ### 2.1 功能概述
 

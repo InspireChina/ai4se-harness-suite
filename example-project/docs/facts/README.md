@@ -2,17 +2,18 @@
 
 描述系统 **当前真实状态** 的文档，随代码同步更新。
 
-> 当前为 **工程空壳 as-built**。目标需求：`docs/features/iteration1/`。
+> 高阶 **意图**（C4、ADR、术语、领域意图）见 [`../architecture/`](../architecture/)。本目录只写 as-built。
 
 | 位置 | 内容 |
 |---|---|
-| 本目录根 | `api.yaml`、`db-schema.md`、`domain-model.md` |
+| 本目录根 | `api.yaml`、`db-schema.md`、`domain-model.md`（as-built） |
 | [`business/`](./business/) | 业务事实（流程等） |
-| [`tech-topic/`](./tech-topic/) | 技术专题 / **ADR 正文** / 实现说明（写法见 [`../standards/adr.md`](../standards/adr.md)） |
+| [`tech-topic/`](./tech-topic/) | 实现专题（非 ADR；写法见 [`../standards/adr.md`](../standards/adr.md)） |
 
 ## 现有文档
 
-- [api.yaml](./api.yaml) — API（仅 health）
-- [db-schema.md](./db-schema.md) — 数据库（无业务表）
-- [domain-model.md](./domain-model.md) — 领域模型（无业务聚合）
-- [business/](./business/) — 业务事实目录（待补充）
+- [api.yaml](./api.yaml) — API
+- [db-schema.md](./db-schema.md) — 数据库
+- [domain-model.md](./domain-model.md) — 领域模型（as-built 全量）；Core 见 [architecture/business/core-domain-model.md](../architecture/business/core-domain-model.md)
+- [business/](./business/) — 业务事实
+- [tech-topic/](./tech-topic/) — 实现专题（ADR 在 architecture/tech/adr.md）

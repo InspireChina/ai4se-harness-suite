@@ -540,7 +540,7 @@ RestAssured + 现有 TestBase/ResetDb；需可用 MySQL（或项目既定测试�
 | 新增 | `containers/frontend/src/views/auth/Login.vue`、`views/user/Profile.vue` | |
 | 修改 | `containers/frontend/src/router/index.ts`、`stores/auth.ts`、`services/*` | |
 | 修改 | `docs/facts/api.yaml`、`db-schema.md`、`domain-model.md`、`tech-topic/security.md`、`data-dict.md` | 实施后 |
-| 修改 | `docs/facts/tech-topic/004-jwt-stateless-auth.md` | Claims 扩展说明（非推翻 HMAC） |
+| 修改 | `docs/architecture/tech/adr.md`（ADR-004）/ `docs/facts/tech-topic/security.md` | Claims 扩展说明（非推翻 HMAC） |
 
 ### 11.2 接口变更
 
@@ -604,7 +604,7 @@ RestAssured + 现有 TestBase/ResetDb；需可用 MySQL（或项目既定测试�
 - `docs/facts/api.yaml`
 - `docs/facts/db-schema.md`
 - `docs/facts/domain-model.md`
-- `docs/facts/tech-topic/security.md`、`data-dict.md`、`004-jwt-stateless-auth.md`（Claims）
+- `docs/facts/tech-topic/security.md`、`data-dict.md`；Claims 对齐 ADR-004（`docs/architecture/tech/adr.md`）
 - `docs/facts/tech-topic/error-code.md`（若新增对外文案映射）
 - `AGENTS.md` §8 聚合简述（Account 等）
 - `docs/test-cases/e2e-cases/test-cases.md`（ACC 相关 TC）

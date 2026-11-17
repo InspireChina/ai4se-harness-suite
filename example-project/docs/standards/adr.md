@@ -1,53 +1,32 @@
 # 架构决策记录（ADR）规范
 
-> 本文约定 **如何写 ADR**。已接受的决策正文落在 `docs/facts/tech-topic/`（as-built），不写在本目录。
+> 已接受的决策落在 `docs/architecture/tech/adr.md`：**一张表，每条 ADR 一句话**。
 
-## 1. 何时写 ADR
+## 1. 何时记一条
 
-满足任一条件时应写 ADR：
+- 跨多个 feature / 迭代仍长期有效的技术取舍
+- 迭代 HLD 中要求沉淀的决策
+- 推翻既有决策时：改状态为已废弃，并新增一行替代决策
 
-- 跨多个 feature / 迭代仍长期有效的技术取舍（框架、分层、鉴权、主键策略等）
-- 迭代高阶设计（`high-level-design.md`）中明确要求沉淀的决策
-- 推翻或替换既有 ADR（新建一条，旧条标为已废弃并互链）
+**不要**为单 feature 实现细节写 ADR——那些写在 feature `plan.md` 或 `facts/tech-topic/`。
 
-**不要**为单 feature 的实现细节写 ADR——那些写在 feature `plan.md`。
+## 2. 怎么写
 
-## 2. 与 HLD / Plan 的关系
+在 `docs/architecture/tech/adr.md` 表格中追加一行：
 
-| 文档 | 粒度 | 寿命 |
-|---|---|---|
-| `docs/features/<迭代>/high-level-design.md` | 本迭代技术边界与跨模块契约 | 迭代内；确认后指导 Plan |
-| feature `plan.md` / `_chores/` | 单需求实现方案 | 定稿不改；二次改造新建 |
-| `docs/facts/tech-topic/NNN-*.md` | 跨迭代架构决策 | 长期；状态可变 |
-
-流程：HLD 确认 → 写 Plan → 实现；跨迭代取舍按本规范写入 / 更新 ADR。
-
-## 3. 编号与文件名
-
-- 文件名：`NNN-slug.md`（三位序号 + 短横线 slug），例如 `006-redis-session.md`
-- 序号在 `docs/facts/tech-topic/` 内递增；不要复用已废弃编号
-- 标题：`# ADR-NNN: <一句话决策>`
-
-## 4. 状态
-
-| 状态 | 含义 |
+| 列 | 要求 |
 |---|---|
-| 提议 | 讨论中，未作为实现依据 |
-| 已接受 | 实现与评审以此为准 |
-| 已废弃 | 被更新决策取代；文内注明替代 ADR |
+| 编号 | `ADR-NNN`，序号递增，不复用 |
+| 决策（一句话） | 一句说清取舍；不要上下文/备选/后果长文 |
+| 状态 | 提议 / 已接受 / 已废弃 |
 
-## 5. 必含章节
+需要展开的实现说明写到 `docs/facts/tech-topic/`，不要把 ADR 表撑成论文。
 
-以 [`templates/adr.md`](./templates/adr.md) 为准：
+## 3. 与其它文档
 
-1. 状态 / 日期
-2. 上下文
-3. 决策
-4. 备选方案（含否决原因）
-5. 后果（正面 / 负面）
-
-## 6. 落盘与索引
-
-- 正文路径：`docs/facts/tech-topic/NNN-slug.md`
-- 写法与模板：本文件 + `templates/adr.md`
-- 实现专题（非决策）可同目录共存（如 `error-code.md`），但不要冒充 ADR 编号
+| 文档 | 粒度 |
+|---|---|
+| `docs/architecture/tech/adr.md` | 项目级一句话决策表 |
+| `docs/features/<迭代>/high-level-design.md` | 本迭边界；引用 ADR 编号 |
+| feature `plan.md` | 单需求方案 |
+| `docs/facts/tech-topic/` | as-built 实现专题 |

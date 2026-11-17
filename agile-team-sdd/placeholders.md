@@ -24,8 +24,10 @@
 | `{{CHORES_DIR}}` | 无关联 feature 的横切 plan 目录 | `docs/features/_chores` | `CHORES_DIR` |
 | `{{PLANS_DIR}}` | 同 `CHORES_DIR`（兼容旧名） | `docs/features/_chores` | `PLANS_DIR` |
 | `{{FACTS_DIR}}` | 事实文档目录 | `docs/facts` | `FACTS_DIR` |
+| `{{ARCHITECTURE_DIR}}` | 高阶架构目录 | `docs/architecture` | `ARCHITECTURE_DIR` |
+| `{{ADR_FILE}}` | 跨迭代 ADR 一句话表 | `docs/architecture/tech/adr.md` | `ADR_FILE` |
 | `{{BUSINESS_FACTS_DIR}}` | 业务事实目录 | `docs/facts/business` | `BUSINESS_FACTS_DIR` |
-| `{{TECH_TOPIC_DIR}}` | 技术专题目录 | `docs/facts/tech-topic` | `TECH_TOPIC_DIR` |
+| `{{TECH_TOPIC_DIR}}` | 技术专题目录（非 ADR） | `docs/facts/tech-topic` | `TECH_TOPIC_DIR` |
 | `{{STANDARDS_DIR}}` | 代码规范目录 | `docs/standards` | `STANDARDS_DIR` |
 | `{{TEST_CASES_DIR}}` | 测试用例文本基线根目录 | `docs/test-cases` | `TEST_CASES_DIR` |
 | `{{E2E_CASES_DIR}}` | QA E2E 文本用例目录 | `docs/test-cases/e2e-cases` | `E2E_CASES_DIR` |
@@ -35,9 +37,10 @@
 | `{{RELEASES_DIR}}` | 发布清单目录 | `docs/releases` | `RELEASES_DIR` |
 | `{{SPEC_TEMPLATE}}` | 需求规格模板 | `docs/features/_template/spec.md` | — |
 | `{{PLAN_TEMPLATE}}` | 技术方案模板 | `docs/features/_template/plan.md` | — |
-| `{{GLOSSARY_FILE}}` | 项目级双语术语表 | `docs/features/glossary.md` | — |
+| `{{GLOSSARY_FILE}}` | 项目级双语术语表 | `docs/architecture/business/glossary.md` | — |
 | `{{OVERNIGHT_DIR}}` | overnight-runner 安装目录 | `.overnight-runner` | `OVERNIGHT_DIR` |
-| `{{DOMAIN_MODEL_DOC}}` | 领域模型文档 | `docs/facts/domain-model.md` | — |
+| `{{ARCH_DOMAIN_MODEL_DOC}}` | 核心领域模型（意图：核心聚合+关键字段） | `docs/architecture/business/core-domain-model.md` | — |
+| `{{DOMAIN_MODEL_DOC}}` | 领域模型（as-built） | `docs/facts/domain-model.md` | — |
 | `{{API_SPEC}}` | API 定义 | `docs/facts/api.yaml` | — |
 | `{{DB_SCHEMA_DOC}}` | 数据库规格 | `docs/facts/db-schema.md` | — |
 | `{{BUSINESS_RULES_DOC}}` | 业务规则文档 | `docs/facts/tech-topic/businessrule.md` | — |

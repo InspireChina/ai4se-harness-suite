@@ -12,7 +12,7 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 - 需求已经过 `ba-grill-me` 澄清，阻塞项都有结论
 - 已读过 `docs/features/_template/spec.md`（规格模板）与 `AGENTS.md`
 - 已查过 `docs/facts/` 下的事实文档，避免和现状冲突
-- 已读过项目级术语表 `docs/features/glossary.md`
+- 已读过项目级术语表 `docs/architecture/business/glossary.md`
 
 ## 输出位置
 
@@ -23,7 +23,7 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 - 从 `docs/features/_template/spec.md` 复制起步；同目录可放 `plan.md` / `plan-{slug}.md`
 - 一个能力一个文件夹，不要把多个模块塞进一份 spec
 - 更新已有模块时基于当前 `spec.md` 改，写明基线版本与目标版本
-- **术语表不按 feature 拆分**：新增/变更术语写入项目级 `docs/features/glossary.md`
+- **术语表不按 feature 拆分**：新增/变更术语写入项目级 `docs/architecture/business/glossary.md`
 
 ## 各章节怎么写
 
@@ -33,7 +33,7 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 - 目标：做完之后什么变了
 - 范围：**明确写出"不做什么"** —— 这一节最容易被跳过，也最容易吵架
 
-### 项目术语表 `docs/features/glossary.md`
+### 项目术语表 `docs/architecture/business/glossary.md`
 
 全项目一份，表头固定：
 
@@ -43,7 +43,7 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 
 - 从本 feature 的 §2.3 业务对象、§5 字段表、角色/状态提炼术语，**追加或更新**到项目术语表（去重，不另建 feature 目录下的 glossary）
 - 英文用简洁业务词（如 `Account`、`BookingOrder`），不强制代码标识
-- `spec.md` §2 附近引用项目术语表（相对路径指向 `docs/features/glossary.md`，例如 feature 目录下写「术语表见」+ 链到 `../../glossary.md`）
+- `spec.md` §2 附近引用项目术语表（相对路径指向 `docs/architecture/business/glossary.md`，例如 feature 目录下链到 `../../../architecture/business/glossary.md`）
 - 本轮无新增术语时不必改术语表，但仍须在 spec 中保留引用
 
 ### §2~3 功能与权限
@@ -118,7 +118,7 @@ AC-001：正常创建
 
 ## 自检清单
 
-- [ ] `spec.md` 已引用项目术语表；本轮新术语已写入 `docs/features/glossary.md`（中英对照）
+- [ ] `spec.md` 已引用项目术语表；本轮新术语已写入 `docs/architecture/business/glossary.md`（中英对照）
 - [ ] 每条规则有编号、适用场景、条件、动作
 - [ ] 每条验收标准有编号，且可测
 - [ ] 字段表里枚举值写全

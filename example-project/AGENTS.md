@@ -117,7 +117,7 @@ DTO 约定：
 ## 8. 领域设计：聚合与规则
 
 > **现状**：ACC（账号与个人中心）已落地，聚合见下；其余 feature 以 `docs/features/iteration1/` 为准，
-> 按 feature plan 重建后回写本节与 `docs/facts/domain-model.md`。
+> 按 feature plan 重建后回写本节与 `docs/facts/domain-model.md`（as-built）；Core 见 `docs/architecture/business/core-domain-model.md`。
 
 业务规则引擎（`domain/businessrule/`）— **框架保留、规则未注册**：
 
@@ -249,12 +249,22 @@ cd e2e && npm run test:dev # 只跑开发自测用例
 
 ```
 docs/
+├── architecture/           # 高阶意图（项目准备：BA/TL）
+│   ├── tech/
+│   │   ├── c4-context.md
+│   │   ├── c4-container.md
+│   │   └── adr.md          # 跨迭代 ADR（一句话表）
+│   └── business/
+│       ├── glossary.md     # 项目级双语术语表
+│       ├── product.md
+│       ├── core-domain-model.md # 核心领域模型（核心聚合+关键字段）
+│       └── iterations.md
 ├── features/               # 需求规格 + 技术方案（过程文档）
-│   ├── glossary.md         # 项目级双语术语表
 │   ├── _template/          # spec.md + plan.md（plan 含粗实施步骤）
 │   ├── _chores/            # 无关联 feature 的横切 plan
 │   └── iteration1/         # 咨询师预约平台样例
 │       ├── README.md
+│       ├── high-level-design.md
 │       ├── ACC-account/spec.md
 │       ├── BKG-booking/spec.md
 │       ├── CDC-consultant-discovery/spec.md
@@ -265,18 +275,13 @@ docs/
 │       ├── ADM-admin-ops/spec.md
 │       ├── PLT-platform-capability/spec.md
 │       └── prototypes/     # 独立 Vite 原型 demo（Element Plus，:5174）
-├── facts/                  # 事实文档
+├── facts/                  # 事实文档（as-built）
 │   ├── api.yaml            # API 接口定义
 │   ├── db-schema.md        # 数据库规格
-│   ├── domain-model.md     # 领域模型
+│   ├── domain-model.md     # 领域模型（as-built）
 │   ├── business/           # 业务事实
 │   │   └── booking-flow.md # 业务流程
-│   └── tech-topic/         # 技术专题
-│       ├── 001-4-layer-ddd.md
-│       ├── 002-uuid-string-pk.md
-│       ├── 003-mybatis-plus-vs-jpa.md
-│       ├── 004-jwt-stateless-auth.md
-│       ├── 005-threadlocal-usercontext.md
+│   └── tech-topic/         # 实现专题（非 ADR）
 │       ├── businessrule.md
 │       ├── data-dict.md
 │       ├── error-code.md
@@ -293,6 +298,7 @@ docs/
 │   ├── test.md             # 测试规范
 │   ├── business-rule.md    # 业务规则规范
 │   ├── data-dictionary.md  # 数据字典规范
+│   ├── adr.md              # ADR 写法（正文在 architecture/tech/adr.md）
 │   └── templates/          # 代码模版
 │       ├── 01-ddd-controller.md
 │       ├── 02-ddd-appservice.md

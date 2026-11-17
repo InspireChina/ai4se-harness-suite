@@ -171,20 +171,22 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 
 ```
 {{DOCS_DIR}}/
+├── architecture/           # 高阶意图（项目准备：BA/TL）
+│   ├── tech/               # C4 + adr.md（一句话表）
+│   └── business/           # glossary / product / core-domain-model / iterations
 ├── features/               # 需求规格 + 技术方案（过程文档）
-│   ├── glossary.md         # 项目级双语术语表
 │   ├── _template/          # spec.md + plan.md
 │   ├── _chores/            # 无关联 feature 的 plan
 │   └── <迭代>/<CODE>-<slug>/
-│       ├── spec.md         # 引用 ../../glossary.md
+│       ├── spec.md         # 引用 architecture/business/glossary.md
 │       ├── plan.md         # 含粗实施步骤
 │       └── plan-progress.md  # dev-build 细化进度
-├── facts/                  # 事实文档
+├── facts/                  # 事实文档（as-built）
 │   ├── api.yaml
 │   ├── db-schema.md
-│   ├── domain-model.md
+│   ├── domain-model.md     # 领域模型 as-built
 │   ├── business/           # 业务事实
-│   └── tech-topic/         # 技术专题
+│   └── tech-topic/         # 实现专题（非 ADR）
 ├── standards/              # 代码规范（事实文档）
 │   ├── architecture.md
 │   ├── naming.md
@@ -194,6 +196,7 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 │   ├── db.md
 │   ├── error.md
 │   ├── test.md
+│   ├── adr.md              # ADR 写法；正文在 architecture/tech/adr.md
 │   └── templates/
 ├── e2e-cases/              # QA 用例：E2E 验收用例文本基线
 ├── manual-cases/           # QA 用例：手动执行用例
