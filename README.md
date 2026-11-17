@@ -29,7 +29,7 @@
 | **SDD 技能套件** | [`agile-team-sdd/`](agile-team-sdd/) | 团队统一的开发流程 skill，17 个覆盖 BA→TL→PM→开发→QA→发布→复盘全流程。模板带占位符，可安装到任意项目 | skill + 安装脚本 |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/) | 为任意项目铺好工程底座：`AGENTS.md`（架构与工程规范）+ `docs/` 文档骨架 + `opencode.jsonc` | skill + 模板 + 脚本 |
 | **工具链安装器** | [`tool-chain-installer/`](tool-chain-installer/) | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态 | skill + 工具清单 + 脚本 |
-| **团队工作流指南** | [`https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/`](team-workflow-guide/index.html) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门 | 文档 |
+| **团队工作流指南** | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门 | 文档 |
 | **持续运行面板** | [`overnight-runner/`](overnight-runner/) | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，**多队列**各自独立，决策全程留痕（白天弹窗问你、夜里自动决策） | skill + Python 实现 |
 | **参考实现** | [`example-project/`](example-project/) | 一份完整、可跑、已填满规范的全栈参考项目（Vue 3 + Spring Boot + DDD 四层），用来对照与教学 | 示例项目 |
 
@@ -94,7 +94,18 @@ ba-grill-me → ba-write-spec → pm-estimate
             dev-release-plan → pm-retro → 改进 harness
 ```
 
+## 实践索引
 
+| 实践 | 说明 | 看哪里 |
+|---|---|---|
+| 团队级 SDD 框架 | 适合团队协作和拓展修改的 SDD 框架；纯 skill 驱动，与具体 agent 无关 | [`agile-team-sdd/`](agile-team-sdd/) |
+| 夜间任务 | 把一串 plan 交给 coding agent 无人值守跑：多队列、看门狗重试、决策全程留痕（白天可弹窗、夜里自动兜底） | [`overnight-runner/`](overnight-runner/) |
+| 团队流程手册 | 人怎么配合：总览矩阵、角色手册、测试归属与闸门；规范硬约束仍在各项目 `AGENTS.md` | [`team-workflow-guide/`](team-workflow-guide/index.html) |
+| Agent as Code | 所有 Harness（skills、AGENTS、docs 骨架、MCP、overnight-runner）可安装进代码仓库，换机器 clone 即可用 | [`harness-installer/`](harness-installer/) · [`tool-chain-installer/`](tool-chain-installer/) |
+| 高阶设计 | 迭代前写迭代级高阶方案（HLD / TRD），确认后再开 feature Plan，让迭代边界更稳定 | [`tl-high-level-design`](agile-team-sdd/skills/tl-high-level-design-template/SKILL.md) · [样例 HLD](example-project/docs/features/iteration1/high-level-design.md) |
+| ADR | 跨迭代技术取舍写成架构决策记录；写法在 standards，正文落在 `docs/facts/tech-topic/` | [ADR 规范](example-project/docs/standards/adr.md) · [tech-topic 样例](example-project/docs/facts/tech-topic/001-4-layer-ddd.md) |
+| 代码打样 | 迭代内用独立 Vite 原型先把交互与页面打通，规格与验收对齐后再进实现 | [iteration1 原型](example-project/docs/features/iteration1/prototypes/README.md) |
+| 事实文档 | 实现后校准 `docs/facts/`，形成可靠知识库（API、库表、领域、专题） | [`ba-gen-facts`](agile-team-sdd/skills/ba-gen-facts-template/SKILL.md) · [facts](example-project/docs/facts/README.md) |
 
 ## 快速开始
 
