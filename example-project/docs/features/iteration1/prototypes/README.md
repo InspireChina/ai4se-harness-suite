@@ -1,6 +1,6 @@
 # iteration1 原型（独立 Vite Demo）
 
-Vue 3 + Vue Router + Element Plus，与业务 `apps/frontend/` **并列独立**，仅作需求演示。
+Vue 3 + Vue Router + Element Plus，与业务 `containers/frontend/` **并列独立**，仅作需求演示。
 
 ## 启动
 

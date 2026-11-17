@@ -96,7 +96,7 @@ git diff main...HEAD --stat   # 改动文件清单
 ## 评审意见写法
 
 ```
-[Blocker] apps/backend/.../AppointmentService.java:42
+[Blocker] containers/backend/.../AppointmentService.java:42
 事务边界放错了：@Transactional 标在 repository 实现上，违反 AGENTS.md §6。
 应移到 AppService 的用例方法上。
 ```

@@ -25,7 +25,7 @@
 ### 后端
 
 ```bash
-cd apps/backend
+cd containers/backend
 cp src/main/resources/application.yml.example src/main/resources/application.yml
 # 填入 MySQL 密码与 JWT 密钥
 mvn spring-boot:run
@@ -35,7 +35,7 @@ mvn spring-boot:run
 ### 前端
 
 ```bash
-cd apps/frontend
+cd containers/frontend
 npm install
 npm run dev
 # http://localhost:5173
@@ -52,7 +52,7 @@ npm install && npm run dev
 ## 测试
 
 ```bash
-cd apps/backend && mvn test
+cd containers/backend && mvn test
 cd e2e && npm run test:dev   # 开发壳冒烟
 cd e2e && npm run test:qa    # QA 闸门（用例待按 iteration1 重建）
 ```

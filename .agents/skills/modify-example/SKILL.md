@@ -33,7 +33,7 @@ description: 先改 example-project 样例，再把约定回写刷新 harness �
 
 | example 改动 | 通常要回写 |
 |---|---|
-| `apps/`、根布局、脚本路径 | `harness-installer` 探测默认值、`agile-team-sdd` 占位符默认值、文档树 |
+| `containers/`、根布局、脚本路径 | `harness-installer` 探测默认值、`agile-team-sdd` 占位符默认值、文档树 |
 | `docs/features` 约定（编码文件夹、spec/plan、`_chores`） | `harness-installer/templates/docs/`、`ba-write-spec` / `dev-plan`、catalog、`placeholders.md` |
 | `docs/facts` 等事实目录 | 模板骨架、相关 skill、`team-workflow-guide` |
 | `.overnight-runner/` 布局 | `overnight-runner/scripts/install.sh` + README/SKILL |

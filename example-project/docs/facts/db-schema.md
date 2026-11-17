@@ -5,5 +5,5 @@
 
 ## 迁移
 
-- 目录：`apps/backend/src/main/resources/db/migration/`
+- 目录：`containers/backend/src/main/resources/db/migration/`
 - 现状：无 migration 脚本（仅占位）

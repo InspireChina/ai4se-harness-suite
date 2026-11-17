@@ -137,7 +137,7 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 ├── AGENTS.md            ← {{AGENTS_FILE}}
 ├── .agents/skills/       ← {{SKILLS_DIR}}
 ├── .mcp.json            ← {{MCP_CONFIG_FILE}}
-├── apps/
+├── containers/
 │   ├── backend/         ← {{BACKEND_DIR}}
 │   └── frontend/        ← {{FRONTEND_DIR}}
 ├── e2e/                 ← {{E2E_DIR}}

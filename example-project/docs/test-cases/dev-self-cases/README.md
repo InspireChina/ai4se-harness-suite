@@ -10,4 +10,4 @@
 
 | 场景 | 位置 | 备注 |
 |---|---|---|
-| （按 Plan 补） | `apps/backend/src/test/...` | Happy Path + 失败分支 |
+| （按 Plan 补） | `containers/backend/src/test/...` | Happy Path + 失败分支 |

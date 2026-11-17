@@ -58,7 +58,7 @@
 | JWT 无状态鉴权 | [ADR-004](../../facts/tech-topic/004-jwt-stateless-auth.md) |
 | ThreadLocal 用户上下文 | [ADR-005](../../facts/tech-topic/005-threadlocal-usercontext.md) |
 
-工程布局：`apps/backend`（Spring Boot）+ `apps/frontend`（Vue 3）；本迭代原型仅在 `prototypes/`，**不**并入业务前端直至对应 Plan 确认。
+工程布局：`containers/backend`（Spring Boot）+ `containers/frontend`（Vue 3）；本迭代原型仅在 `prototypes/`，**不**并入业务前端直至对应 Plan 确认。
 
 ### 3.2 本迭代补充边界
 

@@ -78,8 +78,8 @@ PROJECT_NAME="${PROJECT_NAME:-$(basename "$PROJECT_ROOT")}"
 
 # ── 目录与文件 ───────────────────────────────────────────────────────
 SKILLS_DIR="${SKILLS_DIR:-.agents/skills}"
-BACKEND_DIR="${BACKEND_DIR:-apps/backend}"
-FRONTEND_DIR="${FRONTEND_DIR:-apps/frontend}"
+BACKEND_DIR="${BACKEND_DIR:-containers/backend}"
+FRONTEND_DIR="${FRONTEND_DIR:-containers/frontend}"
 E2E_DIR="${E2E_DIR:-e2e}"
 DOCS_DIR="${DOCS_DIR:-docs}"
 AGENTS_FILE="${AGENTS_FILE:-AGENTS.md}"

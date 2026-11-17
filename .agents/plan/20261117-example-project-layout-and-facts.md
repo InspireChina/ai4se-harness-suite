@@ -106,11 +106,11 @@ example-project/
 
 | 文件 | 改什么 |
 |---|---|
-| `e2e-run.sh` | `apps/backend`、`apps/frontend` |
-| `.gitignore` | `apps/frontend/dist/`、`apps/backend/.../application.yml` 等 |
+| `e2e-run.sh` | `containers/backend`、`containers/frontend` |
+| `.gitignore` | `containers/frontend/dist/`、`containers/backend/.../application.yml` 等 |
 | `AGENTS.md` / `README.md` | 拓扑、命令、文档树 |
-| `docs/README.md`、`docs/standards/*`、`docs/test-cases/**` | `designs`→`facts`，`backend`→`apps/backend` |
-| 活着的 features / 非历史约束的说明 | `frontend/` → `apps/frontend/` |
+| `docs/README.md`、`docs/standards/*`、`docs/test-cases/**` | `designs`→`facts`，`backend`→`containers/backend` |
+| 活着的 features / 非历史约束的说明 | `frontend/` → `containers/frontend/` |
 | 历史 plans | 路径字符串批量替换（定稿不改语义） |
 
 不改：Java/Vue 源码包结构、端口、Maven/npm 工程内部路径。
@@ -118,8 +118,8 @@ example-project/
 ### Phase A 验证
 
 ```bash
-test -d example-project/apps/backend
-test -d example-project/apps/frontend
+test -d example-project/containers/backend
+test -d example-project/containers/frontend
 test -d example-project/docs/facts/business
 test ! -e example-project/tools
 test -x example-project/.overnight-runner/overnight-runner
@@ -136,11 +136,11 @@ grep -R 'docs/designs' example-project --include='*.md' --include='*.sh' | grep 
 
 | 模块 | 改动 |
 |---|---|
-| `agile-team-sdd/placeholders.md` | `BACKEND_DIR`/`FRONTEND_DIR` 默认改为 `apps/backend`、`apps/frontend`；`DESIGNS_DIR` → **`FACTS_DIR`**（`docs/facts`）；新增 `BUSINESS_FACTS_DIR`（`docs/facts/business`）；派生文档路径随之改 |
+| `agile-team-sdd/placeholders.md` | `BACKEND_DIR`/`FRONTEND_DIR` 默认改为 `containers/backend`、`containers/frontend`；`DESIGNS_DIR` → **`FACTS_DIR`**（`docs/facts`）；新增 `BUSINESS_FACTS_DIR`（`docs/facts/business`）；派生文档路径随之改 |
 | `agile-team-sdd/install.sh` | 同上默认值与替换字典；残留检查覆盖新名 |
 | `agile-team-sdd/skills/*-template/` | 所有 `{{DESIGNS_DIR}}` / `docs/designs` 文案改为 facts；`ba-gen-facts` 等输出目录对齐 |
 | `agile-team-sdd/{SKILL,README,catalog}.json/md` | 表格与示例树 |
-| `harness-installer/` | 模板 `docs/designs` → `docs/facts` + `facts/business/`；探测逻辑优先 `apps/backend`、`apps/frontend`（兼容旧根目录） |
+| `harness-installer/` | 模板 `docs/designs` → `docs/facts` + `facts/business/`；探测逻辑优先 `containers/backend`、`containers/frontend`（兼容旧根目录） |
 | `overnight-runner/scripts/install.sh` | `TARGET_TOOLS`：`tools/overnight-runner` → `.overnight-runner`；文档与完成提示 |
 | `overnight-runner/{README,SKILL,docs/design}.md` | 布局图 |
 | 根 `AGENTS.md` / `README.md` / `team-workflow-guide/index.html` | 流程与路径表 |
@@ -167,8 +167,8 @@ PATH_MODE=relative agile-team-sdd/install.sh example-project --force --dry-run
 
 ## 6. 非目标
 
-- 不引入真实 submodule（只留 `apps/` 扩展位）。
-- 不把 `e2e/` 迁入 `apps/`。
+- 不引入真实 submodule（只留 `containers/` 扩展位）。
+- 不把 `e2e/` 迁入 `containers/`。
 - 不改 overnight-runner 运行时状态机 / 决策逻辑。
 
 ## 7. 文档同步检查

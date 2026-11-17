@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-BACKEND_DIR="$ROOT/apps/backend"
-FRONTEND_DIR="$ROOT/apps/frontend"
+BACKEND_DIR="$ROOT/containers/backend"
+FRONTEND_DIR="$ROOT/containers/frontend"
 E2E_DIR="$ROOT/e2e"
 BACKEND_PORT=8080
 FRONTEND_PORT=5173

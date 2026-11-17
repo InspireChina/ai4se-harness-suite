@@ -24,7 +24,7 @@
 - **实现目标**：
   1. **删代码**：示例业务实现（后端四聚合与全层、前端业务页、测试、Flyway、E2E 旧断言）。
   2. **删/复位文档**：凡描述「旧示例已实现状态」的文档一律清理（facts、旧 test-cases、旧 demo 相关 chores plan）；不留误导性 as-built。
-  3. **保留**：`docs/features/iteration1/`（含 prototypes）、`docs/standards/`、`docs/features/_template/`、`AGENTS.md`、`.agents/skills/`、可编译空壳 `apps/` + 平台横切骨架。
+  3. **保留**：`docs/features/iteration1/`（含 prototypes）、`docs/standards/`、`docs/features/_template/`、`AGENTS.md`、`.agents/skills/`、可编译空壳 `containers/` + 平台横切骨架。
   4. 清理后工程 =「空壳 + iteration1 需求输入」，再按 AGENTS.md §14 为各 feature 开 plan 实现。
 - **技术边界**：
   - 本 plan **只做清理与骨架复位**，不实现任何 iteration1 业务功能。
@@ -86,9 +86,9 @@ end note
 
 清理后 **无业务表**。删除现有 migration：
 
-- `apps/backend/src/main/resources/db/migration/V20260619__init_user.sql`
-- `apps/backend/src/main/resources/db/migration/V20260620__consultant_appointment.sql`
-- `apps/backend/src/main/resources/db/migration/V20260621__branch.sql`
+- `containers/backend/src/main/resources/db/migration/V20260619__init_user.sql`
+- `containers/backend/src/main/resources/db/migration/V20260620__consultant_appointment.sql`
+- `containers/backend/src/main/resources/db/migration/V20260621__branch.sql`
 
 测试用 `schema.sql` / `data.sql` 同步清空为最小可启动（可仅保留空文件或注释说明）。
 
@@ -135,8 +135,8 @@ paths:
 ```plantuml
 @startuml
 actor Dev
-participant "apps/backend" as BE
-participant "apps/frontend" as FE
+participant "containers/backend" as BE
+participant "containers/frontend" as FE
 participant "docs/facts" as Facts
 
 Dev -> BE : 删除业务包 / migration / 测试
@@ -256,7 +256,7 @@ end note
 
 **adapter**
 
-- `apps/backend/src/main/java/com/consultation/adapter/rest/AdminController.java`
+- `containers/backend/src/main/java/com/consultation/adapter/rest/AdminController.java`
 - `.../AppointmentController.java`
 - `.../AuthController.java`
 - `.../ConsultantController.java`
@@ -294,7 +294,7 @@ end note
 
 **测试**
 
-- `apps/backend/src/test/java/**` 中业务 `*Test.java` 全部删除
+- `containers/backend/src/test/java/**` 中业务 `*Test.java` 全部删除
 
 #### 11.1.2 新增 — 后端骨架
 
@@ -304,9 +304,9 @@ end note
 
 #### 11.1.3 删除 — 前端业务
 
-- `apps/frontend/src/views/admin/**`
-- `apps/frontend/src/views/user/**`（业务页）
-- `apps/frontend/src/views/auth/**`（登录注册；ACC 再做）
+- `containers/frontend/src/views/admin/**`
+- `containers/frontend/src/views/user/**`（业务页）
+- `containers/frontend/src/views/auth/**`（登录注册；ACC 再做）
 - 业务 API `src/api/**`、业务 composables、业务类型字段
 
 #### 11.1.1 修改 — 前端壳
@@ -325,13 +325,13 @@ end note
 
 | 操作 | 文件 / 目录 | 备注 |
 | :--: | :-- | :-- |
-| 删除 | `apps/backend/.../domain/aggregate/*` | 四聚合 |
-| 删除 | `apps/backend/.../adapter/rest/*Controller`（业务） | 见上 |
-| 删除 | `apps/backend/.../db/migration/V20260619*.sql` 等三份 | Flyway |
-| 删除 | `apps/frontend/src/views/{admin,user,auth}/**` | 业务 UI |
+| 删除 | `containers/backend/.../domain/aggregate/*` | 四聚合 |
+| 删除 | `containers/backend/.../adapter/rest/*Controller`（业务） | 见上 |
+| 删除 | `containers/backend/.../db/migration/V20260619*.sql` 等三份 | Flyway |
+| 删除 | `containers/frontend/src/views/{admin,user,auth}/**` | 业务 UI |
 | 新增 | `.../HealthController.java` | 探针 |
 | 修改 | `SecurityConfig.java` | 仅放行 health |
-| 修改 | `apps/frontend/src/router/index.ts` | 仅首页 |
+| 修改 | `containers/frontend/src/router/index.ts` | 仅首页 |
 | 复位 | `docs/facts/api.yaml` | 骨架 OpenAPI |
 | 复位 | `docs/facts/db-schema.md` | 无表说明 |
 | 复位 | `docs/facts/domain-model.md` | 无聚合说明 |
@@ -358,11 +358,11 @@ end note
 
 ## 12. 验证步骤
 
-1. `cd apps/backend && mvn -q test`（或至少 `mvn -q -DskipTests compile`）— 编译通过；若有 Health 测试则绿灯。
-2. `cd apps/frontend && npm run build` — 通过。
+1. `cd containers/backend && mvn -q test`（或至少 `mvn -q -DskipTests compile`）— 编译通过；若有 Health 测试则绿灯。
+2. `cd containers/frontend && npm run build` — 通过。
 3. 启动后端，`curl -s http://localhost:8080/api/v1/health` — 期望 `{"status":"UP"}`（字段以实作为准）。
 4. 启动前端，`/` 可打开占位页；无预约/登录业务路由。
-5. `rg -n "Appointment|BookAppointment|ROLE_ADMIN" apps/` — 无业务残留（允许注释/文档外代码零命中）。
+5. `rg -n "Appointment|BookAppointment|ROLE_ADMIN" containers/` — 无业务残留（允许注释/文档外代码零命中）。
 6. 确认 `docs/features/iteration1/prototypes` 仍可 `npm run dev`（本 chores 不破坏）。
 7. （可选）父仓 `./.agents/verify.sh` 若依赖 example-project 路径 — 确认仍绿。
 

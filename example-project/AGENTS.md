@@ -6,8 +6,8 @@
 
 这是一个全栈工程（Java 17 / Spring Boot 3.2.x / Vue 3 + TypeScript），主要模块如下：
 
-- `apps/backend/`：Spring Boot 后端（四层 DDD 单体）
-- `apps/frontend/`：Vue 3 + TypeScript 前端（Vite 构建）
+- `containers/backend/`：Spring Boot 后端（四层 DDD 单体）
+- `containers/frontend/`：Vue 3 + TypeScript 前端（Vite 构建）
 
 运行时形态：
 
@@ -323,7 +323,7 @@ docs/
 1. **迭代高阶设计（HLD）等待确认**：规格齐备后，在 `docs/features/<迭代>/high-level-design.md` 写本迭代技术边界与跨模块契约（skill：`tl-high-level-design`）。**人工确认前不得写 feature Plan**。跨迭代取舍按 `docs/standards/adr.md` 沉淀到 `docs/facts/tech-topic/`。
 2. **编写 QA 测试用例**（可与 HLD 并行）：在 `docs/test-cases/e2e-cases/` 下编写本轮需求的 E2E 测试用例（文本格式，编号 `TC-xxx`），由 QA 主导判定。**先写文本用例，再写自动化**。规格确认后即可开始。
 3. **Plan 等待确认**：HLD 已确认后，在对应 feature 目录（`docs/features/<迭代>/<CODE>-<slug>/`）写 `plan.md`（或多份 `plan-{slug}.md`）；无关联 feature 的横切方案放 `docs/features/_chores/`。对照 HLD 与规格，等待人工确认后再继续。
-4. **编写开发自测（API 测试）**：根据 Plan 在 `apps/backend/src/test/` 中编写 RestAssured 集成测试（API 级别），运行成功但断言失败（TDD 红牌阶段）。
+4. **编写开发自测（API 测试）**：根据 Plan 在 `containers/backend/src/test/` 中编写 RestAssured 集成测试（API 级别），运行成功但断言失败（TDD 红牌阶段）。
 5. **编写实现**：编写单元测试 + 实现代码（后端 application/domain/adapter 层），通过 `mvn compile` 编译。
 6. **运行开发自测**：运行 `mvn test` 修复失败的测试及其他错误，直至全部通过；同时补齐 `e2e/tests/qa/` 中本轮需求的自动化实现。
 7. **浏览器调试**：使用 Playwright（`./e2e-run.sh`）启动前后端并调试，确认前端视觉效果和交互功能正常。如果报错使用 chrome-devtool-mcp 查看错误。

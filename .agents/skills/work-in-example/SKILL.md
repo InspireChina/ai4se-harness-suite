@@ -34,7 +34,7 @@ example 业务 Plan 写在 `example-project/docs/features/.../plan.md` 或 `_cho
 
 ### 1. 锚定上下文
 
-- 路径、命令、自测都以 `example-project/` 为根（如 `apps/backend`、`docs/features/`、`.overnight-runner/`）
+- 路径、命令、自测都以 `example-project/` 为根（如 `containers/backend`、`docs/features/`、`.overnight-runner/`）
 - 读 `example-project/AGENTS.md` 与相关 docs，按其规范执行
 - 需要安装态 skill 时，以 `example-project/.agents/skills/` 为准
 
@@ -50,7 +50,7 @@ example 业务 Plan 写在 `example-project/docs/features/.../plan.md` 或 `_cho
 
 | 信号 | 例子 |
 |---|---|
-| 目录/命名约定变了 | feature 文件夹编码规则、`spec.md`/`plan.md` 布局、`apps/`、`.overnight-runner/` |
+| 目录/命名约定变了 | feature 文件夹编码规则、`spec.md`/`plan.md` 布局、`containers/`、`.overnight-runner/` |
 | 文档骨架变了 | `docs/` 下新目录、facts/business、`_chores` 语义 |
 | 流程/检查清单变了 | `example-project/AGENTS.md` 与模板 `AGENTS.md.template` 明显不一致 |
 | 安装默认值会错 | 新默认路径、端口、测试命令，现有 `placeholders.md` / `install.sh` 对不上 |

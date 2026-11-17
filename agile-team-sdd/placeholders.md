@@ -16,8 +16,8 @@
 | `{{AGENTS_FILE}}` | 工程规范文件 | `AGENTS.md` | `AGENTS_FILE` |
 | `{{SKILLS_DIR}}` | skills 安装目录 | `.agents/skills` | `SKILLS_DIR` |
 | `{{MCP_CONFIG_FILE}}` | MCP 配置文件 | `.mcp.json` | `MCP_CONFIG_FILE` |
-| `{{BACKEND_DIR}}` | 后端模块目录 | `apps/backend` | `BACKEND_DIR` |
-| `{{FRONTEND_DIR}}` | 前端模块目录 | `apps/frontend` | `FRONTEND_DIR` |
+| `{{BACKEND_DIR}}` | 后端模块目录 | `containers/backend` | `BACKEND_DIR` |
+| `{{FRONTEND_DIR}}` | 前端模块目录 | `containers/frontend` | `FRONTEND_DIR` |
 | `{{E2E_DIR}}` | E2E 测试目录 | `e2e` | `E2E_DIR` |
 | `{{DOCS_DIR}}` | 文档根目录 | `docs` | `DOCS_DIR` |
 | `{{FEATURES_DIR}}` | 需求与方案根目录（feature 文件夹） | `docs/features` | `FEATURES_DIR` |

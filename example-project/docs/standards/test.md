@@ -30,13 +30,13 @@
 
 | 层 | 类型 | 归属 | 位置 | 框架 |
 |---|---|---|---|---|
-| Adapter | 集成测试 | 开发自测 | `apps/backend/src/test/**/*Test.java` | SpringBootTest + RestAssured |
-| Application | 单元测试 | 开发自测 | `apps/backend/src/test/**/*Test.java` | JUnit 5 + Mockito |
-| Domain | 单元测试 | 开发自测 | `apps/backend/src/test/**/*Test.java` | JUnit 5 |
-| Infrastructure | 集成测试 | 开发自测 | `apps/backend/src/test/**/*Test.java` | SpringBootTest + MariaDB4j |
+| Adapter | 集成测试 | 开发自测 | `containers/backend/src/test/**/*Test.java` | SpringBootTest + RestAssured |
+| Application | 单元测试 | 开发自测 | `containers/backend/src/test/**/*Test.java` | JUnit 5 + Mockito |
+| Domain | 单元测试 | 开发自测 | `containers/backend/src/test/**/*Test.java` | JUnit 5 |
+| Infrastructure | 集成测试 | 开发自测 | `containers/backend/src/test/**/*Test.java` | SpringBootTest + MariaDB4j |
 | View | E2E 验收 | **QA 测试** | `e2e/tests/qa/` | Playwright |
 | — | E2E 自测 | 开发自测 | `e2e/tests/dev/` | Playwright |
-| Composable / Store / Component | 单元测试 | 开发自测 | `apps/frontend/src/**/*.test.ts` | Vitest |
+| Composable / Store / Component | 单元测试 | 开发自测 | `containers/frontend/src/**/*.test.ts` | Vitest |
 | — | 手动用例 | **QA 测试** | `docs/test-cases/manual-cases/` | 人工 |
 | — | 冒烟用例 | **QA 测试** | `docs/test-cases/smoking-cases/` | 人工 / 自动化 |
 | — | 自测场景索引 | 开发自测 | `docs/test-cases/dev-self-cases/` | 可选文本索引 |

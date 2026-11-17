@@ -53,8 +53,8 @@ git diff main...HEAD --stat
 
 ## 2. 测试通过
 
-- [ ] 后端单元测试全绿（`cd apps/backend && mvn test`）
-- [ ] 前端构建通过（`cd apps/frontend && npm run build`）
+- [ ] 后端单元测试全绿（`cd containers/backend && mvn test`）
+- [ ] 前端构建通过（`cd containers/frontend && npm run build`）
 - [ ] **QA 验收用例集全绿**（`cd e2e && npm run test:qa`）
 - [ ] QA 已逐条验收 `docs/test-cases/e2e-cases/test-cases.md`
 - [ ] 冒烟用例全绿（`docs/test-cases/smoking-cases/smoking-test-cases.md`）

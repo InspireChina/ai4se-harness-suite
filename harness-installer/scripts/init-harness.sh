@@ -61,10 +61,10 @@ detect_dir() {
   echo "$found"
 }
 
-BACKEND_DIR="${BACKEND_DIR:-$(detect_dir apps/backend backend service server api pom.xml)}"
-[ -z "$BACKEND_DIR" ] && BACKEND_DIR="apps/backend"
-FRONTEND_DIR="${FRONTEND_DIR:-$(detect_dir apps/frontend frontend web client ui package.json)}"
-[ -z "$FRONTEND_DIR" ] && FRONTEND_DIR="apps/frontend"
+BACKEND_DIR="${BACKEND_DIR:-$(detect_dir containers/backend apps/backend backend service server api pom.xml)}"
+[ -z "$BACKEND_DIR" ] && BACKEND_DIR="containers/backend"
+FRONTEND_DIR="${FRONTEND_DIR:-$(detect_dir containers/frontend apps/frontend frontend web client ui package.json)}"
+[ -z "$FRONTEND_DIR" ] && FRONTEND_DIR="containers/frontend"
 E2E_DIR="${E2E_DIR:-$(detect_dir e2e tests test package.json)}"
 [ -z "$E2E_DIR" ] && E2E_DIR="e2e"
 DOCS_DIR="${DOCS_DIR:-docs}"

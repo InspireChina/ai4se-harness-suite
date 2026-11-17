@@ -40,7 +40,7 @@ harness-installer/
 
 ## 脚本做了什么
 
-1. 探测项目结构：`apps/backend/`（`pom.xml`）、`apps/frontend/`（`package.json`）、`e2e/`、`docs/`
+1. 探测项目结构：`containers/backend/`（`pom.xml`）、`containers/frontend/`（`package.json`）、`e2e/`、`docs/`
 2. 渲染 `templates/AGENTS.md.template` → `<项目>/AGENTS.md`
 3. 复制 `templates/docs/**` → `<项目>/docs/**`
 4. 缺失时创建 `<项目>/opencode.jsonc`

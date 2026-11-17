@@ -9,7 +9,7 @@
 ## 1. 背景与目标
 
 - 将 CDN 静态多页原型改为独立 Vite + Vue 3 + Element Plus demo。
-- 不并入 `example-project/apps/frontend/`。
+- 不并入 `example-project/containers/frontend/`。
 
 ## 2. 交付
 
