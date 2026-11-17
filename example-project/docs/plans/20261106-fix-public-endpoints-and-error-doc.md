@@ -4,7 +4,7 @@
 >
 > 关联需求：不涉及（本轮修的是实现与事实文档之间的既有偏差，偏差来源见 §1.1）
 >
-> 设计 design：docs/designs/topic/businessrule.md、docs/designs/topic/error-code.md
+> 设计 design：docs/facts/tech-topic/businessrule.md、docs/facts/tech-topic/error-code.md
 >
 >
 > **plan 一旦定稿就不修改。** 同一资源的二次改造新建 `YYYY-MM-DD-{slug}.md`，不修改原计划文件
@@ -21,7 +21,7 @@ DataDictionary 的集成测试，runner 在无人值守下记录了 **3 项"发�
 |---|---|---|---|
 | 1 | `config.auth.publicEndpoints` 被序列化成 `{"0":"/api/v1/auth/**",...}` 而非 JSON 数组 | **实现缺陷** | 修（§11.1） |
 | 2 | `AGENTS.md` §7 描述了一套不存在的错误模型 | **事实文档与实现不符** | 修（§11.3） |
-| 3 | `config.auth.*` 的来源与 `docs/designs/topic/businessrule.md` 的"配置路径"列对不上 | **事实文档与实现不符** | 修（§11.3） |
+| 3 | `config.auth.*` 的来源与 `docs/facts/tech-topic/businessrule.md` 的"配置路径"列对不上 | **事实文档与实现不符** | 修（§11.3） |
 | 4 | `docs/standards/error.md` 描述的 `IError` / `AbstractException` / `ErrorGroup` 体系在代码里 **完全不存在** | **事实文档与实现不符** | 修（§11.3） |
 | 5 | 6 处引用 `docs/dev/design-fact/**` 的死链（该目录不存在） | **死链** | 修（§11.3） |
 
@@ -68,12 +68,12 @@ GlobalExceptionHandler（@RestControllerAdvice）
 - 实现目标：
   - `GET /api/v1/business-rules` 返回的 `config.auth.publicEndpoints` 是 **JSON 数组**
   - `AGENTS.md` §7 / §12 与 `docs/standards/error.md` 的错误模型描述与代码 **完全一致**
-  - `docs/designs/topic/businessrule.md` 的"配置路径"列指向 **真实生效** 的配置来源
+  - `docs/facts/tech-topic/businessrule.md` 的"配置路径"列指向 **真实生效** 的配置来源
   - 仓库内不再有指向 `docs/dev/design-fact/**` 的死链
 - 技术边界：
   - 生产代码改动 **限 2 个文件**：`BusinessRuleConfig`、`BusinessRuleProvider`
   - YAML 内容 **不改**
-  - API 契约 **不改**（`docs/designs/api.yaml` 的 `config: {type: object}` 不动）
+  - API 契约 **不改**（`docs/facts/api.yaml` 的 `config: {type: object}` 不动）
   - 前端、数据库、QA 用例 **不涉及**
 
 ---
@@ -125,7 +125,7 @@ AuthConfig *-- "publicEndpoints : String" <<list>>
 
 ## 4. API 设计（OpenAPI）
 
-**无契约变更。** `docs/designs/api.yaml` 里 `BusinessRuleResponse.config` 是
+**无契约变更。** `docs/facts/api.yaml` 里 `BusinessRuleResponse.config` 是
 `{ type: object }`，本轮不细化它（细化属于契约变更，需另行评审）。
 
 本轮修复后响应体的 **实际形状**（`config` 部分，现状 vs 修复后）：
@@ -248,9 +248,9 @@ Prov -> Res : config.auth.publicEndpoints = ["...","..."]
   （8 / BCrypt / 86400000 / HMAC-SHA256 / 5 个端点），
   这样即使 YAML 加载失败，接口也不会返回"空壳"配置。
 * **`appointment` 子树保持 `Map<String,Object>`**，其 YAML 键与值本轮 **一个字都不改**。
-* **不改 YAML 文件内容**（`backend/src/main/resources/business-rules/*.yml`），
+* **不改 YAML 文件内容**（`apps/backend/src/main/resources/business-rules/*.yml`），
   只改它对应的 Java 类型声明。
-* **不改 API 契约**：`docs/designs/api.yaml` 不动。
+* **不改 API 契约**：`docs/facts/api.yaml` 不动。
 * **不改 `SecurityConfig`、`GlobalExceptionHandler`、`ErrorResponse`**。
 * 命名：
   * 测试方法名 `should_{action}_{expectedResult}`
@@ -338,8 +338,8 @@ Prov -> Res : config.auth.publicEndpoints = ["...","..."]
 
 | 操作 | 文件 | 改动 |
 | :--: | :-- | :-- |
-| 改 | `backend/src/main/java/com/consultation/domain/businessrule/BusinessRuleConfig.java` | `auth` 由 `Map<String,Object>` 改为有类型的嵌套类 `AuthConfig`（含 `PasswordConfig` / `TokenConfig` / `List<String> publicEndpoints`）；`appointment` 保持 `Map<String,Object>` |
-| 改 | `backend/src/main/java/com/consultation/infrastructure/config/BusinessRuleProvider.java` | 注入 `ObjectMapper`，在 `@PostConstruct` 里把 `BusinessRuleConfig` 投影为 `Map<String,Object>` 后再挂进 `config`，保证对外返回结构不变（除 `publicEndpoints` 变回数组） |
+| 改 | `apps/backend/src/main/java/com/consultation/domain/businessrule/BusinessRuleConfig.java` | `auth` 由 `Map<String,Object>` 改为有类型的嵌套类 `AuthConfig`（含 `PasswordConfig` / `TokenConfig` / `List<String> publicEndpoints`）；`appointment` 保持 `Map<String,Object>` |
+| 改 | `apps/backend/src/main/java/com/consultation/infrastructure/config/BusinessRuleProvider.java` | 注入 `ObjectMapper`，在 `@PostConstruct` 里把 `BusinessRuleConfig` 投影为 `Map<String,Object>` 后再挂进 `config`，保证对外返回结构不变（除 `publicEndpoints` 变回数组） |
 
 > **为什么投影放在 Provider（infrastructure）而不是让 domain 直接返回 POJO**：
 > `BusinessRuleConfig` 在 `domain` 层，`AGENTS.md` §3 要求 domain 不依赖基础设施；
@@ -357,21 +357,21 @@ Prov -> Res : config.auth.publicEndpoints = ["...","..."]
 | 操作 | 文件 | 改动 |
 | :--: | :-- | :-- |
 | 改 | `AGENTS.md` §7 | 按 `GlobalExceptionHandler` 实际实现重写错误模型：4 条异常映射表 + 真实响应体 `{errorCode, errorMessage, data}`；删除不存在的 `BusinessException` / `APPOINTMENT_CONFLICT` / `message` / `timestamp` |
-| 改 | `AGENTS.md` §12 | 检查清单里「业务校验使用 `BusinessException`」改为实际异常类型（`IllegalArgumentException` / `IllegalStateException`）；3 条 `docs/dev/design-fact/**` 死链改指 `docs/designs/**` |
-| 改 | `docs/standards/error.md` | 删除 `IError` / `ErrorGroup` / `AbstractException` 异常类层次（代码里不存在）；换成 §6.4 的实际映射表；错误码表指向 `docs/designs/topic/error-code.md`（修死链） |
-| 改 | `docs/standards/business-rule.md` | 结尾死链 `docs/dev/design-fact/others/businessrule.md` → `docs/designs/topic/businessrule.md`；补一条约束：**只有列表会被 `Map<String,Object>` 绑坏**，将来往 YAML 加列表前必须先给对应配置类加类型 |
-| 改 | `docs/standards/data-dictionary.md` | 结尾死链 `docs/dev/design-fact/others/data-dict.md` → `docs/designs/topic/data-dict.md` |
-| 改 | `docs/designs/topic/businessrule.md` | 认证规则表的「配置路径」列改为真实来源（`auth.yml → token.expirationMs` 而非 `application.yml → jwt.expiration`；`auth.yml → password.algorithm` 而非 `SecurityConfig (hardcoded)`） |
+| 改 | `AGENTS.md` §12 | 检查清单里「业务校验使用 `BusinessException`」改为实际异常类型（`IllegalArgumentException` / `IllegalStateException`）；3 条 `docs/dev/design-fact/**` 死链改指 `docs/facts/**` |
+| 改 | `docs/standards/error.md` | 删除 `IError` / `ErrorGroup` / `AbstractException` 异常类层次（代码里不存在）；换成 §6.4 的实际映射表；错误码表指向 `docs/facts/tech-topic/error-code.md`（修死链） |
+| 改 | `docs/standards/business-rule.md` | 结尾死链 `docs/dev/design-fact/others/businessrule.md` → `docs/facts/tech-topic/businessrule.md`；补一条约束：**只有列表会被 `Map<String,Object>` 绑坏**，将来往 YAML 加列表前必须先给对应配置类加类型 |
+| 改 | `docs/standards/data-dictionary.md` | 结尾死链 `docs/dev/design-fact/others/data-dict.md` → `docs/facts/tech-topic/data-dict.md` |
+| 改 | `docs/facts/tech-topic/businessrule.md` | 认证规则表的「配置路径」列改为真实来源（`auth.yml → token.expirationMs` 而非 `application.yml → jwt.expiration`；`auth.yml → password.algorithm` 而非 `SecurityConfig (hardcoded)`） |
 
 ### 11.4 文档同步检查
 
 | 文档 | 是否需要更新 | 理由 |
 |---|---|---|
-| `docs/designs/api.yaml` | **不涉及** | 无 API 契约变更（`config` 仍是自由 object） |
-| `docs/designs/db-schema.md` | **不涉及** | 无表结构变更 |
-| `docs/designs/topic/businessrule.md` | **已更新** | 配置路径列与实现对齐（§11.3） |
-| `docs/designs/topic/data-dict.md` | **不涉及** | 字典定义未变 |
-| `docs/designs/topic/error-code.md` | **不涉及** | 其"当前实现映射"表已如实记录现状，无需改 |
+| `docs/facts/api.yaml` | **不涉及** | 无 API 契约变更（`config` 仍是自由 object） |
+| `docs/facts/db-schema.md` | **不涉及** | 无表结构变更 |
+| `docs/facts/tech-topic/businessrule.md` | **已更新** | 配置路径列与实现对齐（§11.3） |
+| `docs/facts/tech-topic/data-dict.md` | **不涉及** | 字典定义未变 |
+| `docs/facts/tech-topic/error-code.md` | **不涉及** | 其"当前实现映射"表已如实记录现状，无需改 |
 | `docs/test-cases/e2e-cases/test-cases.md` | **不涉及** | 属开发自测，不是 QA 用例；无新需求、无验收标准变化 |
 | `docs/standards/error.md` | **已更新** | 见 §11.3 |
 | `docs/standards/business-rule.md` | **已更新** | 见 §11.3 |
@@ -382,23 +382,23 @@ Prov -> Res : config.auth.publicEndpoints = ["...","..."]
 
 ## 12. 验证步骤
 
-1. **基线（改动前）**：`cd backend && mvn -o -B test` → 期望 `Tests run: 28, Failures: 0, Errors: 0`
-2. **实现后**：`cd backend && mvn -o -B test` → 期望 `Tests run: 30, Failures: 0, Errors: 0`
+1. **基线（改动前）**：`cd apps/backend && mvn -o -B test` → 期望 `Tests run: 28, Failures: 0, Errors: 0`
+2. **实现后**：`cd apps/backend && mvn -o -B test` → 期望 `Tests run: 30, Failures: 0, Errors: 0`
    （28 基线 + 2 新增）
-3. **只看新用例**：`cd backend && mvn -o -B test -Dtest='BusinessRuleControllerTest'`
+3. **只看新用例**：`cd apps/backend && mvn -o -B test -Dtest='BusinessRuleControllerTest'`
    → 期望 `Tests run: 7, Failures: 0, Errors: 0`（原 5 + 新 2）
 4. **确认没碰不该碰的**：
    * `git status --short` → 只应出现 §11.1 / §11.3 列出的文件
-   * `git diff -- backend/src/main/resources/business-rules/` → **必须为空**（YAML 不改）
-   * `git diff -- backend/src/main/java/com/consultation/adapter/` → **必须为空**
-   * `git diff -- backend/src/main/java/com/consultation/application/` → **必须为空**
-   * `git diff -- docs/designs/api.yaml` → **必须为空**
+   * `git diff -- apps/backend/src/main/resources/business-rules/` → **必须为空**（YAML 不改）
+   * `git diff -- apps/backend/src/main/java/com/consultation/adapter/` → **必须为空**
+   * `git diff -- apps/backend/src/main/java/com/consultation/application/` → **必须为空**
+   * `git diff -- docs/facts/api.yaml` → **必须为空**
 5. **确认死链已清**：`grep -rn "design-fact" --include="*.md" . | grep -v "docs/plans/"`
    → 无输出（`docs/plans/` 下会命中本 Plan 自身对死链路径的引用，属正常）
 6. **确认文档里的错误码与代码一致**：
-   `grep -rn 'new ErrorResponse("' backend/src/main` 的 4 个错误码，
+   `grep -rn 'new ErrorResponse("' apps/backend/src/main` 的 4 个错误码，
    与 `AGENTS.md` §7 表格逐条对得上
-7. **确认没有引入 `TC-` 编号**：`grep -rn "TC-" backend/src/test/` → 无输出
+7. **确认没有引入 `TC-` 编号**：`grep -rn "TC-" apps/backend/src/test/` → 无输出
 
 ---
 
@@ -425,7 +425,7 @@ Prov -> Res : config.auth.publicEndpoints = ["...","..."]
 * **风险点 4：`publicEndpoints` 变数组属于"对外可见的行为变更"。**
   下游若已按 `{"0":...}` 消费，改完会坏。
   但 `{"0":...}` 从来不是任何文档承诺过的形状（`api.yaml` 只说 `config: {type: object}`），
-  且当前没有任何消费方依赖这个形状（已核实：`frontend/src` 无引用；
+  且当前没有任何消费方依赖这个形状（已核实：`apps/frontend/src` 无引用；
   `e2e/tests/qa/app.spec.ts` 的 TC-004 只断言该接口 HTTP 200，不读 `config`）。
   结论：**属于修 bug，不是破坏兼容**。
 
@@ -438,7 +438,7 @@ Prov -> Res : config.auth.publicEndpoints = ["...","..."]
 
 ## 14. 实施后需更新的 design 文档
 
-见 §11.3（`docs/designs/topic/businessrule.md` 已列入本轮修改清单）。
+见 §11.3（`docs/facts/tech-topic/businessrule.md` 已列入本轮修改清单）。
 
 ---
 

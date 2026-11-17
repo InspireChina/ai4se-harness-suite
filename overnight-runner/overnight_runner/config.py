@@ -1,10 +1,12 @@
-"""配置加载：队列配置（overnight-runner.yaml）与项目配置（.overnight-runner/project.yaml）。
+"""配置加载：队列配置与项目配置（均在 `.overnight-runner/` 下）。
 
 配置分三层：
 
-- **runner 级**：`overnight-runner.yaml` —— agent 命令、看门狗、UI、决策策略（项目共享）
+- **runner 级**：`.overnight-runner/overnight-runner.yaml` —— agent / 看门狗 / UI / 决策策略
 - **project 级**：`.overnight-runner/project.yaml` —— 默认提示词与默认决策规则（全队列共享）
 - **queue 级**：`.overnight-runner/queue/<name>/queue.yaml` —— 队列里的任务列表（每条队列一份）
+
+兼容：若仅项目根还有旧的 `overnight-runner.yaml`，首次加载时自动迁入 `.overnight-runner/`。
 """
 
 from __future__ import annotations
@@ -267,11 +269,27 @@ def strip_queue_section(text: str) -> str:
     return "\n".join(out)
 
 
+def migrate_runner_config_into_project_dir(project_root: Path) -> str:
+    """把项目根的 `overnight-runner.yaml` 迁到 `.overnight-runner/`（幂等）。
+
+    - 目标已存在：不覆盖，也不动根文件（避免误删用户双份配置）
+    - 仅根文件存在：move 到 `.overnight-runner/overnight-runner.yaml`
+    """
+    dest = queue_config_path(project_root)
+    src = legacy_root_queue_config_path(project_root)
+    if dest.exists() or not src.exists():
+        return ""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(src), str(dest))
+    return f"{src.name} → {PROJECT_DIR_NAME}/{QUEUE_CONFIG_NAME}"
+
+
 def migrate_legacy_queue(project_root: Path) -> str:
     """把老布局迁移到 `.overnight-runner/queue/default/`。
 
     老布局：
-        <root>/overnight-runner.yaml            的 queue: 段
+        <root>/overnight-runner.yaml            （先迁入 `.overnight-runner/`）
+        配置文件里的 queue: 段
         <root>/.overnight-runner/state.json
         <root>/.overnight-runner/logs/
         <root>/.overnight-runner/decisions.jsonl
@@ -282,12 +300,16 @@ def migrate_legacy_queue(project_root: Path) -> str:
     返回一句人类可读的迁移说明（没迁移则返回空串）。
     """
     notes: list[str] = []
+    moved = migrate_runner_config_into_project_dir(project_root)
+    if moved:
+        notes.append(moved)
+
     default = queue_paths(project_root, DEFAULT_QUEUE_NAME)
 
-    # 1) 队列定义：根配置文件的 queue: 段 → queue/default/queue.yaml
-    legacy_cfg_path = queue_config_path(project_root)
-    if legacy_cfg_path.exists():
-        raw = legacy_cfg_path.read_text(encoding="utf-8")
+    # 1) 队列定义：配置文件的 queue: 段 → queue/default/queue.yaml
+    cfg_path = queue_config_path(project_root)
+    if cfg_path.exists():
+        raw = cfg_path.read_text(encoding="utf-8")
         data = yaml.loads(raw) or {}
         legacy_queue = list(data.get("queue") or [])
         if legacy_queue and not default.config.exists():
@@ -297,9 +319,9 @@ def migrate_legacy_queue(project_root: Path) -> str:
                 yaml.dumps({"queue": legacy_queue}),
             )
             notes.append(f"队列定义 → {default.config}")
-            # 把根配置里的 queue: 段清空，保证只迁移一次。
+            # 把配置里的 queue: 段清空，保证只迁移一次。
             # 按行做手术，保留用户写的注释与排版。
-            atomic_write(legacy_cfg_path, strip_queue_section(raw))
+            atomic_write(cfg_path, strip_queue_section(raw))
 
     # 2) 运行时状态 / 日志 / 决策记录：整体搬进 default 队列目录
     legacy_dir = project_root / PROJECT_DIR_NAME
@@ -480,10 +502,17 @@ class RunnerConfig:
 
 
 def queue_config_path(project_root: Path) -> Path:
+    """当前规范路径：`.overnight-runner/overnight-runner.yaml`。"""
+    return project_root / PROJECT_DIR_NAME / QUEUE_CONFIG_NAME
+
+
+def legacy_root_queue_config_path(project_root: Path) -> Path:
+    """旧路径：项目根的 `overnight-runner.yaml`。"""
     return project_root / QUEUE_CONFIG_NAME
 
 
 def load_runner_config(project_root: Path) -> RunnerConfig:
+    migrate_runner_config_into_project_dir(project_root)
     path = queue_config_path(project_root)
     if not path.exists():
         return RunnerConfig(source_path=path)
@@ -517,7 +546,9 @@ __all__ = [
     "default_queue_config",
     "load_project_config",
     "load_runner_config",
+    "legacy_root_queue_config_path",
     "migrate_legacy_queue",
+    "migrate_runner_config_into_project_dir",
     "queue_config_path",
     "queue_names",
     "queue_paths",

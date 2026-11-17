@@ -16,13 +16,15 @@
 | `{{AGENTS_FILE}}` | 工程规范文件 | `AGENTS.md` | `AGENTS_FILE` |
 | `{{SKILLS_DIR}}` | skills 安装目录 | `.agent/skills` | `SKILLS_DIR` |
 | `{{MCP_CONFIG_FILE}}` | MCP 配置文件 | `.mcp.json` | `MCP_CONFIG_FILE` |
-| `{{BACKEND_DIR}}` | 后端模块目录 | `backend` | `BACKEND_DIR` |
-| `{{FRONTEND_DIR}}` | 前端模块目录 | `frontend` | `FRONTEND_DIR` |
+| `{{BACKEND_DIR}}` | 后端模块目录 | `apps/backend` | `BACKEND_DIR` |
+| `{{FRONTEND_DIR}}` | 前端模块目录 | `apps/frontend` | `FRONTEND_DIR` |
 | `{{E2E_DIR}}` | E2E 测试目录 | `e2e` | `E2E_DIR` |
 | `{{DOCS_DIR}}` | 文档根目录 | `docs` | `DOCS_DIR` |
 | `{{FEATURES_DIR}}` | 需求规格目录 | `docs/features` | `FEATURES_DIR` |
 | `{{PLANS_DIR}}` | 技术方案（Plan）目录 | `docs/plans` | `PLANS_DIR` |
-| `{{DESIGNS_DIR}}` | 设计文档目录 | `docs/designs` | `DESIGNS_DIR` |
+| `{{FACTS_DIR}}` | 事实文档目录 | `docs/facts` | `FACTS_DIR` |
+| `{{BUSINESS_FACTS_DIR}}` | 业务事实目录 | `docs/facts/business` | `BUSINESS_FACTS_DIR` |
+| `{{TECH_TOPIC_DIR}}` | 技术专题目录 | `docs/facts/tech-topic` | `TECH_TOPIC_DIR` |
 | `{{STANDARDS_DIR}}` | 代码规范目录 | `docs/standards` | `STANDARDS_DIR` |
 | `{{TEST_CASES_DIR}}` | 测试用例文本基线根目录 | `docs/test-cases` | `TEST_CASES_DIR` |
 | `{{E2E_CASES_DIR}}` | QA E2E 文本用例目录 | `docs/test-cases/e2e-cases` | `E2E_CASES_DIR` |
@@ -31,11 +33,11 @@
 | `{{DEV_SELF_CASES_DIR}}` | 开发自测用例索引目录 | `docs/test-cases/dev-self-cases` | `DEV_SELF_CASES_DIR` |
 | `{{RELEASES_DIR}}` | 发布清单目录 | `docs/releases` | `RELEASES_DIR` |
 | `{{SPEC_TEMPLATE}}` | 需求规格模板 | `docs/features/_template.md` | — |
-| `{{DOMAIN_MODEL_DOC}}` | 领域模型文档 | `docs/designs/domain-model.md` | — |
-| `{{API_SPEC}}` | API 定义 | `docs/designs/api.yaml` | — |
-| `{{DB_SCHEMA_DOC}}` | 数据库规格 | `docs/designs/db-schema.md` | — |
-| `{{BUSINESS_RULES_DOC}}` | 业务规则文档 | `docs/designs/topic/businessrule.md` | — |
-| `{{DATA_DICT_DOC}}` | 数据字典文档 | `docs/designs/topic/data-dict.md` | — |
+| `{{DOMAIN_MODEL_DOC}}` | 领域模型文档 | `docs/facts/domain-model.md` | — |
+| `{{API_SPEC}}` | API 定义 | `docs/facts/api.yaml` | — |
+| `{{DB_SCHEMA_DOC}}` | 数据库规格 | `docs/facts/db-schema.md` | — |
+| `{{BUSINESS_RULES_DOC}}` | 业务规则文档 | `docs/facts/tech-topic/businessrule.md` | — |
+| `{{DATA_DICT_DOC}}` | 数据字典文档 | `docs/facts/tech-topic/data-dict.md` | — |
 | `{{E2E_RUNNER}}` | 一键跑 E2E 的脚本 | `e2e-run.sh` | `E2E_RUNNER` |
 | `{{TARGET_BRANCH}}` | 主干分支（MR 目标分支） | `main` | `TARGET_BRANCH` |
 | `{{BACKEND_PORT}}` | 后端端口 | `8080` | `BACKEND_PORT` |
@@ -56,6 +58,7 @@ PATH_MODE=relative ./install.sh ../my-project
 
 相对模式下 `{{PROJECT_ROOT}}` 渲染为 `.`，`{{HARNESS_ROOT}}` 仍为绝对路径
 （它指向套件源码，在项目之外）。
+
 
 ## 不做替换的内容
 

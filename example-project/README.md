@@ -15,34 +15,19 @@
 ## 项目结构
 
 ```
-├── backend/                    # Spring Boot 后端
-│   └── src/main/java/com/consultation/
-│       ├── adapter/rest/       # HTTP 适配层（Controller）
-│       ├── application/        # 用例编排层（Service + Assembler）
-│       ├── domain/             # 领域模型层（Aggregate + VO + DomainService）
-│       └── infrastructure/     # 基础设施层（Persistence + Security + Config）
-├── frontend/                   # Vue 3 前端
-│   └── src/
-│       ├── views/              # 页面视图（user / admin / auth / home）
-│       ├── components/         # 通用组件
-│       ├── composables/        # 可复用逻辑
-│       ├── stores/             # Pinia 状态管理
-│       ├── api/                # API 封装
-│       └── router/             # 路由配置
+├── apps/
+│   ├── backend/                # Spring Boot 后端
+│   └── frontend/               # Vue 3 前端
 ├── e2e/                        # Playwright E2E 测试
-│   └── tests/
-│       ├── qa/                 # QA 验收用例（合并闸门）
-│       └── dev/                # 开发自测用例
-├── docs/                       # 文档体系
-│   ├── features/               # 需求规格（iteration1 样例骨架）
+├── docs/
+│   ├── features/               # 需求规格
 │   ├── plans/                  # 技术方案
-│   ├── designs/                # 设计文档
+│   ├── facts/                  # 事实文档
+│   │   ├── business/           # 业务事实
+│   │   └── tech-topic/         # 技术专题
 │   ├── standards/              # 代码规范
 │   └── test-cases/             # 测试用例文本基线
-│       ├── e2e-cases/          # QA 验收用例（TC-xxx）
-│       ├── manual-cases/       # QA 手动用例
-│       ├── smoking-cases/      # QA 冒烟用例
-│       └── dev-self-cases/     # 开发自测索引
+├── .overnight-runner/          # 无人值守 runner（代码 + 配置 + 队列）
 └── AGENTS.md                   # AI Agent 工程规范
 ```
 
@@ -57,7 +42,7 @@
 ### 1. 配置后端
 
 ```bash
-cd backend
+cd apps/backend
 cp src/main/resources/application.yml.example src/main/resources/application.yml
 # 编辑 application.yml，填入 MySQL 密码和 JWT 密钥
 ```
@@ -65,7 +50,7 @@ cp src/main/resources/application.yml.example src/main/resources/application.yml
 ### 2. 启动后端
 
 ```bash
-cd backend
+cd apps/backend
 mvn spring-boot:run
 # 后端启动于 http://localhost:8080
 ```
@@ -73,7 +58,7 @@ mvn spring-boot:run
 ### 3. 启动前端
 
 ```bash
-cd frontend
+cd apps/frontend
 npm install
 npm run dev
 # 前端启动于 http://localhost:5173，/api 请求自动代理到后端
@@ -86,7 +71,7 @@ npm run dev
 ### 开发自测
 
 ```bash
-cd backend
+cd apps/backend
 mvn test
 # 使用 MariaDB4j 自动启动临时 MySQL，无需手动建库
 
@@ -123,6 +108,6 @@ Client → Vue 前端 (:5173) → /api 代理 → Spring Boot 后端 (:8080) →
 
 - **需求规格**：`docs/features/iteration1/` — 咨询师预约平台样例（v0.1；独立 Vite 原型：`prototypes/`，`npm run dev` :5174）
 - **技术方案**：`docs/plans/` — 技术实现方案与任务拆分
-- **设计文档**：`docs/designs/` — API 定义、数据库设计、领域模型、技术主题
+- **设计文档**：`docs/facts/` — API 定义、数据库设计、领域模型、技术主题
 - **代码规范**：`docs/standards/` — 架构、命名、安全、分层等规范及代码模板
 - **测试用例**：`docs/test-cases/{e2e,manual,smoking,dev-self}-cases/`

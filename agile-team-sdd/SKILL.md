@@ -18,7 +18,7 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 |---|---|---|
 | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时，写规格之前 |
 | `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准） | 需求已澄清，落成 `docs/features/` |
-| `ba-gen-facts` | 从代码生成/校准事实文档（API、库表、领域模型） | 实现变了，`docs/designs/` 与代码不一致 |
+| `ba-gen-facts` | 从代码生成/校准事实文档（API、库表、领域模型） | 实现变了，`docs/facts/` 与代码不一致 |
 
 ### 开发
 
@@ -130,14 +130,17 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 ├── AGENTS.md            ← {{AGENTS_FILE}}
 ├── .agent/skills/       ← {{SKILLS_DIR}}
 ├── .mcp.json            ← {{MCP_CONFIG_FILE}}
-├── backend/             ← {{BACKEND_DIR}}
-├── frontend/            ← {{FRONTEND_DIR}}
+├── apps/
+│   ├── backend/         ← {{BACKEND_DIR}}
+│   └── frontend/        ← {{FRONTEND_DIR}}
 ├── e2e/                 ← {{E2E_DIR}}
 ├── e2e-run.sh           ← {{E2E_RUNNER}}
 └── docs/
     ├── features/        ← {{FEATURES_DIR}}
     ├── plans/           ← {{PLANS_DIR}}
-    ├── designs/         ← {{DESIGNS_DIR}}
+    ├── facts/           ← {{FACTS_DIR}}
+    │   ├── business/    ← {{BUSINESS_FACTS_DIR}}
+    │   └── tech-topic/  ← {{TECH_TOPIC_DIR}}
     ├── standards/       ← {{STANDARDS_DIR}}
     ├── test-cases/
     │   ├── e2e-cases/       ← {{E2E_CASES_DIR}}

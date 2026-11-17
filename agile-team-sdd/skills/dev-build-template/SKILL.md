@@ -37,7 +37,7 @@ description: 遵循四层 DDD 架构实现功能。当为 {{PROJECT_NAME}} 编�
 ## 文档同步
 
 实现完成后检查是否需要更新：
-- `{{DESIGNS_DIR}}/api.yaml` — API 变更
-- `{{DESIGNS_DIR}}/db-schema.md` — 数据库变更
-- `{{DESIGNS_DIR}}/topic/businessrule.md` — 业务规则变更
-- `{{DESIGNS_DIR}}/topic/data-dict.md` — 数据字典变更
+- `{{FACTS_DIR}}/api.yaml` — API 变更
+- `{{FACTS_DIR}}/db-schema.md` — 数据库变更
+- `{{TECH_TOPIC_DIR}}/businessrule.md` — 业务规则变更
+- `{{TECH_TOPIC_DIR}}/data-dict.md` — 数据字典变更

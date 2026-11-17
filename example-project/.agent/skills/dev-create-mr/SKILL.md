@@ -99,7 +99,7 @@ glab mr create --target-branch main --title "feat(appointment): 支持取消预�
 
 ## 关联
 
-- 需求：`docs/features/iteration1/booking.md`
+- 需求：`docs/features/appointment.md`
 - 规则：R-CANCEL-003
 - 用例：TC-013
 
@@ -113,10 +113,10 @@ glab mr create --target-branch main --title "feat(appointment): 支持取消预�
 
 ## 事实文档同步
 
-- [x] `docs/designs/api.yaml` —— 新增 DELETE /api/v1/appointments/{id}
-- [x] `docs/designs/db-schema.md` —— 不涉及
-- [ ] `docs/designs/topic/businessrule.md` —— 不涉及
-- [ ] `docs/designs/topic/data-dict.md` —— 不涉及
+- [x] `docs/facts/api.yaml` —— 新增 DELETE /api/v1/appointments/{id}
+- [x] `docs/facts/db-schema.md` —— 不涉及
+- [ ] `docs/facts/tech-topic/businessrule.md` —— 不涉及
+- [ ] `docs/facts/tech-topic/data-dict.md` —— 不涉及
 
 ## 风险与回滚
 

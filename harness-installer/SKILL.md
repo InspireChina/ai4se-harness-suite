@@ -1,6 +1,6 @@
 ---
 name: harness-installer
-description: 初始化项目的工程 harness —— 生成/补齐 AGENTS.md（架构与工程规范）与 docs/ 文档骨架（features/plans/designs/standards/test-cases 等）。当用户说"初始化项目"、"生成 AGENTS.md"、"建文档骨架"、"harness 安装"、"新项目接入规范"时使用。
+description: 初始化项目的工程 harness —— 生成/补齐 AGENTS.md（架构与工程规范）与 docs/ 文档骨架（features/plans/facts/standards/test-cases 等）。当用户说"初始化项目"、"生成 AGENTS.md"、"建文档骨架"、"harness 安装"、"新项目接入规范"时使用。
 ---
 
 # Harness 初始化器

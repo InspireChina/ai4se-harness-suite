@@ -11,7 +11,7 @@
 ## 1. 背景与目标
 
 - 上一轮已落 9 份骨架 spec；本轮补全字段表、业务规则、GWT 验收，并落地 Element Plus 静态原型。
-- 原型与前端工程同构：Element Plus + Vue 3（CDN 静态页，便于评审；后续 `frontend/` 可装同库）。
+- 原型与前端工程同构：Element Plus + Vue 3（CDN 静态页，便于评审；后续 `apps/frontend/` 可装同库）。
 
 ## 2. 交付物
 

@@ -1,4 +1,4 @@
-# overnight-runner 运行配置（项目级，全队列共享）
+# overnight-runner 运行配置（.overnight-runner/，全队列共享）
 #
 # 这里回答的是"这个项目怎么跑"：
 #   agent 是谁 / 看门狗多严 / 界面怎么刷 / 决策怎么处理

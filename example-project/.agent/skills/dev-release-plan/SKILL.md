@@ -53,8 +53,8 @@ git diff main...HEAD --stat
 
 ## 2. 测试通过
 
-- [ ] 后端单元测试全绿（`cd backend && mvn test`）
-- [ ] 前端构建通过（`cd frontend && npm run build`）
+- [ ] 后端单元测试全绿（`cd apps/backend && mvn test`）
+- [ ] 前端构建通过（`cd apps/frontend && npm run build`）
 - [ ] **QA 验收用例集全绿**（`cd e2e && npm run test:qa`）
 - [ ] QA 已逐条验收 `docs/test-cases/e2e-cases/test-cases.md`
 - [ ] 冒烟用例全绿（`docs/test-cases/smoking-cases/smoking-test-cases.md`）
@@ -62,10 +62,10 @@ git diff main...HEAD --stat
 
 ## 3. 文档同步
 
-- [ ] `docs/designs/api.yaml` 已更新
-- [ ] `docs/designs/db-schema.md` 已更新
-- [ ] `docs/designs/topic/businessrule.md` 已更新
-- [ ] `docs/designs/topic/data-dict.md` 已更新
+- [ ] `docs/facts/api.yaml` 已更新
+- [ ] `docs/facts/db-schema.md` 已更新
+- [ ] `docs/facts/tech-topic/businessrule.md` 已更新
+- [ ] `docs/facts/tech-topic/data-dict.md` 已更新
 - [ ] `docs/features/` 规格已标注已实现
 - [ ] 本清单已建立
 

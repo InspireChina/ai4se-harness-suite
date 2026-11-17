@@ -1,6 +1,6 @@
 ---
 name: ba-gen-facts-template
-description: 从代码与设计文档生成或校准事实文档（API、库表、领域模型、专题）。当实现发生变化后 docs/designs/ 与代码不一致时使用。
+description: 从代码与设计文档生成或校准事实文档（API、库表、领域模型、专题）。当实现发生变化后 docs/facts/ 与代码不一致时使用。
 ---
 
 <!-- TEMPLATE-ONLY -->
@@ -9,14 +9,14 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 
 # BA：生成事实文档
 
-**事实文档**（`{{DESIGNS_DIR}}/`）描述系统 **当前的真实状态**，不是计划、不是意图。
+**事实文档**（`{{FACTS_DIR}}/`）描述系统 **当前的真实状态**，不是计划、不是意图。
 它的唯一判据是：**和代码对得上吗？**
 
 ## 与过程文档的区别
 
 | | 过程文档 | 事实文档 |
 |---|---|---|
-| 位置 | `{{FEATURES_DIR}}/`、`{{PLANS_DIR}}/` | `{{DESIGNS_DIR}}/` |
+| 位置 | `{{FEATURES_DIR}}/`、`{{PLANS_DIR}}/` | `{{FACTS_DIR}}/` |
 | 描述 | 需求与方案（会变） | 系统现状（跟着代码变） |
 | 变更时机 | 迭代推进时 | **代码一变就变** |
 | 写法 | 可以写"待定" | **不许写"待定"** |
@@ -32,7 +32,7 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 | `{{DOMAIN_MODEL_DOC}}` | 聚合类、值对象、领域服务 |
 | `{{BUSINESS_RULES_DOC}}` | `IBusinessRule` 实现类 + 规则配置文件 |
 | `{{DATA_DICT_DOC}}` | 枚举类 + 数据字典注册类 |
-| `topic/*.md` | 对应模块的实现 |
+| `tech-topic/*.md` | 对应模块的实现 |
 
 ## 生成流程
 
@@ -90,8 +90,8 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 
 ```
 事实文档同步：
-- {{DESIGNS_DIR}}/api.yaml — 新增 GET /api/v1/xxx（依据 XxxController#getXxx）
-- {{DESIGNS_DIR}}/db-schema.md — appointments 表新增 remark 字段（依据 V2026xxxx__add_remark.sql）
+- {{FACTS_DIR}}/api.yaml — 新增 GET /api/v1/xxx（依据 XxxController#getXxx）
+- {{FACTS_DIR}}/db-schema.md — appointments 表新增 remark 字段（依据 V2026xxxx__add_remark.sql）
 ```
 
 ## 自检清单
@@ -101,4 +101,4 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 - [ ] 没实现的内容没有写进去
 - [ ] 错误码、枚举值与代码完全一致
 - [ ] 敏感字段已标注
-- [ ] `{{DESIGNS_DIR}}/README.md` 的专题索引已同步
+- [ ] `{{FACTS_DIR}}/README.md` 的专题索引已同步

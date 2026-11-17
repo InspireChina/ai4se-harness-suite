@@ -77,7 +77,7 @@
 
 | | 本文件（QA 测试） | 开发自测 |
 |---|---|---|
-| 位置 | `docs/test-cases/e2e-cases/` + `e2e/tests/qa/` | `backend/src/test/`、`frontend/src/**/*.test.ts`、`e2e/tests/dev/` |
+| 位置 | `docs/test-cases/e2e-cases/` + `e2e/tests/qa/` | `apps/backend/src/test/`、`apps/frontend/src/**/*.test.ts`、`e2e/tests/dev/` |
 | 依据 | 需求规格 | Plan |
 | 闸门 | **是** | 否 |
 

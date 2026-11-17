@@ -28,8 +28,8 @@ description: 运行并修复开发自测（后端单元/集成测试、前端构
 ```
 
 ```bash
-cd backend && mvn test
-cd frontend && npm run build
+cd apps/backend && mvn test
+cd apps/frontend && npm run build
 
 cd e2e && npm run test:dev   # 开发自测 E2E，不含 QA 用例
 ```

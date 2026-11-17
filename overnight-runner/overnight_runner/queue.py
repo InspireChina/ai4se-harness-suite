@@ -197,10 +197,14 @@ def build_task(
     """
     plan_rel = _normalize_rel(project_root, plan)
     if task_id is None:
-        # plan 文件名通常已经带日期前缀（20261106-xxx），别再拼一遍变成双日期
-        stem = DATE_PREFIX_RE.sub("", Path(plan_rel).stem)
-        base = slugify(stem, fallback="task")
-        task_id = f"{today_stamp()}-{base}"
+        # plan 文件名通常已经带日期前缀（20261106-xxx）：保留原日期，别再拼成双日期
+        stem = Path(plan_rel).stem
+        if DATE_PREFIX_RE.match(stem):
+            base = slugify(stem, fallback="task")
+            task_id = base
+        else:
+            base = slugify(stem, fallback="task")
+            task_id = f"{today_stamp()}-{base}"
         taken = existing_ids or set()
         if task_id in taken:
             n = 2

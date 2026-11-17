@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# 把 overnight-runner 安装到目标项目。
+# 把 overnight-runner 安装到目标项目的 `.overnight-runner/`。
 #
 # 用法：
 #   ./install.sh <目标项目目录> [--dry-run] [--force] [--no-config]
 #
 #   --dry-run     只打印将要发生的改动，不写文件
-#   --force       覆盖已存在的 runner 代码
-#   --no-config   不创建队列配置与项目配置
+#   --force       覆盖已存在的 runner 代码与启动脚本（不碰 queue / project.yaml）
+#   --no-config   不创建 overnight-runner.yaml 与 project.yaml
 #
 # 零依赖：只用 Python 3.9+ 标准库，不需要 pip install。
 
@@ -14,7 +14,8 @@ set -euo pipefail
 
 INSTALLER_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PKG_DIR="$INSTALLER_DIR/overnight_runner"
-TARGET_TOOLS="tools/overnight-runner"
+TARGET_DIR=".overnight-runner"
+LEGACY_TOOLS="tools/overnight-runner"
 
 DRY_RUN=0
 FORCE=0
@@ -47,7 +48,14 @@ if [ ! -d "$TARGET" ]; then
 fi
 
 PROJECT_ROOT="$(cd "$TARGET" && pwd)"
-DEST="$PROJECT_ROOT/$TARGET_TOOLS"
+DEST="$PROJECT_ROOT/$TARGET_DIR"
+PKG_DEST="$DEST/overnight_runner"
+LAUNCHER="$DEST/overnight-runner"
+LAUNCHER_CMD="$DEST/overnight-runner.cmd"
+RUNNER_CFG="$DEST/overnight-runner.yaml"
+PROJECT_CFG="$DEST/project.yaml"
+LEGACY_ROOT_CFG="$PROJECT_ROOT/overnight-runner.yaml"
+LEGACY_TOOLS_DIR="$PROJECT_ROOT/$LEGACY_TOOLS"
 
 # ── 找 python ──────────────────────────────────────────────────────
 PYTHON=""
@@ -67,7 +75,7 @@ fi
 echo "overnight-runner 安装器"
 echo "  模板目录 : $INSTALLER_DIR"
 echo "  目标项目 : $PROJECT_ROOT"
-echo "  安装位置 : $TARGET_TOOLS"
+echo "  安装位置 : $TARGET_DIR"
 echo "  Python   : $PYTHON ($($PYTHON -V 2>&1))"
 echo ""
 
@@ -76,25 +84,30 @@ if [ ! -d "$PKG_DIR" ]; then
   exit 1
 fi
 
-# ── 拷贝代码 ───────────────────────────────────────────────────────
-if [ -d "$DEST" ] && [ "$FORCE" -eq 0 ]; then
-  echo "  [跳过] $TARGET_TOOLS 已存在（用 --force 覆盖）"
+# ── 拷贝代码（只替换 overnight_runner 包，不删 queue / 配置）────────
+if [ -d "$PKG_DEST" ] && [ "$FORCE" -eq 0 ]; then
+  echo "  [跳过] $TARGET_DIR/overnight_runner 已存在（用 --force 覆盖）"
+  SKIP_CODE=1
 else
+  SKIP_CODE=0
   if [ "$DRY_RUN" -eq 1 ]; then
-    echo "  [计划] 安装 runner 代码 → $DEST"
+    echo "  [计划] 安装 runner 代码 → $PKG_DEST"
   else
-    rm -rf "$DEST"
     mkdir -p "$DEST"
-    cp -R "$PKG_DIR" "$DEST/overnight_runner"
-    echo "  [安装] runner 代码 → $DEST"
+    rm -rf "$PKG_DEST"
+    cp -R "$PKG_DIR" "$PKG_DEST"
+    echo "  [安装] runner 代码 → $PKG_DEST"
   fi
 fi
 
 # ── 启动脚本 ───────────────────────────────────────────────────────
-if [ "$DRY_RUN" -eq 1 ]; then
-  echo "  [计划] 生成 overnight-runner 启动脚本"
+if [ -f "$LAUNCHER" ] && [ "$FORCE" -eq 0 ] && [ "$SKIP_CODE" -eq 1 ]; then
+  echo "  [跳过] 启动脚本已存在（用 --force 覆盖）"
+elif [ "$DRY_RUN" -eq 1 ]; then
+  echo "  [计划] 生成 $TARGET_DIR/overnight-runner 启动脚本"
 else
-  cat > "$DEST/overnight-runner" <<EOF
+  mkdir -p "$DEST"
+  cat > "$LAUNCHER" <<EOF
 #!/usr/bin/env bash
 # overnight-runner 启动脚本（由 install.sh 生成）
 set -euo pipefail
@@ -102,9 +115,9 @@ DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
 PYTHONPATH="\$DIR\${PYTHONPATH:+:\$PYTHONPATH}" export PYTHONPATH
 exec "$PYTHON" -m overnight_runner "\$@"
 EOF
-  chmod +x "$DEST/overnight-runner"
+  chmod +x "$LAUNCHER"
 
-  cat > "$DEST/overnight-runner.cmd" <<EOF
+  cat > "$LAUNCHER_CMD" <<EOF
 @echo off
 REM overnight-runner 启动脚本（Windows，由 install.sh 生成）
 setlocal
@@ -112,11 +125,24 @@ set "DIR=%~dp0"
 set "PYTHONPATH=%DIR%;%PYTHONPATH%"
 "$PYTHON" -m overnight_runner %*
 EOF
-  echo "  [安装] 启动脚本 → overnight-runner / overnight-runner.cmd"
+  echo "  [安装] 启动脚本 → $TARGET_DIR/overnight-runner(.cmd)"
+fi
+
+# ── 清理旧 tools/overnight-runner ──────────────────────────────────
+if [ -d "$LEGACY_TOOLS_DIR" ]; then
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "  [计划] 删除旧目录 $LEGACY_TOOLS"
+  else
+    rm -rf "$LEGACY_TOOLS_DIR"
+    # 若 tools/ 已空则删掉
+    if [ -d "$PROJECT_ROOT/tools" ] && [ -z "$(ls -A "$PROJECT_ROOT/tools" 2>/dev/null || true)" ]; then
+      rmdir "$PROJECT_ROOT/tools" 2>/dev/null || true
+    fi
+    echo "  [清理] 已删除旧目录 $LEGACY_TOOLS"
+  fi
 fi
 
 # ── 依赖 ───────────────────────────────────────────────────────────
-# 零依赖：只用 Python 3.9+ 标准库
 if [ "$DRY_RUN" -eq 1 ]; then
   echo "  [计划] 校验 Python 可用（已通过：$($PYTHON -V 2>&1)）"
 fi
@@ -124,21 +150,30 @@ fi
 # ── 配置文件 ───────────────────────────────────────────────────────
 if [ "$NO_CONFIG" -eq 0 ]; then
   if [ "$DRY_RUN" -eq 1 ]; then
-    echo "  [计划] 创建 overnight-runner.yaml 与 .overnight-runner/project.yaml"
+    echo "  [计划] 创建 $TARGET_DIR/overnight-runner.yaml 与 project.yaml"
   else
-    if [ ! -f "$PROJECT_ROOT/overnight-runner.yaml" ]; then
-      cp "$INSTALLER_DIR/config/overnight-runner.example.yaml" "$PROJECT_ROOT/overnight-runner.yaml"
-      echo "  [安装] 运行配置 → overnight-runner.yaml"
-    else
-      echo "  [保留] overnight-runner.yaml 已存在"
+    mkdir -p "$DEST"
+
+    # 根目录旧配置 → .overnight-runner/
+    if [ -f "$LEGACY_ROOT_CFG" ] && [ ! -f "$RUNNER_CFG" ]; then
+      mv "$LEGACY_ROOT_CFG" "$RUNNER_CFG"
+      echo "  [迁移] overnight-runner.yaml → $TARGET_DIR/"
+    elif [ -f "$LEGACY_ROOT_CFG" ] && [ -f "$RUNNER_CFG" ]; then
+      echo "  [保留] $TARGET_DIR/overnight-runner.yaml 已存在（根目录仍有旧文件，请自行确认后删除）"
     fi
 
-    mkdir -p "$PROJECT_ROOT/.overnight-runner"
-    if [ ! -f "$PROJECT_ROOT/.overnight-runner/project.yaml" ]; then
-      cp "$INSTALLER_DIR/config/project.example.yaml" "$PROJECT_ROOT/.overnight-runner/project.yaml"
-      echo "  [安装] 项目配置 → .overnight-runner/project.yaml"
+    if [ ! -f "$RUNNER_CFG" ]; then
+      cp "$INSTALLER_DIR/config/overnight-runner.example.yaml" "$RUNNER_CFG"
+      echo "  [安装] 运行配置 → $TARGET_DIR/overnight-runner.yaml"
     else
-      echo "  [保留] .overnight-runner/project.yaml 已存在"
+      echo "  [保留] $TARGET_DIR/overnight-runner.yaml 已存在"
+    fi
+
+    if [ ! -f "$PROJECT_CFG" ]; then
+      cp "$INSTALLER_DIR/config/project.example.yaml" "$PROJECT_CFG"
+      echo "  [安装] 项目配置 → $TARGET_DIR/project.yaml"
+    else
+      echo "  [保留] $TARGET_DIR/project.yaml 已存在"
     fi
   fi
 else
@@ -146,7 +181,6 @@ else
 fi
 
 # ── gitignore 提醒 ─────────────────────────────────────────────────
-# 逐层往上找 .gitignore（项目自己的 / 仓库根的），找到已排除队列运行时产物的就不提醒
 if [ "$NO_CONFIG" -eq 0 ]; then
   NEED_IGNORE=1
   DIR="$PROJECT_ROOT"
@@ -170,8 +204,8 @@ echo ""
 echo "完成。"
 echo ""
 echo "下一步："
-echo "  1) 编辑 overnight-runner.yaml 配 agent / 看门狗 / 决策模式"
-echo "  2) 编辑 .overnight-runner/project.yaml 配默认提示词与默认决策规则"
-echo "  3) 追加任务：$TARGET_TOOLS/overnight-runner add docs/plans/xxx.md"
-echo "  4) 启动面板：$TARGET_TOOLS/overnight-runner run"
-echo "  5) 多队列：$TARGET_TOOLS/overnight-runner --queue alice add docs/plans/yyy.md"
+echo "  1) 编辑 $TARGET_DIR/overnight-runner.yaml 配 agent / 看门狗 / 决策模式"
+echo "  2) 编辑 $TARGET_DIR/project.yaml 配默认提示词与默认决策规则"
+echo "  3) 追加任务：$TARGET_DIR/overnight-runner add docs/plans/xxx.md"
+echo "  4) 启动面板：$TARGET_DIR/overnight-runner run"
+echo "  5) 多队列：$TARGET_DIR/overnight-runner --queue alice add docs/plans/yyy.md"

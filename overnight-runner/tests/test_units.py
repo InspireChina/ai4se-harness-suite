@@ -254,6 +254,29 @@ def test_queue_name_rejected() -> None:
         raise AssertionError(f"队列名 {bad!r} 应该被拒绝")
 
 
+def test_runner_config_migrated_from_root() -> None:
+    root = _tmp_root()
+    (root / ".overnight-runner").mkdir(parents=True, exist_ok=True)
+    (root / "overnight-runner.yaml").write_text(
+        yaml_lite.dumps({"runner": {"agent": {"command": "opencode"}}}),
+        encoding="utf-8",
+    )
+    from overnight_runner.config import (
+        load_runner_config,
+        migrate_runner_config_into_project_dir,
+        queue_config_path,
+    )
+
+    note = migrate_runner_config_into_project_dir(root)
+    assert note
+    assert queue_config_path(root).exists()
+    assert not (root / "overnight-runner.yaml").exists()
+    # 幂等
+    assert migrate_runner_config_into_project_dir(root) == ""
+    cfg = load_runner_config(root)
+    assert cfg.agent_command == "opencode"
+
+
 def test_legacy_queue_migrated() -> None:
     root = _tmp_root()
     _legacy_project(root)
@@ -263,9 +286,12 @@ def test_legacy_queue_migrated() -> None:
     assert paths.config.exists(), "队列定义应搬到 queue/default/queue.yaml"
     defs = load_queue_defs(paths)
     assert len(defs) == 1 and defs[0]["id"] == "t1"
-    # 根配置里的 queue: 段被清空
-    data = yaml_lite.loads((root / "overnight-runner.yaml").read_text(encoding="utf-8"))
-    assert not data.get("queue"), "根配置的 queue 段应被清空"
+    # 配置已迁入 .overnight-runner/，queue: 段被清空
+    cfg_path = root / ".overnight-runner" / "overnight-runner.yaml"
+    assert cfg_path.exists(), "overnight-runner.yaml 应迁入 .overnight-runner/"
+    assert not (root / "overnight-runner.yaml").exists(), "根目录旧配置应被移走"
+    data = yaml_lite.loads(cfg_path.read_text(encoding="utf-8"))
+    assert not data.get("queue"), "配置的 queue 段应被清空"
     # runner 段还在
     assert data["runner"]["agent"]["command"] == "opencode"
 
@@ -330,7 +356,7 @@ def test_migration_preserves_comments() -> None:
         encoding="utf-8",
     )
     migrate_legacy_queue(root)
-    text = (root / "overnight-runner.yaml").read_text(encoding="utf-8")
+    text = (root / ".overnight-runner" / "overnight-runner.yaml").read_text(encoding="utf-8")
     assert "# 头部注释" in text, text
     assert "# 保留我" in text, text
     assert "# 末尾的注释也要留" in text, text

@@ -101,8 +101,6 @@ def _setup(
             "ui": {"refreshHz": 8, "logTail": 100},
         },
     }
-    (root / "overnight-runner.yaml").write_text(yaml.dumps(cfg), encoding="utf-8")
-
     pcfg = {
         "project": {"name": "proj", "agent": {"command": agent, "args": [], "env": {}}},
         "default": {"prompt": "{{DECISIONS}}\n{{PLAN}}", "onUnknownDecision": "跳过并记录"},
@@ -117,6 +115,9 @@ def _setup(
         ],
     }
     (root / ".overnight-runner").mkdir()
+    (root / ".overnight-runner" / "overnight-runner.yaml").write_text(
+        yaml.dumps(cfg), encoding="utf-8"
+    )
     (root / ".overnight-runner" / "project.yaml").write_text(
         yaml.dumps(pcfg), encoding="utf-8"
     )

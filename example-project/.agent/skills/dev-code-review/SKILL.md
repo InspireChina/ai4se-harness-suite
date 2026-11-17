@@ -12,7 +12,7 @@ description: 按项目规范做代码评审。当提交前自查、或评审别�
 ```
 1. AGENTS.md          —— 架构边界、分层规则、工程规范
 2. docs/standards/       —— 命名、分层、API、数据库、错误、安全、测试规范
-3. docs/designs/         —— 系统现状（对照实现是否与设计一致）
+3. docs/facts/         —— 系统现状（对照实现是否与设计一致）
 4. 再看 diff
 ```
 
@@ -76,10 +76,10 @@ git diff main...HEAD --stat   # 改动文件清单
 
 ### 文档
 
-- [ ] API 变更 → `docs/designs/api.yaml` 已更新
-- [ ] 表结构变更 → `docs/designs/db-schema.md` 已更新
-- [ ] 业务规则变更 → `docs/designs/topic/businessrule.md` 已更新
-- [ ] 枚举变更 → `docs/designs/topic/data-dict.md` 已更新
+- [ ] API 变更 → `docs/facts/api.yaml` 已更新
+- [ ] 表结构变更 → `docs/facts/db-schema.md` 已更新
+- [ ] 业务规则变更 → `docs/facts/tech-topic/businessrule.md` 已更新
+- [ ] 枚举变更 → `docs/facts/tech-topic/data-dict.md` 已更新
 - [ ] 迁移脚本 + 测试 `schema.sql` 同步
 
 ## 严重级别
@@ -96,7 +96,7 @@ git diff main...HEAD --stat   # 改动文件清单
 ## 评审意见写法
 
 ```
-[Blocker] backend/.../AppointmentService.java:42
+[Blocker] apps/backend/.../AppointmentService.java:42
 事务边界放错了：@Transactional 标在 repository 实现上，违反 AGENTS.md §6。
 应移到 AppService 的用例方法上。
 ```

@@ -51,10 +51,10 @@ git log --format="%h %s" --since="2 weeks ago"
 ```markdown
 ### 改进项 1：Plan 缺少"接口不兼容变更"检查
 
-- 证据：迭代中 2 次接口变更没同步 `docs/designs/api.yaml`，QA 验收时才发现
+- 证据：迭代中 2 次接口变更没同步 `docs/facts/api.yaml`，QA 验收时才发现
 - 归类：流程缺失
 - 改哪里：`../agile-team-sdd/skills/dev-plan-template/SKILL.md` §规则
-- 改成什么：加一条 —— "若新增/修改/删除接口，在 Plan 的'修改清单 → 接口变更'表中必须逐条列出，并在'实施后需更新的 design 文档'中写明 `docs/designs/api.yaml`"
+- 改成什么：加一条 —— "若新增/修改/删除接口，在 Plan 的'修改清单 → 接口变更'表中必须逐条列出，并在'实施后需更新的 design 文档'中写明 `docs/facts/api.yaml`"
 - 谁改：TL
 - 怎么验证：下个迭代 Plan 评审时检查这条是否被填
 ```

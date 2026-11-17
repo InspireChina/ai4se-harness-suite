@@ -1,18 +1,18 @@
 ---
 name: ba-gen-facts
-description: 从代码与设计文档生成或校准事实文档（API、库表、领域模型、专题）。当实现发生变化后 docs/designs/ 与代码不一致时使用。
+description: 从代码与设计文档生成或校准事实文档（API、库表、领域模型、专题）。当实现发生变化后 docs/facts/ 与代码不一致时使用。
 ---
 
 # BA：生成事实文档
 
-**事实文档**（`docs/designs/`）描述系统 **当前的真实状态**，不是计划、不是意图。
+**事实文档**（`docs/facts/`）描述系统 **当前的真实状态**，不是计划、不是意图。
 它的唯一判据是：**和代码对得上吗？**
 
 ## 与过程文档的区别
 
 | | 过程文档 | 事实文档 |
 |---|---|---|
-| 位置 | `docs/features/`、`docs/plans/` | `docs/designs/` |
+| 位置 | `docs/features/`、`docs/plans/` | `docs/facts/` |
 | 描述 | 需求与方案（会变） | 系统现状（跟着代码变） |
 | 变更时机 | 迭代推进时 | **代码一变就变** |
 | 写法 | 可以写"待定" | **不许写"待定"** |
@@ -23,12 +23,12 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 
 | 文档 | 事实来源（按可信度排序） |
 |---|---|
-| `docs/designs/api.yaml` | Controller 的路由与方法签名、DTO 字段、错误码 |
-| `docs/designs/db-schema.md` | 迁移脚本 `db/migration/*.sql`、PO 类 |
-| `docs/designs/domain-model.md` | 聚合类、值对象、领域服务 |
-| `docs/designs/topic/businessrule.md` | `IBusinessRule` 实现类 + 规则配置文件 |
-| `docs/designs/topic/data-dict.md` | 枚举类 + 数据字典注册类 |
-| `topic/*.md` | 对应模块的实现 |
+| `docs/facts/api.yaml` | Controller 的路由与方法签名、DTO 字段、错误码 |
+| `docs/facts/db-schema.md` | 迁移脚本 `db/migration/*.sql`、PO 类 |
+| `docs/facts/domain-model.md` | 聚合类、值对象、领域服务 |
+| `docs/facts/tech-topic/businessrule.md` | `IBusinessRule` 实现类 + 规则配置文件 |
+| `docs/facts/tech-topic/data-dict.md` | 枚举类 + 数据字典注册类 |
+| `tech-topic/*.md` | 对应模块的实现 |
 
 ## 生成流程
 
@@ -86,8 +86,8 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 
 ```
 事实文档同步：
-- docs/designs/api.yaml — 新增 GET /api/v1/xxx（依据 XxxController#getXxx）
-- docs/designs/db-schema.md — appointments 表新增 remark 字段（依据 V2026xxxx__add_remark.sql）
+- docs/facts/api.yaml — 新增 GET /api/v1/xxx（依据 XxxController#getXxx）
+- docs/facts/db-schema.md — appointments 表新增 remark 字段（依据 V2026xxxx__add_remark.sql）
 ```
 
 ## 自检清单
@@ -97,4 +97,4 @@ description: 从代码与设计文档生成或校准事实文档（API、库表�
 - [ ] 没实现的内容没有写进去
 - [ ] 错误码、枚举值与代码完全一致
 - [ ] 敏感字段已标注
-- [ ] `docs/designs/README.md` 的专题索引已同步
+- [ ] `docs/facts/README.md` 的专题索引已同步

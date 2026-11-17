@@ -40,28 +40,27 @@
 
 ```
 <项目>/
-├── overnight-runner.yaml              # 运行配置（提交进仓库，全队列共享）
-├── .overnight-runner/
-│   ├── project.yaml                   # 项目配置：默认提示词 + 默认决策（提交）
-│   └── queue/
-│       └── default/                   # 一条队列一个目录
-│           ├── queue.yaml             # 队列定义：跑哪些 plan（提交）
-│           ├── state.json             # 运行时状态（不提交）
-│           ├── decisions.jsonl        # 决策记录（提交，便于回溯）
-│           ├── logs/                   # 每个任务的 agent 日志（不提交）
-│           └── .lock                   # 单实例锁（不提交）
-└── tools/overnight-runner/
+└── .overnight-runner/
+    ├── overnight-runner.yaml          # 运行配置（提交进仓库，全队列共享）
+    ├── project.yaml                   # 项目配置：默认提示词 + 默认决策（提交）
     ├── overnight-runner               # 启动脚本（POSIX）
     ├── overnight-runner.cmd           # 启动脚本（Windows）
-    └── overnight_runner/              # 实现
+    ├── overnight_runner/              # 实现
+    └── queue/
+        └── default/                   # 一条队列一个目录
+            ├── queue.yaml             # 队列定义：跑哪些 plan（提交）
+            ├── state.json             # 运行时状态（不提交）
+            ├── decisions.jsonl        # 决策记录（提交，便于回溯）
+            ├── logs/                   # 每个任务的 agent 日志（不提交）
+            └── .lock                   # 单实例锁（不提交）
 ```
 
 **多队列**：`.overnight-runner/queue/<队列名>/` —— 同一个仓库里可以有多条队列，
 多人各跑各的互不干扰（`--queue <名字>` 切换）。
 
-**老项目自动迁移**：老布局（队列写在项目根 `overnight-runner.yaml`、
-状态在 `.overnight-runner/state.json`）第一次运行时 **自动搬到**
-`.overnight-runner/queue/default/`，不丢任务、不丢状态，且迁移幂等（只发生一次）。
+**老项目自动迁移**：根目录旧的 `overnight-runner.yaml` 会迁入 `.overnight-runner/`；
+队列写在 yaml `queue:` 段、状态在 `.overnight-runner/state.json` 的老布局，
+第一次运行时 **自动搬到** `.overnight-runner/queue/default/`，不丢任务、不丢状态，且迁移幂等。
 
 **依赖**：**没有**。
 
@@ -77,7 +76,7 @@ Windows 用 `CREATE_NEW_PROCESS_GROUP` —— 全是标准库。
 ## 用法
 
 ```bash
-OR=tools/overnight-runner/overnight-runner
+OR=.overnight-runner/overnight-runner
 
 $OR init                                   # 初始化配置
 $OR add docs/plans/20261103-feature-a.md  # 追加 plan（相对项目根）
@@ -182,11 +181,11 @@ agent 抛出 `QUESTION:` 时，右栏弹出带倒计时的决策框：
 
 | 层 | 文件 | 作用域 | 管什么 |
 |---|---|---|---|
-| runner 级 | `overnight-runner.yaml` | 项目 | agent、看门狗、UI、决策策略 |
+| runner 级 | `.overnight-runner/overnight-runner.yaml` | 项目 | agent、看门狗、UI、决策策略 |
 | project 级 | `.overnight-runner/project.yaml` | 项目（全队列共享） | 默认提示词、默认决策规则 |
 | queue 级 | `.overnight-runner/queue/<n>/queue.yaml` | 单条队列 | 跑哪些 plan |
 
-### 1. 运行配置 `overnight-runner.yaml`
+### 1. 运行配置 `.overnight-runner/overnight-runner.yaml`
 
 管 **怎么跑**。
 

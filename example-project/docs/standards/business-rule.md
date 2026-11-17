@@ -62,4 +62,4 @@ Spring Boot 的 binder 拿到 YAML 里的 **序列** 而目标类型是 `Map<Str
 
 ## 同步
 
-新增或修改业务规则后，同步更新 `docs/designs/topic/businessrule.md`。
+新增或修改业务规则后，同步更新 `docs/facts/tech-topic/businessrule.md`。

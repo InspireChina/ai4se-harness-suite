@@ -43,7 +43,7 @@ team-harness-suite/
                                   ├─ agile-team-sdd      → 目标项目/.agent/skills/
                                   ├─ harness-installer   → 目标项目/AGENTS.md + docs/
                                   ├─ tool-chain-installer→ 目标项目/.mcp.json + opencode.jsonc
-                                  └─ overnight-runner    → 目标项目/tools/overnight-runner/
+                                  └─ overnight-runner    → 目标项目/.overnight-runner/
 ```
 
 ## 2. 横切关注点：skill 机制与占位符
@@ -79,7 +79,7 @@ description: <一句话说明"做什么"+"什么时候用"，第三人称，前�
 模板里的项目专属路径一律写成 `{{PLACEHOLDER}}`，由安装脚本渲染：
 
 ```
-{{PROJECT_ROOT}}   {{FEATURES_DIR}}   {{DESIGNS_DIR}}   {{AGENTS_FILE}}   ...
+{{PROJECT_ROOT}}   {{FEATURES_DIR}}   {{FACTS_DIR}}   {{AGENTS_FILE}}   ...
 ```
 
 约束：
@@ -257,7 +257,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
     └─ qa-write-cases（QA 文本用例，与 Plan 并行；规格确认后即可开始）
   → 两边都就绪后 → dev-build（实现）
   → dev-self-test（开发自测）
-  → ba-gen-facts（事实文档 docs/designs/ 同步）
+  → ba-gen-facts（事实文档 docs/facts/ 同步）
   → dev-code-review / dev-ui-review
   → dev-create-mr
   → qa-run-e2e / qa-write-manual-plan（QA 验收，合并闸门）
@@ -337,7 +337,7 @@ pending ──▶ running ──┬──▶ success
 | 清单 ↔ 模板 ↔ 已安装 三方一致 | 见验证脚本 |
 | Markdown 相对链接有效 | 见验证脚本 |
 | 安装后无残留占位符 | 见验证脚本 |
-| overnight-runner 单元测试 | `overnight-runner/tests/test_units.py`（43 个用例：YAML 子集 + 终端宽度 + 队列路径/迁移 + 决策 + 锁 + 按键读取） |
+| overnight-runner 单元测试 | `overnight-runner/tests/test_units.py`（44 个用例：YAML 子集 + 终端宽度 + 队列路径/迁移 + 决策 + 锁 + 按键读取） |
 | overnight-runner 行为 | `overnight-runner/tests/test_smoke.py`（13 个用例，假 agent 驱动） |
 
 一条命令跑全部：
@@ -394,7 +394,7 @@ pending ──▶ running ──┬──▶ success
 - [ ] 安装脚本幂等：`--dry-run` 可跑，重复执行不炸
 - [ ] 产物里 **没有** 安装机的绝对路径
 - [ ] 跑过 `./scripts/verify.sh`
-- [ ] 改了 `overnight-runner` 的行为 → 单元测试 43/43 + 冒烟测试 13/13 通过
+- [ ] 改了 `overnight-runner` 的行为 → 单元测试 44/44 + 冒烟测试 13/13 通过
 - [ ] 文档里的相对链接有效
 - [ ] 没提交 `.venv/`、`__pycache__/`、运行时状态（`.overnight-runner/queue/*/state.json`、`logs/`、`.lock`）
 

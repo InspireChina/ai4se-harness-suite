@@ -54,9 +54,9 @@ Thumbs.db
 
 # Frontend
 node_modules/
-frontend/dist/
-frontend/.env.local
-frontend/.env.*.local
+apps/frontend/dist/
+apps/frontend/.env.local
+apps/frontend/.env.*.local
 
 # Env
 .env
@@ -71,4 +71,4 @@ e2e/screenshots/
 *.tsbuildinfo
 
 # Secret config (use application.yml.example as template)
-backend/src/main/resources/application.yml
+apps/backend/src/main/resources/application.yml

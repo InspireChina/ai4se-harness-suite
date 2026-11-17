@@ -34,7 +34,7 @@
 
 ## 错误码表
 
-全量错误码与"当前实现映射"见 `docs/designs/topic/error-code.md`。
+全量错误码与"当前实现映射"见 `docs/facts/tech-topic/error-code.md`。
 
 ---
 

@@ -337,10 +337,18 @@ with tempfile.TemporaryDirectory() as tmp:
     if queue_names(root) != ['default']:
         print(f'  \033[31m✘\033[0m 迁移后队列名不对: {queue_names(root)}')
         bad.append('migrate-names')
-    raw = yaml_lite.loads((root / 'overnight-runner.yaml').read_text(encoding='utf-8'))
-    if raw.get('queue'):
-        print('  \033[31m✘\033[0m 迁移后根配置的 queue 段没清空')
-        bad.append('migrate-clear')
+    cfg_path = root / '.overnight-runner' / 'overnight-runner.yaml'
+    if not cfg_path.exists():
+        print('  \033[31m✘\033[0m 迁移后 overnight-runner.yaml 未进入 .overnight-runner/')
+        bad.append('migrate-cfg-path')
+    elif (root / 'overnight-runner.yaml').exists():
+        print('  \033[31m✘\033[0m 迁移后根目录仍留有 overnight-runner.yaml')
+        bad.append('migrate-root-left')
+    else:
+        raw = yaml_lite.loads(cfg_path.read_text(encoding='utf-8'))
+        if raw.get('queue'):
+            print('  \033[31m✘\033[0m 迁移后配置的 queue 段没清空')
+            bad.append('migrate-clear')
 
 # 11.4 .gitignore 排除了队列运行时产物
 gi = pathlib.Path('.gitignore').read_text(encoding='utf-8')

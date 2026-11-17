@@ -161,9 +161,9 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 - [ ] 错误处理：业务校验使用 `BusinessException`，避免裸 `RuntimeException`
 - [ ] API 设计：RESTful 风格，路径统一 `/api/v1/resource`
 - [ ] 安全：不记录 token / 敏感信息；对外接口做鉴权检查
-- [ ] 数据字典：新增枚举需要同时更新注册类与 `{{DESIGNS_DIR}}/topic/data-dict.md`
-- [ ] 业务规则：新增规则需要同时更新规则配置与 `{{DESIGNS_DIR}}/topic/businessrule.md`
-- [ ] 数据库变更：新增 DDL 需同时更新迁移脚本、测试 `schema.sql` 与 `{{DESIGNS_DIR}}/db-schema.md`
+- [ ] 数据字典：新增枚举需要同时更新注册类与 `{{TECH_TOPIC_DIR}}/data-dict.md`
+- [ ] 业务规则：新增规则需要同时更新规则配置与 `{{TECH_TOPIC_DIR}}/businessrule.md`
+- [ ] 数据库变更：新增 DDL 需同时更新迁移脚本、测试 `schema.sql` 与 `{{FACTS_DIR}}/db-schema.md`
 - [ ] 验证：本地运行 `{{TEST_CMD_BACKEND}}` 与 `{{TEST_CMD_FRONTEND}}` 全部通过
 - [ ] 文档同步检查（已更新 / 不涉及）
 
@@ -175,11 +175,12 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 │   └── _template.md
 ├── plans/                  # 技术方案（过程文档）
 │   └── _template.md
-├── designs/                # 设计文档（事实文档）
+├── facts/                  # 事实文档
 │   ├── api.yaml
 │   ├── db-schema.md
 │   ├── domain-model.md
-│   └── topic/
+│   ├── business/           # 业务事实
+│   └── tech-topic/         # 技术专题
 ├── standards/              # 代码规范（事实文档）
 │   ├── architecture.md
 │   ├── naming.md
@@ -200,11 +201,11 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 
 ### 同步要求
 
-- 每轮任务完成后，必须检查 `{{DESIGNS_DIR}}/` 中的内容是否因本次变更而需要更新
-- 新增 / 修改 API → 更新 `{{DESIGNS_DIR}}/api.yaml`
-- 新增 / 修改数据表 → 更新 `{{DESIGNS_DIR}}/db-schema.md`
-- 新增 / 修改业务规则 → 更新 `{{DESIGNS_DIR}}/topic/businessrule.md`
-- 新增 / 修改数据字典 → 更新 `{{DESIGNS_DIR}}/topic/data-dict.md`
+- 每轮任务完成后，必须检查 `{{FACTS_DIR}}/` 中的内容是否因本次变更而需要更新
+- 新增 / 修改 API → 更新 `{{FACTS_DIR}}/api.yaml`
+- 新增 / 修改数据表 → 更新 `{{FACTS_DIR}}/db-schema.md`
+- 新增 / 修改业务规则 → 更新 `{{TECH_TOPIC_DIR}}/businessrule.md`
+- 新增 / 修改数据字典 → 更新 `{{TECH_TOPIC_DIR}}/data-dict.md`
 
 ### 执行检查点
 

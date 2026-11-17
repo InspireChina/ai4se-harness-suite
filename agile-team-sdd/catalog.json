@@ -23,9 +23,9 @@
     {
       "name": "ba-gen-facts",
       "description": "从代码与文档生成/校准事实文档（API、库表、领域模型、专题）",
-      "when": "实现发生变化后，docs/designs/ 与代码不一致时",
+      "when": "实现发生变化后，docs/facts/ 与代码不一致时",
       "produces": [
-        "docs/designs/**"
+        "docs/facts/**"
       ],
       "dependsOn": []
     }

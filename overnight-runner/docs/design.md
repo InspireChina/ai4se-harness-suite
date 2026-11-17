@@ -38,7 +38,7 @@ overnight_runner/
 
 | 文件 | 管什么 | 作用域 | 提交进仓库 |
 |---|---|---|---|
-| `overnight-runner.yaml` | agent 命令 + 看门狗 + UI + 决策策略 | 项目 | ✅ |
+| `.overnight-runner/overnight-runner.yaml` | agent 命令 + 看门狗 + UI + 决策策略 | 项目 | ✅ |
 | `.overnight-runner/project.yaml` | 默认提示词 + 默认决策规则 | 项目（全队列共享） | ✅ |
 | `.overnight-runner/queue/<n>/queue.yaml` | 队列定义（跑哪些 plan） | 单条队列 | ✅ |
 | `.overnight-runner/queue/<n>/state.json` | 运行时状态（谁跑过、重试几次） | 单条队列 | ❌ |
@@ -76,14 +76,14 @@ overnight_runner/
 
 ### 老布局迁移（幂等）
 
-老布局：队列写在项目根 `overnight-runner.yaml` 的 `queue:` 段，
+老布局：队列写在 overnight-runner.yaml 的 `queue:` 段（根目录或 `.overnight-runner/`），
 状态在 `.overnight-runner/state.json`，日志在 `.overnight-runner/logs/`。
 
 任何读队列的子命令都会触发迁移：
 
 | 源 | 目标 |
 |---|---|
-| `<root>/overnight-runner.yaml` 的 `queue:` 段 | `.overnight-runner/queue/default/queue.yaml` |
+| `.overnight-runner/overnight-runner.yaml`（或旧根文件）的 `queue:` 段 | `.overnight-runner/queue/default/queue.yaml` |
 | `<root>/.overnight-runner/state.json` | `.overnight-runner/queue/default/state.json` |
 | `<root>/.overnight-runner/logs/` | `.overnight-runner/queue/default/logs/` |
 | `<root>/.overnight-runner/decisions.jsonl` | `.overnight-runner/queue/default/decisions.jsonl` |

@@ -31,5 +31,5 @@ description: 在编写任何代码之前在 docs/plans/ 中创建开发计划。
 - 计划必须经用户审核确认后方可继续（AGENTS.md §14 第 1 步）
 - 包含每个需要变更的文件的路径
 - 参考现有模式（assembler、converter、service）以保持一致性
-- 考虑文档同步：本次变更是否会影响 `docs/designs/` 中的文件？
+- 考虑文档同步：本次变更是否会影响 `docs/facts/` 中的文件？
 - **plan 一旦定稿就不修改**，同一资源的二次改造新建 `YYYYMMDD-{slug}.md`

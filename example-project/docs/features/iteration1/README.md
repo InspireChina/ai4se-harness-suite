@@ -37,7 +37,7 @@
 ## 4. 原型约定
 
 - 独立 Vite 工程：[`prototypes/`](./prototypes/)（`npm run dev` → http://127.0.0.1:5174/）
-- 技术：Vue 3 + Vue Router + Element Plus（**不**并入业务 `frontend/`）
+- 技术：Vue 3 + Vue Router + Element Plus（**不**并入业务 `apps/frontend/`）
 - 路由：`/` 入口；`/user/*`、`/consultant/*`、`/admin/*`
 - 规格与原型冲突时，以规格中的业务规则与验收标准为准
 

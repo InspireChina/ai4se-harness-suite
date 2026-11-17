@@ -4,7 +4,7 @@
 >
 > 关联需求：不涉及（本轮不引入新需求，修复的是 AGENTS.md §10 已写明的规范缺口）
 >
-> 设计 design：docs/designs/topic/businessrule.md、docs/designs/topic/data-dict.md
+> 设计 design：docs/facts/tech-topic/businessrule.md、docs/facts/tech-topic/data-dict.md
 >
 >
 > **plan 一旦定稿就不修改。** 同一资源的二次改造新建 `YYYY-MM-DD-{slug}.md`，不修改原计划文件
@@ -18,7 +18,7 @@
 > 每个 API **必须** 有对应的集成测试
 > 至少覆盖：1 个 Happy Path + 关键失败分支（参数错误 / 权限不足 / 业务冲突）
 
-现状盘点 —— `backend/src/test/java/com/consultation/adapter/rest/`：
+现状盘点 —— `apps/backend/src/test/java/com/consultation/adapter/rest/`：
 
 | Controller | 集成测试 | 状态 |
 |---|---|---|
@@ -47,7 +47,7 @@
   - 新增 `BusinessRuleControllerTest`，覆盖 `GET /api/v1/business-rules` 的 happy path、规则完整性、YAML 配置透出、免鉴权
   - 新增 `DataDictionaryControllerTest`，覆盖 `GET /api/v1/data-dictionaries` 与 `GET /api/v1/data-dictionaries/{type}` 的 happy path、大小写不敏感、字典项内容、未知类型失败分支
 - 技术边界：
-  - **只新增 2 个测试文件**，`backend/src/main/**` 一行不动
+  - **只新增 2 个测试文件**，`apps/backend/src/main/**` 一行不动
   - 不引入新依赖（RestAssured + JUnit 5 + Hamcrest 均已在 `pom.xml`）
   - 不改数据库、不改 API 契约、不改前端
 
@@ -282,21 +282,21 @@ API --> Client : 400 ErrorResponse
 
 ### 11.1 代码修改
 
-**无。** `backend/src/main/**` 本轮一行不改。
+**无。** `apps/backend/src/main/**` 本轮一行不改。
 
 ### 11.1.2 新增文件
 
 | 操作 | 文件 | 用途 |
 | :--: | :-- | :-- |
-| 新增 | `backend/src/test/java/com/consultation/adapter/rest/BusinessRuleControllerTest.java` | 5 个用例，覆盖 `GET /api/v1/business-rules` |
-| 新增 | `backend/src/test/java/com/consultation/adapter/rest/DataDictionaryControllerTest.java` | 5 个用例，覆盖两个数据字典接口 |
+| 新增 | `apps/backend/src/test/java/com/consultation/adapter/rest/BusinessRuleControllerTest.java` | 5 个用例，覆盖 `GET /api/v1/business-rules` |
+| 新增 | `apps/backend/src/test/java/com/consultation/adapter/rest/DataDictionaryControllerTest.java` | 5 个用例，覆盖两个数据字典接口 |
 
 #### 11.1.x 关键文件速查
 
 | 操作 | 文件 | 备注 |
 | :--: | :-- | :-- |
-| 新增 | `backend/src/test/java/com/consultation/adapter/rest/BusinessRuleControllerTest.java` | 继承 `TestBase`，`should_*` 命名 |
-| 新增 | `backend/src/test/java/com/consultation/adapter/rest/DataDictionaryControllerTest.java` | 继承 `TestBase`，`should_*` 命名 |
+| 新增 | `apps/backend/src/test/java/com/consultation/adapter/rest/BusinessRuleControllerTest.java` | 继承 `TestBase`，`should_*` 命名 |
+| 新增 | `apps/backend/src/test/java/com/consultation/adapter/rest/DataDictionaryControllerTest.java` | 继承 `TestBase`，`should_*` 命名 |
 
 ### 11.2 接口变更
 
@@ -310,10 +310,10 @@ API --> Client : 400 ErrorResponse
 
 | 文档 | 是否需要更新 | 理由 |
 |---|---|---|
-| `docs/designs/api.yaml` | **不涉及** | 无 API 契约变更 |
-| `docs/designs/db-schema.md` | **不涉及** | 无表结构变更 |
-| `docs/designs/topic/businessrule.md` | **不涉及** | 规则定义未变，只是给它补了测试 |
-| `docs/designs/topic/data-dict.md` | **不涉及** | 字典定义未变，只是给它补了测试 |
+| `docs/facts/api.yaml` | **不涉及** | 无 API 契约变更 |
+| `docs/facts/db-schema.md` | **不涉及** | 无表结构变更 |
+| `docs/facts/tech-topic/businessrule.md` | **不涉及** | 规则定义未变，只是给它补了测试 |
+| `docs/facts/tech-topic/data-dict.md` | **不涉及** | 字典定义未变，只是给它补了测试 |
 | `docs/test-cases/e2e-cases/test-cases.md` | **不涉及** | 属开发自测，不是 QA 用例；无新需求、无验收标准变化 |
 | `AGENTS.md` §7 | **本轮不修，建议单独开一轮** | 见 §6.4 记录的 `ErrorResponse` 字段名不一致 |
 
@@ -321,13 +321,13 @@ API --> Client : 400 ErrorResponse
 
 ## 12. 验证步骤
 
-1. **基线（改动前）**：`cd backend && mvn -o -B test` → 期望 `Tests run: 18, Failures: 0, Errors: 0`
-2. **实现后**：`cd backend && mvn -o -B test` → 期望 `Tests run: 28, Failures: 0, Errors: 0`
+1. **基线（改动前）**：`cd apps/backend && mvn -o -B test` → 期望 `Tests run: 18, Failures: 0, Errors: 0`
+2. **实现后**：`cd apps/backend && mvn -o -B test` → 期望 `Tests run: 28, Failures: 0, Errors: 0`
    （18 基线 + 10 新增）
-3. **只看新用例**：`cd backend && mvn -o -B test -Dtest='BusinessRuleControllerTest,DataDictionaryControllerTest'`
+3. **只看新用例**：`cd apps/backend && mvn -o -B test -Dtest='BusinessRuleControllerTest,DataDictionaryControllerTest'`
    → 期望 `Tests run: 10, Failures: 0, Errors: 0`
 4. **确认没碰生产代码**：`git status --short` → 只应出现 2 个新增测试文件
-5. **确认没有引入 `TC-` 编号**：`grep -rn "TC-" backend/src/test/` → 无输出
+5. **确认没有引入 `TC-` 编号**：`grep -rn "TC-" apps/backend/src/test/` → 无输出
 
 ---
 

@@ -13,8 +13,8 @@ harness-installer/
         ├── README.md
         ├── features/_template.md
         ├── plans/_template.md
-        ├── designs/README.md
-        ├── designs/topic/README.md
+        ├── facts/README.md
+        ├── facts/tech-topic/README.md
         ├── standards/README.md
         ├── standards/templates/README.md
         └── test-cases/
@@ -40,7 +40,7 @@ harness-installer/
 
 ## 脚本做了什么
 
-1. 探测项目结构：`backend/`（`pom.xml`）、`frontend/`（`package.json`）、`e2e/`、`docs/`
+1. 探测项目结构：`apps/backend/`（`pom.xml`）、`apps/frontend/`（`package.json`）、`e2e/`、`docs/`
 2. 渲染 `templates/AGENTS.md.template` → `<项目>/AGENTS.md`
 3. 复制 `templates/docs/**` → `<项目>/docs/**`
 4. 缺失时创建 `<项目>/opencode.jsonc`

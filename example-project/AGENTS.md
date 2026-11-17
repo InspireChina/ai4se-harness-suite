@@ -6,8 +6,8 @@
 
 这是一个全栈工程（Java 17 / Spring Boot 3.2.x / Vue 3 + TypeScript），主要模块如下：
 
-- `backend/`：Spring Boot 后端（四层 DDD 单体）
-- `frontend/`：Vue 3 + TypeScript 前端（Vite 构建）
+- `apps/backend/`：Spring Boot 后端（四层 DDD 单体）
+- `apps/frontend/`：Vue 3 + TypeScript 前端（Vite 构建）
 
 运行时形态：
 
@@ -112,7 +112,7 @@ DTO 约定：
 }
 ```
 
-错误码清单与"当前实现映射"见 `docs/designs/topic/error-code.md`。
+错误码清单与"当前实现映射"见 `docs/facts/tech-topic/error-code.md`。
 
 ## 8. 领域设计：聚合与规则
 
@@ -246,9 +246,9 @@ cd e2e && npm run test:dev # 只跑开发自测用例
 - 错误处理：参数/资源错误抛 `IllegalArgumentException`，业务冲突抛 `IllegalStateException`，避免裸 `RuntimeException`
 - API 设计：RESTful 风格，路径统一 `/api/v1/resource`，admin 使用 `/admin/resource`
 - 安全：不记录 token / 敏感信息；对外接口做鉴权检查
-- 数据字典：新增枚举需要同时更新 `DemoDataDictionaryType` 与 `docs/designs/topic/data-dict.md`
-- 业务规则：新增规则需要同时更新 YAML 配置与 `docs/designs/topic/businessrule.md`
-- 数据库变更：新增 DDL 需同时更新 Flyway migration 文件、测试 `schema.sql`、以及 `docs/designs/db-schema.md`
+- 数据字典：新增枚举需要同时更新 `DemoDataDictionaryType` 与 `docs/facts/tech-topic/data-dict.md`
+- 业务规则：新增规则需要同时更新 YAML 配置与 `docs/facts/tech-topic/businessrule.md`
+- 数据库变更：新增 DDL 需同时更新 Flyway migration 文件、测试 `schema.sql`、以及 `docs/facts/db-schema.md`
 - 验证：本地运行 `mvn test` 确认全部通过，`npm run build` 确认前端编译通过
 
 ## 13. 文档结构
@@ -274,21 +274,23 @@ docs/
 ├── plans/                  # 技术方案（过程文档）
 │   ├── _template.md        # 技术方案模板
 │   └── 20260619-project-plan.md
-├── designs/                # 设计文档（事实文档）
+├── facts/                  # 事实文档
 │   ├── api.yaml            # API 接口定义
 │   ├── db-schema.md        # 数据库规格
 │   ├── domain-model.md     # 领域模型
-│   ├── booking-flow.md     # 业务流程
-│   └── topic/              # 其他技术主题
-│       ├── authentication.md
-│       ├── architecture.md
+│   ├── business/           # 业务事实
+│   │   └── booking-flow.md # 业务流程
+│   └── tech-topic/         # 技术专题
 │       ├── 001-4-layer-ddd.md
 │       ├── 002-uuid-string-pk.md
 │       ├── 003-mybatis-plus-vs-jpa.md
 │       ├── 004-jwt-stateless-auth.md
 │       ├── 005-threadlocal-usercontext.md
 │       ├── businessrule.md
-│       └── data-dict.md
+│       ├── data-dict.md
+│       ├── error-code.md
+│       ├── security.md
+│       └── state-machine.md
 ├── standards/              # 代码规范（事实文档）
 │   ├── architecture.md     # 架构规范
 │   ├── naming.md           # 命名规范
@@ -327,11 +329,11 @@ docs/
 
 ### 同步要求
 
-- 每轮任务完成后，必须检查 `docs/designs/` 中的内容是否因本次变更而需要更新
-- 新增/修改 API → 更新 `docs/designs/api.yaml`
-- 新增/修改数据表 → 更新 `docs/designs/db-schema.md`
-- 新增/修改业务规则 → 更新 `docs/designs/topic/businessrule.md`
-- 新增/修改数据字典 → 更新 `docs/designs/topic/data-dict.md`
+- 每轮任务完成后，必须检查 `docs/facts/` 中的内容是否因本次变更而需要更新
+- 新增/修改 API → 更新 `docs/facts/api.yaml`
+- 新增/修改数据表 → 更新 `docs/facts/db-schema.md`
+- 新增/修改业务规则 → 更新 `docs/facts/tech-topic/businessrule.md`
+- 新增/修改数据字典 → 更新 `docs/facts/tech-topic/data-dict.md`
 
 ### 执行检查点
 
@@ -345,7 +347,7 @@ docs/
 
 1. **Plan 等待确认**：在 `docs/plans/` 下根据模版创建 Plan，包含技术方案与任务拆分，等待人工确认后再继续。
 2. **编写 QA 测试用例**：在 `docs/test-cases/e2e-cases/` 下编写本轮需求的 E2E 测试用例（文本格式，编号 `TC-xxx`），由 QA 主导判定。**先写文本用例，再写自动化**。
-3. **编写开发自测（API 测试）**：根据 Plan 在 `backend/src/test/` 中编写 RestAssured 集成测试（API 级别），运行成功但断言失败（TDD 红牌阶段）。
+3. **编写开发自测（API 测试）**：根据 Plan 在 `apps/backend/src/test/` 中编写 RestAssured 集成测试（API 级别），运行成功但断言失败（TDD 红牌阶段）。
 4. **编写实现**：编写单元测试 + 实现代码（后端 application/domain/adapter 层），通过 `mvn compile` 编译。
 5. **运行开发自测**：运行 `mvn test` 修复失败的测试及其他错误，直至全部通过；同时补齐 `e2e/tests/qa/` 中本轮需求的自动化实现。
 6. **浏览器调试**：使用 Playwright（`./e2e-run.sh`）启动前后端并调试，确认前端视觉效果和交互功能正常。如果报错使用 chrome-devtool-mcp 查看错误。

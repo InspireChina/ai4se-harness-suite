@@ -34,5 +34,5 @@ public interface DataDictionaryType {
 
 ## docs 同步
 
-修改枚举后，运行 `DataDictionaryUtil` 的 `generateMarkdown()` 更新 `docs/designs/topic/data-dict.md`。
+修改枚举后，运行 `DataDictionaryUtil` 的 `generateMarkdown()` 更新 `docs/facts/tech-topic/data-dict.md`。
 也可以在 AGENTS.md 中约定手动同步。

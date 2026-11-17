@@ -11,13 +11,13 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 
 - 需求已经过 `ba-grill-me` 澄清，阻塞项都有结论
 - 已读过 `docs/features/_template.md`（规格模板）与 `AGENTS.md`
-- 已查过 `docs/designs/` 下的事实文档，避免和现状冲突
+- 已查过 `docs/facts/` 下的事实文档，避免和现状冲突
 
 ## 输出位置
 
 `docs/features/{模块}.md`
 
-- 命名用模块名（如 `booking.md`、`account.md`），可按迭代放在 `docs/features/iterationN/`；不要用日期
+- 命名用模块名（`auth.md`、`appointment.md`），不要用日期
 - 一个模块一份，不要把多个模块塞进一个文件
 - 更新已有模块时基于当前版本改，写明基线版本与目标版本
 

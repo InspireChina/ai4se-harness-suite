@@ -14,7 +14,7 @@ description: 拷问需求，把模糊的一句话需求逼成可验收的规格�
 - 需求里出现"支持"、"优化"、"友好"、"快速" 这类不可测的词
 - 涉及 **权限、状态流转、数据迁移、金额/库存** 等高风险面
 
-**已经澄清过的不用再问一遍。** 先读 `docs/features/` 里已有的规格和 `docs/designs/` 里的事实文档。
+**已经澄清过的不用再问一遍。** 先读 `docs/features/` 里已有的规格和 `docs/facts/` 里的事实文档。
 
 ## 拷问协议
 
@@ -39,11 +39,11 @@ description: 拷问需求，把模糊的一句话需求逼成可验收的规格�
 
 | 问题 | 先查 |
 |---|---|
-| 现有接口长什么样 | `docs/designs/api.yaml`、Controller |
-| 表结构 | `docs/designs/db-schema.md`、迁移脚本 |
-| 领域模型 | `docs/designs/domain-model.md`、聚合类 |
-| 已有业务规则 | `docs/designs/topic/businessrule.md` |
-| 现有枚举取值 | `docs/designs/topic/data-dict.md` |
+| 现有接口长什么样 | `docs/facts/api.yaml`、Controller |
+| 表结构 | `docs/facts/db-schema.md`、迁移脚本 |
+| 领域模型 | `docs/facts/domain-model.md`、聚合类 |
+| 已有业务规则 | `docs/facts/tech-topic/businessrule.md` |
+| 现有枚举取值 | `docs/facts/tech-topic/data-dict.md` |
 
 查完再问，问的是 **产品决策**，不是事实。
 

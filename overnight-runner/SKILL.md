@@ -35,24 +35,24 @@ description: 启动 overnight-runner 分屏面板，把队列里的 plan 交给 
 
 ```
 <项目>/
-├── overnight-runner.yaml              # 运行配置（提交进仓库，全队列共享）
-├── .overnight-runner/
-│   ├── project.yaml                   # 项目配置：默认提示词 + 默认决策（提交）
-│   └── queue/
-│       └── default/                   # 一条队列一个目录
-│           ├── queue.yaml             # 队列定义：跑哪些 plan（提交）
-│           ├── state.json             # 运行时状态（不提交）
-│           ├── decisions.jsonl        # 决策记录（提交，便于回溯）
-│           ├── logs/                   # 每个任务的 agent 日志（不提交）
-│           └── .lock                   # 单实例锁（不提交）
-└── tools/overnight-runner/
+└── .overnight-runner/
+    ├── overnight-runner.yaml          # 运行配置（提交进仓库，全队列共享）
+    ├── project.yaml                   # 项目配置：默认提示词 + 默认决策（提交）
     ├── overnight-runner               # 启动脚本（POSIX）
     ├── overnight-runner.cmd           # 启动脚本（Windows）
-    └── overnight_runner/              # 实现
+    ├── overnight_runner/              # 实现
+    └── queue/
+        └── default/                   # 一条队列一个目录
+            ├── queue.yaml             # 队列定义：跑哪些 plan（提交）
+            ├── state.json             # 运行时状态（不提交）
+            ├── decisions.jsonl        # 决策记录（提交，便于回溯）
+            ├── logs/                   # 每个任务的 agent 日志（不提交）
+            └── .lock                   # 单实例锁（不提交）
 ```
 
-**老项目自动迁移**：老布局（队列写在项目根 `overnight-runner.yaml`）第一次运行时会
-自动搬到 `.overnight-runner/queue/default/`，不丢任务、不丢状态，迁移幂等。
+**老项目自动迁移**：根目录旧的 `overnight-runner.yaml` 会迁入 `.overnight-runner/`；
+带 `queue:` 段的老布局第一次运行时会搬到 `.overnight-runner/queue/default/`，
+不丢任务、不丢状态，迁移幂等。
 
 **依赖**：**没有**。只用 Python 3.9+ 标准库 —— 界面是自绘的 ANSI 转义序列，
 配置解析是自己实现的 YAML 子集。Windows / macOS / Linux 都支持。
@@ -60,7 +60,7 @@ description: 启动 overnight-runner 分屏面板，把队列里的 plan 交给 
 ## 用法
 
 ```bash
-OR=tools/overnight-runner/overnight-runner
+OR=.overnight-runner/overnight-runner
 
 $OR init                                   # 初始化配置
 $OR add docs/plans/20261103-feature-a.md  # 追加 plan（相对项目根）
