@@ -144,7 +144,10 @@ team-harness-suite/
 ├── team-workflow-guide/  # 团队流程与角色手册
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
 ├── example-project/      # 全栈参考实现（已装全套 skills）
-├── .agents/verify.sh     # 一键验证（语法 / skill 一致性 / 链接 / 冒烟测试）
+├── .agents/
+│   ├── verify.sh         # 一键验证
+│   ├── plan/             # 本仓库开发计划
+│   └── skills/           # 维护型：work-in-example / modify-example / modify-harness
 └── opencode.jsonc        # 注册本仓库的 skills 路径
 ```
 

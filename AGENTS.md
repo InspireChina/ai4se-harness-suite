@@ -26,7 +26,7 @@
 
 ```
 team-harness-suite/
-├── .agents/              # 本仓库自用：verify.sh + plan/
+├── .agents/              # 本仓库自用：verify.sh + plan/ + skills/
 ├── agile-team-sdd/       # SDD 技能套件（16 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
@@ -58,6 +58,7 @@ team-harness-suite/
 | **安装器型** | `harness-installer/`、`tool-chain-installer/` | 一个 skill，作用是把东西装进目标项目 |
 | **套件型** | `agile-team-sdd/` | 一个 skill（安装器）+ N 个 skill 模板，一次装一批 |
 | **运行时型** | `overnight-runner/` | 一个 skill，作用是 **启动** 一个长跑工具 |
+| **维护型** | `.agents/skills/` | 本仓库自用：`work-in-example`（样例上下文）与 example↔harness 刷新（不装进目标项目） |
 | **文档型** | `team-workflow-guide/` | 不是 skill，是人读的指南 |
 
 ### SKILL.md 格式（强制）
@@ -409,7 +410,8 @@ team-harness-suite/
 │
 ├── .agents/
 │   ├── verify.sh                 # 一键验证
-│   └── plan/                     # 本仓库自身的开发计划（业务项目仍用 docs/plans/）
+│   ├── plan/                     # 本仓库自身的开发计划（业务项目用 feature/plan 或 _chores）
+│   └── skills/                   # 本仓库维护型 skill（work-in-example / modify-example / modify-harness）
 │
 ├── agile-team-sdd/
 │   ├── README.md                 # 套件说明

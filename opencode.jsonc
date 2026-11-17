@@ -3,6 +3,7 @@
 
   "skills": {
     "paths": [
+      ".agents/skills",
       "agile-team-sdd",
       "harness-installer",
       "tool-chain-installer",
