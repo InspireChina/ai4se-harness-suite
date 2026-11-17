@@ -56,6 +56,8 @@ NEW
 
 ## 2. 功能说明
 
+术语表见 [glossary.md](./glossary.md)。
+
 ### 2.1 功能概述
 
 统一账号承载 USER / CONSULTANT / ADMIN 三类身份；用户端提供个人中心与收藏；咨询师端访问受入驻审核状态约束。

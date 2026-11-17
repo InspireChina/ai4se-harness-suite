@@ -37,7 +37,7 @@
 
 - 需求规格与 Plan **定稿后不改**；同一 feature 的二次改造新建 `plan-{slug}.md`。
 - 事实文档必须与代码一致；改了代码就要改文档。
-- 新建需求：复制 `features/_template/` 为 `features/<迭代>/<CODE>-<slug>/`，再改 `spec.md` / `plan.md`。
+- 新建需求：复制 `features/_template/` 为 `features/<迭代>/<CODE>-<slug>/`，再改 `spec.md` / `glossary.md` / `plan.md`。
 - 每个迭代应有 `features/<迭代>/high-level-design.md`；**确认前不得写 feature Plan**。
 
 ## 同步检查点

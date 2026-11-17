@@ -172,10 +172,11 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 ```
 {{DOCS_DIR}}/
 ├── features/               # 需求规格 + 技术方案（过程文档）
-│   ├── _template/          # spec.md + plan.md
+│   ├── _template/          # spec.md + plan.md + glossary.md
 │   ├── _chores/            # 无关联 feature 的 plan
 │   └── <迭代>/<CODE>-<slug>/
 │       ├── spec.md
+│       ├── glossary.md     # 本 feature 双语术语表
 │       └── plan.md
 ├── facts/                  # 事实文档
 │   ├── api.yaml

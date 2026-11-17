@@ -4,7 +4,7 @@
 
 ```
 docs/features/
-├── _template/                 # 模板：spec.md + plan.md
+├── _template/                 # 模板：spec.md + plan.md + glossary.md
 ├── _chores/                   # 无关联 feature 的横切 plan
 │   └── plan-{slug}.md
 └── iteration1/
@@ -12,12 +12,14 @@ docs/features/
     ├── high-level-design.md   # 迭代高阶技术设计（HLD / TRD，人工确认）
     ├── ACC-account/
     │   ├── spec.md            # 业务规格
+    │   ├── glossary.md        # 本 feature 双语术语表（统一语言）
     │   ├── plan.md            # 主技术方案（可选；HLD 确认后）
     │   └── plan-{slug}.md     # 多份方案时
     └── prototypes/            # 迭代原型（可选）
 ```
 
-约定：每个迭代目录应有 `high-level-design.md`；**确认前不得写 feature Plan**。
+约定：每个迭代目录应有 `high-level-design.md`；**确认前不得写 feature Plan**。  
+每个 feature 目录应有 `glossary.md`（中文 | 英文 | 说明）；`spec.md` 在 §2 附近引用之。
 
 | 编码 | 文件夹 | 含义 |
 |---|---|---|

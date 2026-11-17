@@ -33,7 +33,7 @@ agile-team-sdd/
 | 组 | Skill | 作用 |
 |---|---|---|
 | **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
-| | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准 |
+| | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准、双语术语表 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |

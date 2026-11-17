@@ -235,7 +235,7 @@ cd e2e && npm run test:dev # 只跑开发自测用例
 ```
 docs/
 ├── features/               # 需求规格 + 技术方案（过程文档）
-│   ├── _template/          # spec.md + plan.md 模板
+│   ├── _template/          # spec.md + plan.md + glossary.md 模板
 │   ├── _chores/            # 无关联 feature 的横切 plan
 │   └── iteration1/         # 咨询师预约平台样例
 │       ├── README.md

@@ -1,6 +1,6 @@
 ---
 name: ba-write-spec-template
-description: 编写需求规格说明书（字段表、业务规则、权限矩阵、验收标准）。当需求已澄清，需要把需求落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时使用。
+description: 编写需求规格说明书（字段表、业务规则、权限矩阵、验收标准、双语术语表 glossary.md）。当需求已澄清，需要把需求落成 docs/features/<迭代>/<CODE>-<slug>/spec.md 时使用。
 ---
 
 <!-- TEMPLATE-ONLY -->
@@ -19,13 +19,14 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 
 ## 输出位置
 
-`{{FEATURES_DIR}}/<迭代>/<CODE>-<slug>/spec.md`
+`{{FEATURES_DIR}}/<迭代>/<CODE>-<slug>/spec.md`  
+同目录还必须产出 `glossary.md`（本 feature 双语术语表）。
 
 - 文件夹名用 **JIRA 风格大写编码** + slug（如 `ACC-account`、`BKG-booking`）
-- 规格文件固定为目录内的 `spec.md`
-- 从 `{{SPEC_TEMPLATE}}` 复制起步；同目录可放 `plan.md` / `plan-{slug}.md`
+- 规格文件固定为目录内的 `spec.md`；术语表固定为同目录 `glossary.md`
+- 从 `{{SPEC_TEMPLATE}}` 复制起步；同目录可放 `plan.md` / `plan-{slug}.md` 与 `glossary.md` 骨架
 - 一个能力一个文件夹，不要把多个模块塞进一份 spec
-- 更新已有模块时基于当前 `spec.md` 改，写明基线版本与目标版本
+- 更新已有模块时基于当前 `spec.md` 改，写明基线版本与目标版本；同步维护术语表
 
 ## 各章节怎么写
 
@@ -34,6 +35,19 @@ description: 编写需求规格说明书（字段表、业务规则、权限矩�
 - 背景：为什么要做（业务动机，不是技术动机）
 - 目标：做完之后什么变了
 - 范围：**明确写出"不做什么"** —— 这一节最容易被跳过，也最容易吵架
+
+### 术语表 `glossary.md`
+
+与 `spec.md` 同目录，表头固定：
+
+| 中文 | 英文 | 说明（可选） |
+|---|---|---|
+| 备注 | remark | |
+
+- 从 §2.3 业务对象、§5 字段表、角色/状态提炼本 feature 统一语言（Ubiquitous Language）
+- 英文用简洁业务词（如 `Account`、`BookingOrder`），不强制代码标识
+- `spec.md` §2 附近加一行引用同目录术语表（文案：`术语表见` + 指向 `glossary.md` 的相对链接）
+- 无新增术语时可保留表头 +「无」一行
 
 ### §2~3 功能与权限
 
@@ -107,6 +121,7 @@ AC-001：正常创建
 
 ## 自检清单
 
+- [ ] 术语表 `glossary.md` 已写，中英对照，且 `spec.md` 已引用
 - [ ] 每条规则有编号、适用场景、条件、动作
 - [ ] 每条验收标准有编号，且可测
 - [ ] 字段表里枚举值写全
