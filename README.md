@@ -144,15 +144,15 @@ team-harness-suite/
 ├── team-workflow-guide/  # 团队流程与角色手册
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
 ├── example-project/      # 全栈参考实现（已装全套 skills）
-├── scripts/verify.sh     # 一键验证（语法 / skill 一致性 / 链接 / 冒烟测试）
+├── .agents/verify.sh     # 一键验证（语法 / skill 一致性 / 链接 / 冒烟测试）
 └── opencode.jsonc        # 注册本仓库的 skills 路径
 ```
 
 ## 开发
 
 ```bash
-./scripts/verify.sh          # 全量验证
-./scripts/verify.sh --fast   # 跳过冒烟测试
+./.agents/verify.sh          # 全量验证
+./.agents/verify.sh --fast   # 跳过冒烟测试
 ```
 
 工程约定见 [`AGENTS.md`](AGENTS.md) —— 改任何脚本前先读它。

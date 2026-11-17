@@ -26,6 +26,7 @@
 
 ```
 team-harness-suite/
+├── .agents/              # 本仓库自用：verify.sh + plan/
 ├── agile-team-sdd/       # SDD 技能套件（16 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
@@ -343,7 +344,7 @@ pending ──▶ running ──┬──▶ success
 一条命令跑全部：
 
 ```bash
-./scripts/verify.sh
+./.agents/verify.sh
 ```
 
 **改了任何脚本都要跑。** 改 overnight-runner 的行为要额外跑冒烟测试。
@@ -393,7 +394,7 @@ pending ──▶ running ──┬──▶ success
 - [ ] 模板 `SKILL.md` 带 `TEMPLATE-ONLY` 标记块
 - [ ] 安装脚本幂等：`--dry-run` 可跑，重复执行不炸
 - [ ] 产物里 **没有** 安装机的绝对路径
-- [ ] 跑过 `./scripts/verify.sh`
+- [ ] 跑过 `./.agents/verify.sh`
 - [ ] 改了 `overnight-runner` 的行为 → 单元测试 44/44 + 冒烟测试 13/13 通过
 - [ ] 文档里的相对链接有效
 - [ ] 没提交 `.venv/`、`__pycache__/`、运行时状态（`.overnight-runner/queue/*/state.json`、`logs/`、`.lock`）
@@ -405,11 +406,10 @@ team-harness-suite/
 ├── README.md                     # 仓库总览：目的 + 模块表 + 快速开始
 ├── AGENTS.md                     # 本文件：架构与工程规范
 ├── opencode.jsonc                # 注册本仓库的 skills 路径
-├── scripts/
-│   └── verify.sh                 # 一键验证
 │
-├── docs/
-│   └── plans/                    # 本仓库自身的开发计划（业务项目的在 example-project/docs/plans/）
+├── .agents/
+│   ├── verify.sh                 # 一键验证
+│   └── plan/                     # 本仓库自身的开发计划（业务项目仍用 docs/plans/）
 │
 ├── agile-team-sdd/
 │   ├── README.md                 # 套件说明
@@ -466,11 +466,11 @@ team-harness-suite/
 每轮改动必须按以下顺序执行，严禁跳过或调换步骤：
 
 1. **确认范围**：改动落在哪个模块？是加 skill、加占位符、改脚本，还是改文档？
-2. **Plan 等待确认**：在 `docs/plans/` 下按模板写方案，等待人工确认后再继续。
-   （本仓库目前没有 `docs/plans/`，新建目录并在 Plan 里说明放置位置。）
+2. **Plan 等待确认**：在 `.agents/plan/` 下按 `YYYYMMDD-{slug}.md` 写方案，等待人工确认后再继续。
+   （本 harness 仓库用 `.agents/plan/` 保持根目录干净；目标/业务项目仍用 `docs/plans/`。）
 3. **先写验证**：能加自动化检查的先加（验证脚本、冒烟用例），再写实现。
 4. **编写实现**：按 §5 的文件与目录约定落代码，遵循 §3 的模块边界。
-5. **运行验证**：`./scripts/verify.sh` 全绿；改了 overnight-runner 则冒烟测试全绿。
+5. **运行验证**：`./.agents/verify.sh` 全绿；改了 overnight-runner 则冒烟测试全绿。
 6. **同步文档**：按 §13 的同步要求逐条过。
 7. **提交**：提交描述里写清楚「改了什么 / 为什么 / 怎么验证的 / 文档同步检查」。
 

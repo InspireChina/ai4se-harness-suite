@@ -2,8 +2,8 @@
 # 一键验证本仓库。
 #
 # 用法：
-#   ./scripts/verify.sh              # 全部检查
-#   ./scripts/verify.sh --fast       # 跳过 overnight-runner 冒烟测试
+#   ./.agents/verify.sh              # 全部检查
+#   ./.agents/verify.sh --fast       # 跳过 overnight-runner 冒烟测试
 #
 # 退出码：0 全绿，1 有失败。
 
