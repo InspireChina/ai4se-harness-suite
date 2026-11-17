@@ -1,0 +1,60 @@
+# overnight-runner 运行配置（项目级，全队列共享）
+#
+# 这里回答的是"这个项目怎么跑"：
+#   agent 是谁 / 看门狗多严 / 界面怎么刷 / 决策怎么处理
+#
+# "跑哪些任务"不在这里 —— 队列定义在
+#   .overnight-runner/queue/<队列名>/queue.yaml
+# 用 `overnight-runner --queue <名字> add docs/plans/xxx.md` 追加。
+#
+# 运行时状态（谁跑过、重试几次）写在同目录的 state.json，不进版本库。
+
+runner:
+  # coding agent 命令与参数。默认 opencode run；也可以用 claude / codex 等。
+  agent:
+    command: opencode
+    args: ["run"]
+    env: {}
+
+  # 看门狗：失败自动重试
+  watchdog:
+    maxRetries: 2          # 失败后额外重试几次
+    backoffSec: 60         # 重试前等多久
+    idleTimeoutSec: 1800   # agent 多久没输出就判定卡死（秒）
+    totalTimeoutSec: 7200  # 单个任务最长跑多久（秒）
+    killGraceSec: 15       # 终止后等多久再强杀
+
+  # 决策策略：agent 抛 "QUESTION: <问题>" 时怎么办
+  decision:
+    # attended   —— 有人值守（白天）：打断 agent，TUI 弹决策窗口问你；
+    #               你在 timeoutSec 内没回答，就按规则/兜底策略自动决策
+    # unattended —— 无人值守（夜里）：不打断 agent，直接按规则/兜底策略决策
+    mode: attended
+
+    timeoutSec: 600        # attended 模式下决策窗口等多久（秒）；0 = 不限
+
+    # 打断 agent 拿到答案后怎么让它继续：
+    #   session —— 用 `agent --session <sid>` 续跑同一会话（上下文不丢）
+    #   restart —— 重跑整个任务（决策历史会注入新一轮 prompt）
+    resume: session
+
+    # json 模式下 agent 每行输出都是 json 事件 —— 能拿到 sessionID，
+    # 决策才能送回给 agent。换不支持 json 输出的 agent 时改成 text。
+    outputFormat: json
+    jsonArgs: ["--format", "json"]
+
+    # 续跑时追加的参数，{session} 会被替换成真实的 session id
+    sessionArgs: ["--session", "{session}"]
+
+    # text 模式下从 agent 输出里正则抓 session id 的兜底
+    sessionPattern: '"sessionID"\s*:\s*"(ses_[A-Za-z0-9]+)"'
+
+  state:
+    dir: .overnight-runner
+
+  # agent 在哪个目录下跑（相对项目根）
+  workdir: .
+
+  ui:
+    refreshHz: 8
+    logTail: 400

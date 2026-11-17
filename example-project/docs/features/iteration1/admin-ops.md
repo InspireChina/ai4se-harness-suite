@@ -1,0 +1,308 @@
+# 需求规格说明书：管理端运营与治理
+
+> 文档类型：需求规格 / Feature Specification  
+> 适用目录：`docs/features/iteration1/`  
+> 需求类型：NEW  
+> 版本：v0.1  
+> 作者：BA  
+> 日期：2026-11-16  
+> 状态：**v0.1** — 字段/规则/验收已补齐；原型已挂接  
+> 源追溯：REQ-013、014、015、016、017
+
+---
+
+## 1. 需求说明
+
+### 1.1 需求名称
+
+管理端运营与治理
+
+### 1.2 需求类型
+
+NEW
+
+### 1.3 版本信息
+
+| 项目 | 内容 |
+|---|---|
+| 基线版本 | 无 |
+| 目标版本 | v0.1 |
+
+### 1.4 背景
+
+平台需运营看板、咨询师准入审核、分类治理、用户/订单治理与举报处理，才能保障服务质量与合规。
+
+### 1.5 目标
+
+补齐管理员侧审核、分类、治理与纠纷处理能力，并提供核心运营指标看板。
+
+### 1.6 范围
+
+本次包含：
+
+- **看板**：用户数、咨询师数、订单量、成交额、退款率；日/周/月对比；分类分布与活跃排行；异常指标提示
+- **入驻审核**：待审列表、详情与资质预览、通过/驳回（必填原因）、通知、操作留痕
+- **分类与标签**：树形维护、增删改启停、停用影响确认、操作日志、分类下咨询师/订单分布
+- **用户与订单治理**：检索用户/订单、禁用用户、异常订单退款（原因+通知）、操作审计
+- **举报与纠纷**：用户/咨询师举报；管理员处理与通知；历史举报与风险查看
+
+本次不包含：
+
+- 咨询师侧申请填写（consultant-onboarding.md）
+- 复杂 BI / 数仓
+- 客服工单系统
+
+---
+
+## 2. 功能说明
+
+### 2.1 功能概述
+
+管理端聚合运营指标与五类治理能力：审核、分类、用户、订单、举报。
+
+### 2.2 适用用户
+
+| 用户角色 | 角色说明 | 使用场景 |
+|---|---|---|
+| ADMIN | 平台管理员 | 看板、审核、分类、治理、举报 |
+
+### 2.3 主要业务对象
+
+| 业务对象 | 说明 |
+|---|---|
+| OpsDashboardMetrics | 看板指标 |
+| OnboardingApplication | 入驻申请（审核视角） |
+| Category / Tag | 分类与标签树 |
+| UserAccount | 用户治理对象 |
+| BookingOrder | 订单治理对象 |
+| ReportCase | 举报工单 |
+| AuditLog | 操作审计 |
+
+---
+
+## 3. 用户角色与权限
+
+| 角色 | 可查看 | 可新增 | 可编辑 | 可删除 | 可审批 | 说明 |
+|---|---:|---:|---:|---:|---:|---|
+| ADMIN | 是 | 是（分类等） | 是 | 有限 | 是 | 敏感操作须留痕 |
+| USER / CONSULTANT | 否 | 是（举报） | 否 | 否 | 否 | 仅发起举报 |
+
+### 3.1 权限规则
+
+- PR-001：管理端独立鉴权；支持操作级权限（细则可后补）。
+- PR-002：驳回入驻、退款、禁用用户必须填原因并留痕。
+- PR-003：停用分类前须确认影响范围。
+- PR-004：未提及操作一律不允许。
+
+---
+
+## 4. 业务流程
+
+### 4.1 主流程（入驻审核示例）
+
+1. 管理员筛选待审申请并打开详情/资质。
+2. 通过或驳回（驳回必选原因+说明）。
+3. 系统通知咨询师并写审计日志。
+
+### 4.2 主流程（举报处理示例）
+
+1. 用户或咨询师对订单/咨询师发起举报（类型、说明、证据）。
+2. 管理员筛选待处理列表并处理。
+3. 结果通知双方；可查看同咨询师历史举报。
+
+### 4.3 异常流程
+
+| 编号 | 触发条件 | 系统行为 | 结果 |
+|---|---|---|---|
+| EX-001 | 驳回无原因 | 拒绝 | 字段错误 |
+| EX-002 | 停用分类仍有大量依赖未确认 | 要求确认 | 不静默停用 |
+| EX-003 | 无权限管理员操作 | 拒绝 | 403 |
+
+---
+
+## 5. 字段表
+
+### 5.1 OpsDashboardMetrics / ApplicationReview
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---|---:|---:|
+| metrics.periodType | 统计周期 | enum | 是 | 看板粒度 | day / week / month | 查询时 | — |
+| metrics.periodStart | 周期开始 | date | 是 | 对比基准 | 查询条件 | 查询时 | — |
+| metrics.userCount | 用户数 | integer | 是 | 有效用户总数 | 系统聚合 | 否 | 否 |
+| metrics.consultantCount | 咨询师数 | integer | 是 | approved 且 active | 系统聚合 | 否 | 否 |
+| metrics.orderCount | 订单量 | integer | 是 | 有效订单数量 | 系统聚合 | 否 | 否 |
+| metrics.gmv | 成交额 | decimal(14,2) | 是 | 支付成功金额 | 系统聚合 | 否 | 否 |
+| metrics.refundRate | 退款率 | decimal(5,2) | 是 | 退款单/支付单 | 系统聚合 | 否 | 否 |
+| metrics.comparisonRate | 环比 | decimal(7,2) | 是 | 对比上一周期 | 系统计算 | 否 | 否 |
+| review.applicationId | 申请 ID | string | 是 | 被审核申请 | OnboardingApplication.id | 审核时 | 否 |
+| review.result | 审核结果 | enum | 是 | 通过/驳回 | approved / rejected | 审核时 | 否 |
+| review.reasonCode | 驳回原因 | enum | 条件 | 驳回原因码 | 资料不全/资质无效/内容违规/其他 | 驳回时 | 否 |
+| review.note | 审核说明 | string(2..500) | 条件 | 驳回时必填 | 管理员输入 | 审核时 | 否 |
+| review.reviewerId | 审核人 | string | 是 | 当前管理员 | 系统上下文 | 否 | 否 |
+| review.reviewedAt | 审核时间 | datetime | 是 | 决策时间 | 系统生成 | 否 | 否 |
+
+### 5.2 Category / Tag / UserGovernance
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---|---:|---:|
+| category.id | 分类 ID | string | 是 | 分类标识 | 系统生成 | 否 | 否 |
+| category.parentId | 父分类 ID | string | 否 | 根节点为空 | Category.id | 否 | 是 |
+| category.code | 分类编码 | string(2..50) | 是 | 稳定编码 | 管理员输入 | 是 | 否 |
+| category.name | 分类名 | string(2..50) | 是 | 同级唯一 | 管理员输入 | 是 | 是 |
+| category.sortOrder | 排序值 | integer | 是 | 升序展示 | 管理员输入 | 是 | 是 |
+| category.status | 分类状态 | enum | 是 | 启停 | enabled / disabled | 是 | 是 |
+| tag.id | 标签 ID | string | 是 | 标签标识 | 系统生成 | 否 | 否 |
+| tag.name | 标签名 | string(2..30) | 是 | 全局唯一 | 管理员输入 | 是 | 是 |
+| tag.status | 标签状态 | enum | 是 | 启停 | enabled / disabled | 是 | 是 |
+| governance.accountId | 用户账号 ID | string | 是 | 治理对象 | Account.id | 操作时 | 否 |
+| governance.action | 治理动作 | enum | 是 | 用户动作 | disable / enable | 操作时 | 否 |
+| governance.reason | 操作原因 | string(2..500) | 是 | 必填说明 | 管理员输入 | 操作时 | 否 |
+
+### 5.3 Refund / ReportCase / AuditLog
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---|---:|---:|
+| refund.id | 退款单 ID | string | 是 | 退款标识 | 系统生成 | 否 | 否 |
+| refund.orderId | 订单 ID | string | 是 | 被退款订单 | BookingOrder.id | 是 | 否 |
+| refund.amount | 退款金额 | decimal(10,2) | 是 | 不超过可退金额 | 管理员输入 | 是 | 否 |
+| refund.reason | 退款原因 | string(2..500) | 是 | 操作原因 | 管理员输入 | 是 | 否 |
+| refund.status | 退款状态 | enum | 是 | 网关进度 | pending / success / failed | 是 | 系统 |
+| report.id | 举报 ID | string | 是 | 举报标识 | 系统生成 | 否 | 否 |
+| report.reporterId | 举报人 ID | string | 是 | 用户或咨询师 | 当前账号 | 是 | 否 |
+| report.targetType | 对象类型 | enum | 是 | 举报对象 | order / consultant / user | 是 | 否 |
+| report.targetId | 对象 ID | string | 是 | 被举报对象 | 业务对象 | 是 | 否 |
+| report.type | 举报类型 | enum | 是 | 类型 | fraud / harassment / service / other | 是 | 否 |
+| report.description | 举报说明 | string(10..2000) | 是 | 事实描述 | 举报人输入 | 是 | 否 |
+| report.evidenceFileIds | 证据文件 | array | 否 | 安全校验文件 | 上传服务 | 否 | 否 |
+| report.status | 举报状态 | enum | 是 | 处理状态 | pending / processing / resolved / rejected | 是 | 系统 |
+| report.resolution | 处理结论 | string(2..1000) | 条件 | 结案必填 | 管理员输入 | 否 | 系统 |
+| audit.id | 审计日志 ID | string | 是 | 日志标识 | 系统生成 | 否 | 否 |
+| audit.operatorId | 操作人 | string | 是 | 管理员账号 | 系统上下文 | 否 | 否 |
+| audit.action | 操作类型 | string | 是 | 敏感动作编码 | 系统记录 | 否 | 否 |
+| audit.targetType/id | 对象类型/ID | string | 是 | 操作对象 | 系统记录 | 否 | 否 |
+| audit.before/after | 变更前后 | object | 是 | 脱敏快照 | 系统记录 | 否 | 否 |
+| audit.traceId | 链路 ID | string | 是 | 调用追踪 | 系统生成 | 否 | 否 |
+| audit.createdAt | 操作时间 | datetime | 是 | 发生时间 | 系统生成 | 否 | 否 |
+
+---
+
+## 6. 字段变更说明
+
+无
+
+---
+
+## 7. 业务规则
+
+1. **R-CREATE-001（分类）**：分类 code 全局唯一、name 同级唯一；树深不超过 3 层且不得形成环。
+2. **R-CREATE-002（举报）**：举报人须登录、目标存在、说明 10..2000 字；证据文件须通过安全校验。
+3. **R-CREATE-003（退款）**：仅支付成功且存在可退余额的订单可创建退款，金额须大于 0 且不超过可退金额。
+4. **R-QUERY-001（看板口径）**：看板按 Asia/Shanghai 自然日/周/月聚合，展示当前值、上一周期对比、分类分布与活跃排行。
+5. **R-QUERY-002（治理检索）**：用户、订单、申请、举报均支持关键词、状态、时间范围分页查询；敏感字段默认脱敏。
+6. **R-QUERY-003（历史风险）**：举报详情展示同目标历史举报数量、处理结果与风险标记，仅授权管理员可见。
+7. **R-UPDATE-001（入驻审核）**：仅 pending 申请可审核；驳回须原因码和说明，通过后幂等开通咨询师权限并通知申请人。
+8. **R-UPDATE-002（分类停用）**：停用前返回关联咨询师数、未来订单数并要求显式确认；停用后不可用于新建/检索，历史快照保留。
+9. **R-UPDATE-003（用户禁用）**：禁用必须填写原因，使会话失效并阻止登录、下单和新增举报；不影响历史数据查询。
+10. **R-UPDATE-004（退款处理）**：退款原因必填，网关回调幂等；成功后更新订单和结算调整并通知用户、咨询师。
+11. **R-UPDATE-005（举报处理）**：pending 可转 processing，再以 resolution 结案为 resolved/rejected；结果通知举报人与被举报方。
+12. **R-DELETE-001（分类删除）**：仅无子分类、无咨询师与订单引用的分类可删除；否则只能停用。
+13. **R-DELETE-002（禁止删除审计）**：申请审核、退款、用户治理、举报与审计日志不可物理删除。
+14. **R-COMMON-001（操作授权）**：每个管理动作执行操作级权限校验，越权返回 403。
+15. **R-COMMON-002（审计）**：审核、分类变更、禁用、退款、举报处理均记录操作人、前后值、原因、时间和 traceId。
+16. **R-COMMON-003（异常提示）**：退款率或举报量超过配置阈值时看板显示异常提示，不自动执行治理动作。
+
+---
+
+## 8. 业务规则变更说明
+
+无
+
+---
+
+## 9. 状态流转规则
+
+### 9.1 入驻申请（管理员侧）
+
+| 当前状态 | 触发动作 | 目标状态 | 允许角色 | 规则编号 |
+|---|---|---|---|---|
+| pending | approve | approved | ADMIN | R-STATE-001 |
+| pending | reject | rejected | ADMIN | R-STATE-002 |
+
+### 9.2 举报
+
+| 当前状态 | 触发动作 | 目标状态 | 允许角色 | 规则编号 |
+|---|---|---|---|---|
+| （无） | submit | pending | USER/CONSULTANT | R-STATE-003 |
+| pending | resolve | resolved | ADMIN | R-STATE-004 |
+| pending | dismiss | rejected | ADMIN | R-STATE-005 |
+
+---
+
+## 10. 数据约束
+
+### 10.1 唯一性约束
+
+| 字段 | 唯一范围 | 说明 |
+|---|---|---|
+| category.code | 全局唯一 | 创建后不可修改 |
+| category.parentId + name | 同级唯一 | 避免同级重名 |
+| tag.name | 全局唯一 | 忽略首尾空格 |
+
+### 10.2 引用约束
+
+| 当前对象字段 | 引用对象 | 引用字段 | 约束说明 |
+|---|---|---|---|
+| report.orderId | BookingOrder | id | 订单须存在 |
+| report.consultantId | Consultant | id | 咨询师须存在 |
+
+### 10.3 数据保留策略
+
+- DATA-001：审核、退款、禁用、举报处理日志可检索导出（见 platform-capability）。
+
+---
+
+## 11. 影响范围
+
+无
+
+---
+
+## 12. 验收标准
+
+- **AC-001**：Given 平台存在跨多个周期的业务数据，When 管理员切换日/周/月，Then 看板展示用户、咨询师、订单、GMV、退款率、环比、分类分布、排行及命中阈值的异常提示。
+- **AC-002**：Given 入驻申请为 pending，When 管理员通过或填写原因驳回，Then 状态正确更新、申请人收到通知、权限按结果处理且审计日志包含前后值。
+- **AC-003**：Given 分类树存在关联咨询师或未来订单，When 管理员编辑或停用分类，Then 树结构校验生效、停用前展示影响范围并要求确认，历史引用不丢失。
+- **AC-004**：Given 管理员具备治理权限，When 检索用户/订单并执行禁用或合法退款，Then 结果可追踪、相关方收到通知、敏感操作有审计；无权限操作返回 403。
+- **AC-005**：Given 有待处理举报及同目标历史记录，When 管理员查看并结案，Then 历史风险可见、结论必填、双方收到结果通知且处理过程留痕。
+
+---
+
+## 13. 测试场景建议
+
+| 场景编号 | 场景名称 | 前置条件 | 操作 | 预期结果 |
+|---|---|---|---|---|
+| TC-001 | 通过入驻 | pending 申请 | 通过 | 开通咨询师权限 |
+| TC-002 | 驳回无原因 | pending | 驳回 | 失败 |
+| TC-003 | 禁用用户 | 正常用户 | 禁用 | 无法登录下单 |
+| TC-004 | 处理举报 | pending 举报 | 结案 | 双方收到通知 |
+
+---
+
+## 14. 原型引用说明
+
+- 原型工程：`docs/features/iteration1/prototypes/`（`npm run dev` → :5174）
+- 路由：`/admin`、`/admin/applications`、`/admin/categories`、`/admin/users`、`/admin/orders`、`/admin/reports`
+
+---
+
+## 15. 合并说明
+
+无
+
+---
+
+## 16. AI 实现提示
+
+1. 本文件覆盖 5 个 REQ，实现时可按子域拆 Plan，但规格保持一份。
+2. 所有敏感操作必须写 AuditLog，缺少留痕视为未完成。
+3. 入驻通过后的权限开通与 account / onboarding 对齐。

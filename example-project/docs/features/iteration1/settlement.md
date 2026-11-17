@@ -1,0 +1,256 @@
+# 需求规格说明书：收入与结算
+
+> 文档类型：需求规格 / Feature Specification  
+> 适用目录：`docs/features/iteration1/`  
+> 需求类型：NEW  
+> 版本：v0.1  
+> 作者：BA  
+> 日期：2026-11-16  
+> 状态：**v0.1** — 字段/规则/验收已补齐；原型已挂接  
+> 源追溯：REQ-011
+
+---
+
+## 1. 需求说明
+
+### 1.1 需求名称
+
+收入与结算
+
+### 1.2 需求类型
+
+NEW
+
+### 1.3 版本信息
+
+| 项目 | 内容 |
+|---|---|
+| 基线版本 | 无 |
+| 目标版本 | v0.1 |
+
+### 1.4 背景
+
+咨询师需要可核对的收入与结算能力，才能持续履约；平台按周期结算并支持提现。
+
+### 1.5 目标
+
+提供收入概览、月度结算单、提现申请与明细下载。
+
+### 1.6 范围
+
+本次包含：
+
+- 收入概览（今日/本月收入、待结算、提现状态）
+- 按月结算单（订单明细、服务费、应结金额）
+- 提现申请（不超过可提现余额）；失败可重提并展示原因
+- 结算单与订单明细文件下载
+
+本次不包含：
+
+- 跨境/多币种/发票税务
+- 费率合同配置后台（费率规则见 platform-capability）
+- 支付网关对接细节（platform-capability）
+
+---
+
+## 2. 功能说明
+
+### 2.1 功能概述
+
+咨询师查看收入与结算单，发起提现并下载明细。
+
+### 2.2 适用用户
+
+| 用户角色 | 角色说明 | 使用场景 |
+|---|---|---|
+| CONSULTANT | 咨询师 | 查看收入、提现、下载 |
+
+### 2.3 主要业务对象
+
+| 业务对象 | 说明 |
+|---|---|
+| IncomeOverview | 收入概览 |
+| SettlementBill | 月度结算单 |
+| WithdrawalRequest | 提现申请 |
+
+---
+
+## 3. 用户角色与权限
+
+| 角色 | 可查看 | 可新增 | 可编辑 | 可删除 | 可审批 | 说明 |
+|---|---:|---:|---:|---:|---:|---|
+| CONSULTANT | 是（本人） | 是（提现） | 否 | 否 | 否 | 仅本人结算数据 |
+
+### 3.1 权限规则
+
+- PR-001：仅可查看本人结算与提现。
+- PR-002：提现金额不可超过可提现余额。
+- PR-003：未提及操作一律不允许。
+
+---
+
+## 4. 业务流程
+
+### 4.1 主流程
+
+1. 咨询师打开收入页查看概览。
+2. 按月查看结算单与明细。
+3. 发起提现；成功则扣减可提现余额；失败展示原因可重提。
+4. 下载结算单/明细文件。
+
+### 4.2 异常流程
+
+| 编号 | 触发条件 | 系统行为 | 结果 |
+|---|---|---|---|
+| EX-001 | 提现超额 | 拒绝 | 提示余额不足 |
+| EX-002 | 提现失败 | 记录失败原因 | 可重新发起 |
+
+---
+
+## 5. 字段表
+
+### 5.1 IncomeOverview / SettlementBill
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---|---:|---:|
+| overview.todayIncome | 今日收入 | decimal(12,2) | 是 | 今日完成订单净收入 | 系统聚合 | 否 | 否 |
+| overview.monthIncome | 本月收入 | decimal(12,2) | 是 | 本月完成订单净收入 | 系统聚合 | 否 | 否 |
+| overview.pendingSettlement | 待结算金额 | decimal(12,2) | 是 | 未出账净收入 | 系统聚合 | 否 | 否 |
+| overview.withdrawableBalance | 可提现余额 | decimal(12,2) | 是 | 已结算未冻结余额 | 系统计算 | 否 | 否 |
+| overview.frozenBalance | 冻结金额 | decimal(12,2) | 是 | 提现处理中金额 | 系统计算 | 否 | 否 |
+| bill.id | 结算单 ID | string | 是 | 月账单标识 | 系统生成 | 否 | 否 |
+| bill.consultantId | 咨询师 ID | string | 是 | 账单所有者 | Consultant.id | 否 | 否 |
+| bill.period | 账期 | string(7) | 是 | 月度账期 | YYYY-MM | 否 | 否 |
+| bill.status | 账单状态 | enum | 是 | 结算状态 | calculating / issued / adjusted | 系统 | 系统 |
+| bill.grossAmount | 订单总额 | decimal(12,2) | 是 | 成交合计 | 明细汇总 | 否 | 否 |
+| bill.platformFee | 服务费 | decimal(12,2) | 是 | 平台佣金 | 明细汇总 | 否 | 否 |
+| bill.refundAmount | 退款金额 | decimal(12,2) | 是 | 本期退款 | 明细汇总 | 否 | 否 |
+| bill.netAmount | 应结金额 | decimal(12,2) | 是 | gross-fee-refund | 系统计算 | 否 | 否 |
+| bill.issuedAt | 出账时间 | datetime | 否 | 账单生成完成时间 | 系统生成 | 否 | 否 |
+
+### 5.2 SettlementLine / WithdrawalRequest
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---:|---:|
+| line.id | 明细 ID | string | 是 | 结算明细标识 | 系统生成 | 否 | 否 |
+| line.billId | 结算单 ID | string | 是 | 所属账单 | SettlementBill.id | 否 | 否 |
+| line.orderId | 订单 ID | string | 是 | 来源订单 | BookingOrder.id | 否 | 否 |
+| line.completedAt | 完成时间 | datetime | 是 | 归属账期依据 | BookingOrder | 否 | 否 |
+| line.grossAmount | 订单金额 | decimal(10,2) | 是 | 支付成功金额 | 订单快照 | 否 | 否 |
+| line.feeRateVersion | 费率版本 | string | 是 | 订单适用费率 | FeeRateVersion | 否 | 否 |
+| line.platformFee | 服务费 | decimal(10,2) | 是 | 按费率计算 | 系统计算 | 否 | 否 |
+| line.netAmount | 净收入 | decimal(10,2) | 是 | 可结算金额 | 系统计算 | 否 | 否 |
+| withdrawal.id | 提现单 ID | string | 是 | 提现标识 | 系统生成 | 否 | 否 |
+| withdrawal.amount | 提现金额 | decimal(12,2) | 是 | 大于 0 | 咨询师输入 | 是 | 否 |
+| withdrawal.accountSnapshot | 收款账户快照 | object | 是 | 脱敏展示、加密存储 | 已验证账户 | 是 | 否 |
+| withdrawal.status | 提现状态 | enum | 是 | 处理状态 | pending / processing / success / failed | 是 | 系统 |
+| withdrawal.gatewayTradeNo | 渠道流水号 | string | 否 | 出款凭据 | 支付网关 | 否 | 否 |
+| withdrawal.failureCode | 失败码 | string | 条件 | 失败原因编码 | 支付网关 | 否 | 否 |
+| withdrawal.failureReason | 失败原因 | string(500) | 条件 | 用户可见原因 | 系统映射 | 否 | 否 |
+| withdrawal.createdAt | 申请时间 | datetime | 是 | 提交时间 | 系统生成 | 否 | 否 |
+| withdrawal.completedAt | 完成时间 | datetime | 否 | 成功/失败时间 | 系统生成 | 否 | 否 |
+
+---
+
+## 6. 字段变更说明
+
+无
+
+---
+
+## 7. 业务规则
+
+1. **R-CREATE-001（出账范围）**：月度账单仅纳入该账期内 completed 且未被上一账单纳入的订单，并按订单费率版本计算。
+2. **R-CREATE-002（提现金额）**：提现金额须大于 0 且不超过提交瞬间可提现余额；校验与冻结余额在同一事务完成。
+3. **R-CREATE-003（提现幂等）**：客户端幂等键相同的重复申请返回原提现单，不重复冻结余额。
+4. **R-CREATE-004（失败重提）**：提现 failed 后解冻金额，咨询师可新建提现申请；原失败记录不可改写。
+5. **R-QUERY-001（本人隔离）**：咨询师仅可查询、下载本人的概览、账单、明细和提现记录。
+6. **R-QUERY-002（金额口径）**：今日/本月按 Asia/Shanghai 完成时间统计；待结算、可提现、冻结三者不得重叠计入。
+7. **R-QUERY-003（下载一致性）**：下载文件金额、行数和账期必须与页面账单一致，并包含生成时间与账单 ID。
+8. **R-UPDATE-001（出款成功）**：验签成功的网关回调将 processing 置 success 并扣减冻结余额；重复回调幂等。
+9. **R-UPDATE-002（出款失败）**：失败回调将状态置 failed、记录可读原因并原子解冻金额。
+10. **R-UPDATE-003（账单调整）**：已出账订单发生退款时生成调整明细，不直接改写原明细，并将账单标记 adjusted。
+11. **R-DELETE-001（财务留存）**：账单、明细与提现记录不可物理删除。
+12. **R-COMMON-001（金额精度）**：人民币以分为最小计算单位，展示保留两位小数，汇总不得使用浮点运算。
+
+---
+
+## 8. 业务规则变更说明
+
+无
+
+---
+
+## 9. 状态流转规则
+
+| 当前状态 | 触发动作 | 目标状态 | 允许角色 | 规则编号 |
+|---|---|---|---|---|
+| （无） | applyWithdraw | pending | CONSULTANT | R-STATE-001 |
+| pending | gatewaySuccess | success | 系统 | R-STATE-002 |
+| pending | gatewayFail | failed | 系统 | R-STATE-003 |
+| failed | reapply | pending | CONSULTANT | R-STATE-004 |
+
+---
+
+## 10. 数据约束
+
+### 10.1 唯一性约束
+
+| 字段 | 唯一范围 | 说明 |
+|---|---|---|
+| consultantId + period | 咨询师+账期 | 每月一份结算单 |
+
+### 10.2 引用约束
+
+| 当前对象字段 | 引用对象 | 引用字段 | 约束说明 |
+|---|---|---|---|
+| orderLines.orderId | BookingOrder | id | 须已完成可结算 |
+
+### 10.3 数据保留策略
+
+- DATA-001：结算单与提现记录长期保留供核对。
+
+---
+
+## 11. 影响范围
+
+无
+
+---
+
+## 12. 验收标准
+
+- **AC-001**：Given 咨询师存在已完成、待出账及提现中订单，When 打开收入页，Then 今日、本月、待结算、可提现、冻结金额与提现状态按统一口径正确展示。
+- **AC-002**：Given 月度账单已 issued，When 查看该账期，Then 订单明细、费率版本、服务费、退款与应结金额可逐行核对且汇总一致。
+- **AC-003**：Given 可提现余额为 100 元，When 申请 101 元，Then 系统拒绝；When 合法提现失败，Then 展示失败原因、余额解冻且可新建申请。
+- **AC-004**：Given 咨询师打开本人已出账账单，When 下载结算单与订单明细，Then 文件可打开，账单 ID、账期、行数和金额与页面一致。
+
+---
+
+## 13. 测试场景建议
+
+| 场景编号 | 场景名称 | 前置条件 | 操作 | 预期结果 |
+|---|---|---|---|---|
+| TC-001 | 查看结算单 | 有已完成订单 | 打开账期 | 明细正确 |
+| TC-002 | 超额提现 | 余额 100 | 提现 200 | 拒绝 |
+| TC-003 | 失败重提 | 上次 failed | 再提现 | 进入 pending |
+
+---
+
+## 14. 原型引用说明
+
+- 原型工程：`docs/features/iteration1/prototypes/`（`npm run dev` → :5174）
+- 路由：`/consultant/settlements`
+
+---
+
+## 15. 合并说明
+
+无
+
+---
+
+## 16. AI 实现提示
+
+1. 服务费率与结算周期以 platform-capability 配置为准。
+2. 提现与支付回调幂等见 platform-capability，本模块不自建网关。

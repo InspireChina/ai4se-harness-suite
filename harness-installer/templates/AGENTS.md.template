@@ -1,0 +1,227 @@
+# {{PROJECT_NAME}} · 架构与工程规范
+
+> 本文件由 `harness-installer` 生成，是本代码库的 **唯一权威工程约定**。
+> 新成员与自动化工具在不了解上下文的情况下，也应按本文件一致地新增功能、扩展模块并避免破坏依赖关系。
+>
+> **待补充**：标有 `TODO` 的段落需要由项目负责人填写后生效。
+
+## 1. 仓库拓扑
+
+这是一个全栈工程，技术栈：{{TECH_STACK}}
+
+主要模块：
+
+- `{{BACKEND_DIR}}/`：{{BACKEND_DESC}}
+- `{{FRONTEND_DIR}}/`：{{FRONTEND_DESC}}
+
+运行时形态：
+
+```
+Client → {{FRONTEND_NAME}} → /api 代理 → {{BACKEND_NAME}} → {{DATABASE}}
+```
+
+## 2. 横切关注点：鉴权与用户上下文
+
+- TODO：写明认证方式（JWT / Session / OAuth2）
+- TODO：写明 token 存放位置与请求头约定
+- TODO：写明后端如何获取当前用户（ThreadLocal / 拦截器注入 / 方法参数）
+- TODO：写明权限模型（RBAC / ABAC）与管理员路径约定
+
+约束：
+
+- 后端自行校验认证信息（不在前端或网关层做）
+- application / domain 层不得依赖 Web 框架对象（Request / Response）
+- 对外接口必须做鉴权检查
+
+## 3. 标准分层
+
+TODO：写明分层结构与包路径。
+
+依赖方向（强制）：
+
+- adapter → application → domain
+- infrastructure → domain（实现 domain 定义的接口）
+- domain 不得依赖 infrastructure / adapter / Web 框架
+
+## 4. DTO、Assembler 与 Converter 约定
+
+- 写操作入参使用 `*Command` 或 Request DTO
+- 对外返回使用 `*Response`
+- domain 与 infrastructure 之间使用 `*Converter` 做 PO ⟷ domain 转换
+- application 层使用 `*Assembler` 做 domain ⟷ DTO 转换
+- 映射约定：adapter 不直接操作 domain 实体；使用手动转换，遵循现有命名
+
+## 5. 持久化规则
+
+- TODO：写明 ORM / Mapper 框架与版本
+- PO 放在 `{{BACKEND_DIR}}/**/persistence/po/`
+- Mapper 放在 `{{BACKEND_DIR}}/**/persistence/mapper/`
+- Repository：domain 只定义接口，infrastructure 提供实现（`*RepositoryImpl`）
+- 主键策略：TODO
+- 聚合与一致性：聚合内子实体由 repository 在同一事务内装配与持久化
+
+## 6. 事务边界
+
+事务边界统一放在 application 层：
+
+- 以一个用例为单位在 AppService 方法上标注 `@Transactional`
+- domain 方法不直接开启 / 提交事务
+- `@Transactional` 不在 Controller 或 Repository 层使用
+
+## 7. 错误模型与异常处理
+
+- 业务错误：抛 `BusinessException`（携带 errorCode 与 message）
+- 参数错误：抛 `IllegalArgumentException`，由 `GlobalExceptionHandler` 转为 HTTP 400
+- 权限错误：由框架返回 HTTP 401 / 403
+- 资源冲突：HTTP 409
+
+对外响应由 `GlobalExceptionHandler` 统一包装：
+
+```json
+{
+  "errorCode": "{{ERROR_CODE_EXAMPLE}}",
+  "message": "{{ERROR_MESSAGE_EXAMPLE}}",
+  "timestamp": "..."
+}
+```
+
+## 8. 领域设计：聚合与规则
+
+TODO：列出核心聚合（名称 + 关键字段）、业务规则引擎位置、数据字典注册方式。
+
+## 9. 状态机
+
+TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫方法控制。
+
+## 10. 测试规范
+
+### 两类用例的归属
+
+测试用例分两层，**归属看"谁定义、谁判定"，不是"谁敲的代码"**：
+
+| | 开发自测 | QA 测试 |
+|---|---|---|
+| 验证什么 | 代码按 Plan 的设计工作 | 系统符合需求规格 |
+| 谁定义 / 谁判定 | 开发本人 | **QA** |
+| 用例编号 | 无编号，命名表达意图 | `TC-xxx`，与文本用例一一对应 |
+| 存放位置 | 源码旁（`*Test.java`、`*.test.ts`） | `{{DOCS_DIR}}/` 用例库 + `{{E2E_DIR}}/tests/qa/` |
+| 合并闸门 | 否 | **是** |
+| 失败意味着 | 代码写错了 | 需求没实现 / 理解有偏差 / 规格有歧义 |
+
+约定：
+
+- QA 用例的自动化实现可由开发代写，但定义权与判定权归 QA
+- 开发自测全绿 ≠ 需求被实现，不能替代 QA 测试
+- QA 用例必须先有文本用例（`{{E2E_CASES_DIR}}/`），再写自动化
+
+### 测试技术栈
+
+- TODO：单元测试框架、集成测试框架、数据库测试方案
+- 测试使用 `schema.sql` + `data.sql` 初始化数据
+- 每个用例前重置数据库，保证可重复执行、不依赖执行顺序
+
+### 开发自测覆盖要求
+
+- 每个 API **必须** 有对应的集成测试
+- 至少覆盖：1 个 Happy Path + 关键失败分支（参数错误 / 权限不足 / 业务冲突）
+- 前端组件 / Composable 单元测试使用 Vitest（与源码同目录，`*.test.ts`）
+- 命名：类名 `{被测Controller}Test`，方法名 `should_{action}_{expectedResult}`（不写 `TC-` 编号）
+
+### QA 测试要求
+
+- 需求规格的每条验收标准、每条业务规则 → 至少 1 条 QA 用例
+- 编号统一 `TC-xxx`，文本用例与自动化用例共用同一编号
+- 四类产物：文本用例 `{{E2E_CASES_DIR}}/`、E2E 自动化 `{{E2E_DIR}}/tests/qa/`、手动用例 `{{DOCS_DIR}}/manual-cases/`、冒烟用例 `{{DOCS_DIR}}/smoking-cases/`
+- 用例可独立重复执行，不依赖执行顺序
+
+### E2E 测试
+
+- Playwright + Chromium，按归属分两层：
+
+| 目录 | 归属 | 说明 |
+|---|---|---|
+| `{{E2E_DIR}}/tests/qa/` | **QA 测试** | 验收用例的自动化实现，与 `{{E2E_CASES_DIR}}/test-cases.md` 一一对应，合并闸门 |
+| `{{E2E_DIR}}/tests/dev/` | 开发自测 | 开发期快速反馈，不作为验收依据 |
+
+- 运行命令：`{{E2E_RUNNER}}`
+
+## 11. 前端规范
+
+- TODO：写明框架版本与组合式 API / 类组件约定
+- 状态管理：TODO
+- 路由：TODO
+- HTTP 封装：TODO
+- 视图文件按子系统分组：`{{FRONTEND_DIR}}/src/views/<subsystem>/`
+- Service 层封装 API 调用，Composable 封装可复用逻辑
+- 页面级组件组合 Composable + UI 组件，视图内不含直接 API 调用
+
+## 12. PR / 变更检查清单
+
+- [ ] 分层检查：adapter 不含业务逻辑；domain 不依赖 infrastructure；事务边界在 application
+- [ ] 错误处理：业务校验使用 `BusinessException`，避免裸 `RuntimeException`
+- [ ] API 设计：RESTful 风格，路径统一 `/api/v1/resource`
+- [ ] 安全：不记录 token / 敏感信息；对外接口做鉴权检查
+- [ ] 数据字典：新增枚举需要同时更新注册类与 `{{DESIGNS_DIR}}/topic/data-dict.md`
+- [ ] 业务规则：新增规则需要同时更新规则配置与 `{{DESIGNS_DIR}}/topic/businessrule.md`
+- [ ] 数据库变更：新增 DDL 需同时更新迁移脚本、测试 `schema.sql` 与 `{{DESIGNS_DIR}}/db-schema.md`
+- [ ] 验证：本地运行 `{{TEST_CMD_BACKEND}}` 与 `{{TEST_CMD_FRONTEND}}` 全部通过
+- [ ] 文档同步检查（已更新 / 不涉及）
+
+## 13. 文档结构
+
+```
+{{DOCS_DIR}}/
+├── features/               # 需求规格（过程文档）
+│   └── _template.md
+├── plans/                  # 技术方案（过程文档）
+│   └── _template.md
+├── designs/                # 设计文档（事实文档）
+│   ├── api.yaml
+│   ├── db-schema.md
+│   ├── domain-model.md
+│   └── topic/
+├── standards/              # 代码规范（事实文档）
+│   ├── architecture.md
+│   ├── naming.md
+│   ├── security.md
+│   ├── api-design.md
+│   ├── layers.md
+│   ├── db.md
+│   ├── error.md
+│   ├── test.md
+│   └── templates/
+├── e2e-cases/              # QA 用例：E2E 验收用例文本基线
+├── manual-cases/           # QA 用例：手动执行用例
+└── smoking-cases/          # QA 用例：快速回归（冒烟）用例
+```
+
+> `{{DOCS_DIR}}/` 下的 `e2e-cases/`、`manual-cases/`、`smoking-cases/` 均为 **QA 测试** 产物（定义权与判定权归 QA）；
+> 开发自测用例放在源码旁（`*Test.java`、`*.test.ts`）与 `{{E2E_DIR}}/tests/dev/`。归属详见 §10 与 `{{STANDARDS_DIR}}/test.md`。
+
+### 同步要求
+
+- 每轮任务完成后，必须检查 `{{DESIGNS_DIR}}/` 中的内容是否因本次变更而需要更新
+- 新增 / 修改 API → 更新 `{{DESIGNS_DIR}}/api.yaml`
+- 新增 / 修改数据表 → 更新 `{{DESIGNS_DIR}}/db-schema.md`
+- 新增 / 修改业务规则 → 更新 `{{DESIGNS_DIR}}/topic/businessrule.md`
+- 新增 / 修改数据字典 → 更新 `{{DESIGNS_DIR}}/topic/data-dict.md`
+
+### 执行检查点
+
+每轮任务提交描述中必须包含：
+
+- [ ] `{{DOCS_DIR}}/` 同步检查（已更新 / 不涉及）
+
+## 14. 开发流程（每轮需求的标准执行步骤）
+
+每轮需求开发必须按以下顺序执行，严禁跳过或调换步骤：
+
+1. **Plan 等待确认**：在 `{{PLANS_DIR}}/` 下根据模板创建 Plan，包含技术方案与任务拆分，等待人工确认后再继续。
+2. **编写 QA 测试用例**：在 `{{E2E_CASES_DIR}}/` 下编写本轮需求的 E2E 测试用例（文本格式，编号 `TC-xxx`），由 QA 主导判定。**先写文本用例，再写自动化**。
+3. **编写开发自测（API 测试）**：根据 Plan 在 `{{BACKEND_DIR}}/src/test/` 中编写集成测试（TDD 红牌阶段）。
+4. **编写实现**：编写单元测试 + 实现代码，通过后端编译。
+5. **运行开发自测**：运行后端测试，修复失败用例直至全部通过；同时补齐 `{{E2E_DIR}}/tests/qa/` 中本轮需求的自动化实现。
+6. **浏览器调试**：使用 Playwright 启动前后端并调试，确认前端视觉效果和交互功能正常。
+7. **运行 QA 验收**：`{{E2E_DIR}}` 下跑 QA 用例集全部通过，并交由 QA 对照 `{{E2E_CASES_DIR}}/` 逐条验收。
+
+> 第 3~6 步是 **开发自测**（对开发负责）；第 2、7 步是 **QA 测试**（对需求负责，是合并闸门）。开发自测全绿不等于需求已实现。

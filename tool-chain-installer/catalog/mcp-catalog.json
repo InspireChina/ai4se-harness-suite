@@ -1,0 +1,73 @@
+{
+  "browser": [
+    {
+      "name": "chrome-devtools",
+      "description": "Chrome DevTools MCP：页面导航、截图、无障碍树、控制台、网络请求、性能追踪",
+      "package": "chrome-devtools-mcp@latest",
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"],
+      "env": {},
+      "usedBy": ["dev-debug"]
+    },
+    {
+      "name": "playwright",
+      "description": "Playwright MCP：跨浏览器自动化操作、截图、表单填写",
+      "package": "@playwright/mcp@latest",
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--browser", "chromium"],
+      "env": {},
+      "usedBy": ["dev-debug", "qa"]
+    }
+  ],
+  "context": [
+    {
+      "name": "context7",
+      "description": "Context7：拉取框架/库的最新版官方文档",
+      "package": "context7-mcp@latest",
+      "command": "npx",
+      "args": ["-y", "context7-mcp@latest"],
+      "env": {},
+      "usedBy": ["dev-build"]
+    },
+    {
+      "name": "sequential-thinking",
+      "description": "Sequential Thinking MCP：结构化推理，拆解复杂任务",
+      "package": "@modelcontextprotocol/server-sequential-thinking@latest",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking@latest"],
+      "env": {},
+      "usedBy": ["dev-plan"]
+    }
+  ],
+  "data": [
+    {
+      "name": "filesystem",
+      "description": "Filesystem MCP：限定目录范围内的文件读写",
+      "package": "@modelcontextprotocol/server-filesystem@latest",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem@latest", "."],
+      "env": {},
+      "usedBy": []
+    },
+    {
+      "name": "git",
+      "description": "Git MCP：查询仓库历史、分支、diff",
+      "package": "mcp-server-git@latest",
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "."],
+      "env": {},
+      "usedBy": []
+    }
+  ],
+  "observability": [
+    {
+      "name": "sentry",
+      "description": "Sentry MCP：线上错误与性能问题排查（需 SENTRY_TOKEN）",
+      "package": "mcp-remote",
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://mcp.sentry.dev/mcp"],
+      "env": { "SENTRY_TOKEN": "{env:SENTRY_TOKEN}" },
+      "usedBy": ["dev-debug"]
+    }
+  ]
+}

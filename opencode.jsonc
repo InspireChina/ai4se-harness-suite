@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "skills": {
+    "paths": [
+      "agile-team-sdd",
+      "harness-installer",
+      "tool-chain-installer",
+      "overnight-runner",
+      "example-project/.agent/skills"
+    ]
+  }
+}

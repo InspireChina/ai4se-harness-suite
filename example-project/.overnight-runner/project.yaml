@@ -1,0 +1,75 @@
+# overnight-runner 项目配置
+#
+# 这个文件回答两个问题：
+#   1. agent 是什么 —— command / args / env
+#   2. 无人值守时，**默认怎么决策** —— default.prompt + decisions
+#
+# 每次用到决策，都会写一条记录到
+#   .overnight-runner/queue/<队列名>/decisions.jsonl
+# 方便事后回溯"昨晚它替我做了什么决定"。
+#
+# 这里的规则是 **全队列共享** 的 —— 决策记录才是 per-queue 的。
+
+project:
+  name: example-project
+  agent:
+    command: opencode
+    args: ["run", "--dangerously-skip-permissions"]
+    env: {}
+
+default:
+  # 每次任务都会用的默认提示词。
+  # 占位符：
+  #   {{PLAN}}      —— plan 文件的全文
+  #   {{DECISIONS}} —— 下面的默认决策清单
+  prompt: |
+    你在无人值守模式下工作，不要停下来等待人工确认。
+
+    按下面的方案执行，遇到需要决策的问题，按"默认决策"处理：
+
+    {{DECISIONS}}
+
+    {{PLAN}}
+
+    执行要求：
+    1. 每做出一个决策，输出一行：DECISION: <问题> → <决策>
+    2. 全部完成后输出一行：DONE: <一句话总结>
+    3. 如果无法继续，输出一行：BLOCKED: <原因>
+
+  # 命中不了任何规则时的兜底策略。
+  # 可选：跳过并记录到决策日志 / 采用最安全可回滚的方案 / 停止任务并标记为阻塞
+  onUnknownDecision: 采用最安全、可回滚的方案（优先只改测试代码，不动生产代码），并在最终总结里明确标注这个假设
+
+# 默认决策规则：agent 遇到这类问题时，直接用这里的答案，不要等人。
+#
+# match 是正则（大小写不敏感时用 (?i) 前缀），question 是精确/包含匹配。
+decisions:
+  - id: test-failure
+    question: 测试失败了，是断言写错还是实现有 bug？
+    match: "测试失败|断言失败|用例失败|mvn test"
+    answer: 先读失败输出定位根因——断言与实际契约不符就按 Plan §9.5 用例清单修断言；确实是实现 bug 就做最小修复并在总结里说明，不要扩大改动范围
+    enabled: true
+
+  - id: db-migration
+    question: 是否执行数据库迁移脚本？
+    match: "数据库迁移|flyway|migration"
+    answer: 先写好回滚脚本，再执行迁移；迁移后跑一遍冒烟用例
+    enabled: true
+
+  - id: missing-plan
+    question: plan 里没有写清楚的部分
+    match: "plan.*(缺失|没有写|不明确)"
+    answer: 按项目现有实现的模式推断，并在最终总结里明确标注这个假设
+    enabled: true
+
+  - id: flaky-test
+    question: 测试偶发失败
+    match: "flaky|偶发|时好时坏"
+    answer: 不要靠重试掩盖，定位根因后修复；在总结里写明根因
+    enabled: true
+
+  - id: scope-creep
+    question: 是否扩大改动范围
+    match: "范围外|额外的改动|顺便"
+    answer: 不扩大范围，把发现的问题记录下来，不要顺手改
+    enabled: true

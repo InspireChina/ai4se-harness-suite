@@ -1,0 +1,47 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+*.iml
+.vscode/
+.settings/
+
+# Node
+node_modules/
+*.tsbuildinfo
+
+# Java / Maven
+target/
+*.class
+*.jar
+
+# Build output
+frontend/dist/
+
+# E2E artifacts
+e2e/playwright-report/
+e2e/test-results/
+e2e/screenshots/
+
+# Runtime state（只排除运行时产物，project.yaml / queue.yaml / decisions.jsonl 要进版本库）
+**/.overnight-runner/state.json
+**/.overnight-runner/state.json.bak
+**/.overnight-runner/logs/
+**/.overnight-runner/queue/*/state.json
+**/.overnight-runner/queue/*/state.json.bak
+**/.overnight-runner/queue/*/logs/
+**/.overnight-runner/queue/*/.lock
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Secrets
+.env
+.env.local
+**/src/main/resources/application.yml

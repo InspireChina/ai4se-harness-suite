@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# overnight-runner 启动脚本（由 install.sh 生成）
+set -euo pipefail
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PYTHONPATH="$DIR${PYTHONPATH:+:$PYTHONPATH}" export PYTHONPATH
+exec "python3" -m overnight_runner "$@"

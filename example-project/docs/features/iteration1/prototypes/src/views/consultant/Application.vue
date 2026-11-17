@@ -1,0 +1,7 @@
+<script setup lang="ts">
+import { reactive,ref } from 'vue'
+import SideLayout from '@/layouts/SideLayout.vue'
+import { consultantNav } from '@/nav'
+const status=ref('待审核'); const form=reactive({name:'李文静',title:'资深职业规划师',specs:['a'],years:8,price:399})
+</script>
+<template><SideLayout title="咨询师工作台" who="李文静 · 已认证" base="/consultant" :items="[...consultantNav]"><h1 class="proto-page-title">入驻申请</h1><p class="proto-page-desc">当前状态：<el-tag type="warning">{{status}}</el-tag> · 同时仅允许一份进行中申请</p><el-card><el-form label-width="110px" style="max-width:640px"><el-form-item label="姓名"><el-input v-model="form.name"/></el-form-item><el-form-item label="执业身份"><el-input v-model="form.title"/></el-form-item><el-form-item label="擅长领域"><el-select v-model="form.specs" multiple style="width:100%"><el-option label="职业规划" value="a"/><el-option label="情绪心理" value="b"/><el-option label="家庭教育" value="c"/></el-select></el-form-item><el-form-item label="从业年限"><el-input-number v-model="form.years" :min="0"/></el-form-item><el-form-item label="期望定价"><el-input-number v-model="form.price" :min="0" :step="10"/><span style="margin-left:8px;color:#909399">元 / 次</span></el-form-item><el-form-item label="资质文件"><el-upload action="#" :auto-upload="false" :limit="5"><el-button>上传证明</el-button></el-upload></el-form-item><el-form-item v-if="status==='已驳回'" label="驳回原因"><el-alert type="error" :closable="false" title="资质照片不清晰，请重新上传清晰扫描件。"/></el-form-item><el-button type="primary">提交申请</el-button><el-button>保存草稿</el-button></el-form></el-card></SideLayout></template>

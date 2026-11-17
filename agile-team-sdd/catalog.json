@@ -1,0 +1,172 @@
+{
+  "ba": [
+    {
+      "name": "ba-grill-me",
+      "description": "拷问需求，把模糊描述逼成可验收的规格",
+      "when": "拿到一句话需求、需求描述含糊、有多种理解时，在写规格之前先问清楚",
+      "produces": [
+        "对话结论（供 ba-write-spec 使用）"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "ba-write-spec",
+      "description": "编写需求规格说明书（字段表、业务规则、权限、验收标准）",
+      "when": "需求已澄清，需要落成 docs/features/ 下的规格文档时",
+      "produces": [
+        "docs/features/{模块}.md"
+      ],
+      "dependsOn": [
+        "ba-grill-me"
+      ]
+    },
+    {
+      "name": "ba-gen-facts",
+      "description": "从代码与文档生成/校准事实文档（API、库表、领域模型、专题）",
+      "when": "实现发生变化后，docs/designs/ 与代码不一致时",
+      "produces": [
+        "docs/designs/**"
+      ],
+      "dependsOn": []
+    }
+  ],
+  "dev": [
+    {
+      "name": "dev-plan",
+      "description": "在实现前写技术方案（Plan），等待人工确认",
+      "when": "新功能、重构或任何非简单变更，动手写代码之前",
+      "produces": [
+        "docs/plans/YYYYMMDD-{slug}.md"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "dev-debug",
+      "description": "用 chrome-devtools-mcp 调试前端与后端问题",
+      "when": "浏览器报错、UI 异常、网络请求失败时",
+      "produces": [
+        "失败根因 + 修复"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "dev-build",
+      "description": "按四层 DDD 约定实现功能",
+      "when": "Plan 已确认，进入实现阶段",
+      "produces": [
+        "代码变更"
+      ],
+      "dependsOn": [
+        "dev-plan"
+      ]
+    },
+    {
+      "name": "dev-self-test",
+      "description": "运行并修复开发自测（单元/集成/E2E 自测）",
+      "when": "实现完成后、交给 QA 之前，需要自证代码按 Plan 工作",
+      "produces": [
+        "测试报告"
+      ],
+      "dependsOn": [
+        "dev-build"
+      ]
+    },
+    {
+      "name": "dev-code-review",
+      "description": "按项目规范做代码评审",
+      "when": "提交前自查，或评审别人的 PR/MR 时",
+      "produces": [
+        "评审意见"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "dev-ui-review",
+      "description": "用 chrome-devtools-mcp 做界面与交互评审",
+      "when": "前端界面需要实机检查视觉、响应式、报错时",
+      "produces": [
+        "评审意见 + 截图证据"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "dev-release-plan",
+      "description": "整理当前迭代的上线准备清单",
+      "when": "迭代收尾、准备发版时",
+      "produces": [
+        "docs/releases/{version}.md"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "dev-create-mr",
+      "description": "创建 Merge Request / Pull Request",
+      "when": "分支开发完成、自测通过、准备提交评审时",
+      "produces": [
+        "MR/PR 链接"
+      ],
+      "dependsOn": [
+        "dev-self-test",
+        "dev-code-review"
+      ]
+    }
+  ],
+  "qa": [
+    {
+      "name": "qa-write-cases",
+      "description": "编写 QA 测试用例（TC-xxx 文本用例 + 自动化实现）",
+      "when": "需求规格已确认，需要把验收标准变成可执行用例时",
+      "produces": [
+        "docs/test-cases/e2e-cases/test-cases.md",
+        "e2e/tests/qa/*.spec.ts"
+      ],
+      "dependsOn": [
+        "ba-write-spec"
+      ]
+    },
+    {
+      "name": "qa-run-e2e",
+      "description": "运行 E2E 用例集并定位失败原因",
+      "when": "验收前跑 QA 用例集，或用例失败需要排查时",
+      "produces": [
+        "执行报告 + 失败诊断"
+      ],
+      "dependsOn": [
+        "qa-write-cases"
+      ]
+    },
+    {
+      "name": "qa-write-manual-plan",
+      "description": "编写手动测试与冒烟用例计划",
+      "when": "自动化覆盖不到的场景，或需要发版前最小回归集时",
+      "produces": [
+        "docs/test-cases/manual-cases/manual-test-cases.md",
+        "docs/test-cases/smoking-cases/smoking-test-cases.md"
+      ],
+      "dependsOn": [
+        "qa-write-cases"
+      ]
+    }
+  ],
+  "pm": [
+    {
+      "name": "pm-estimate",
+      "description": "基于需求分类基线表做工作量估算",
+      "when": "需求进入迭代前需要给工作量与排期时",
+      "produces": [
+        "估算结论"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "pm-retro",
+      "description": "复盘并把改进项回写到 harness 本身",
+      "when": "迭代结束、或流程反复出问题需要修 harness 时",
+      "produces": [
+        "复盘记录",
+        "harness 改进项"
+      ],
+      "dependsOn": []
+    }
+  ]
+}

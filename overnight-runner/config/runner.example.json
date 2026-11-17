@@ -1,0 +1,37 @@
+{
+  "runner": {
+    "host": "127.0.0.1",
+    "port": 7801,
+    "stateDir": ".overnight-runner",
+    "logRetentionDays": 14
+  },
+  "defaults": {
+    "restart": {
+      "maxRetries": 0,
+      "backoffSec": 30
+    },
+    "timeoutSec": 1800,
+    "env": {}
+  },
+  "tasks": [
+    {
+      "id": "nightly-e2e",
+      "name": "夜跑 E2E",
+      "description": "每天凌晨跑一遍全量 Playwright 用例",
+      "command": "bash e2e-run.sh",
+      "cwd": "../example-project",
+      "schedule": "0 2 * * *",
+      "timeoutSec": 3600,
+      "restart": {
+        "maxRetries": 2,
+        "backoffSec": 60
+      },
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "notify": {
+        "onFailure": true
+      }
+    }
+  ]
+}

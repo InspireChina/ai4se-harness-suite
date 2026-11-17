@@ -1,0 +1,275 @@
+# 需求规格说明书：咨询师入驻与档案
+
+> 文档类型：需求规格 / Feature Specification  
+> 适用目录：`docs/features/iteration1/`  
+> 需求类型：NEW  
+> 版本：v0.1  
+> 作者：BA  
+> 日期：2026-11-16  
+> 状态：**v0.1** — 字段/规则/验收已补齐；原型已挂接  
+> 源追溯：REQ-007、REQ-008
+
+---
+
+## 1. 需求说明
+
+### 1.1 需求名称
+
+咨询师入驻与档案
+
+### 1.2 需求类型
+
+NEW
+
+### 1.3 版本信息
+
+| 项目 | 内容 |
+|---|---|
+| 基线版本 | 无 |
+| 目标版本 | v0.1 |
+
+### 1.4 背景
+
+平台需把控咨询师准入与对外展示内容；咨询师需提交资质并维护可展示档案。
+
+### 1.5 目标
+
+完成入驻申请、审核进度可见、档案维护（含关键信息再审）与周固定档期模板配置入口。
+
+### 1.6 范围
+
+本次包含：
+
+- 入驻申请提交（身份、领域、年限、定价、资质文件）
+- 待审/驳回进度与原因；驳回后修改重提；同时仅一份进行中申请
+- 对外档案维护（简介、标签、分类、价格、头像与资质图、服务说明）
+- 关键信息变更触发再审；审核期保留上一版对外内容
+- 每周固定可预约时间模板配置（具体排期见 consultant-schedule.md）
+
+本次不包含：
+
+- 管理员审核操作（见 admin-ops.md）
+- 日级档期例外与占用（见 consultant-schedule.md）
+
+---
+
+## 2. 功能说明
+
+### 2.1 功能概述
+
+咨询师提交入驻与资质；通过后维护档案。关键变更走再审，保证对外展示连续。
+
+### 2.2 适用用户
+
+| 用户角色 | 角色说明 | 使用场景 |
+|---|---|---|
+| USER→CONSULTANT 申请人 | 申请入驻的用户 | 提交/重提申请 |
+| CONSULTANT | 已入驻咨询师 | 维护档案与周模板 |
+
+### 2.3 主要业务对象
+
+| 业务对象 | 说明 |
+|---|---|
+| OnboardingApplication | 入驻申请 |
+| ConsultantProfile | 对外档案（含草稿/线上版） |
+| CredentialFile | 资质文件 |
+| WeeklySlotTemplate | 周固定可约模板 |
+
+---
+
+## 3. 用户角色与权限
+
+| 角色 | 可查看 | 可新增 | 可编辑 | 可删除 | 可审批 | 说明 |
+|---|---:|---:|---:|---:|---:|---|
+| 申请人 | 是（本人申请） | 是 | 是（驳回后） | 否 | 否 | 同时仅一份进行中 |
+| CONSULTANT | 是（本人档案） | 是（文件） | 是 | 否 | 否 | 关键变更进再审 |
+| ADMIN | 是 | 否 | 否 | 否 | 是 | 审核在 admin-ops |
+
+### 3.1 权限规则
+
+- PR-001：同一咨询师同时最多一份进行中申请。
+- PR-002：未通过审核不可访问咨询师端业务页（工作台等）。
+- PR-003：档案图片须内容安全校验通过后才可展示。
+- PR-004：未提及操作一律不允许。
+
+---
+
+## 4. 业务流程
+
+### 4.1 主流程
+
+1. 用户填写入驻信息并上传资质。
+2. 提交后进入待审核；可查看进度。
+3. 通过后开通 CONSULTANT 权限；驳回则可改后重提。
+4. 咨询师维护档案；关键字段变更提交再审，线上仍展示旧版。
+
+### 4.2 异常流程
+
+| 编号 | 触发条件 | 系统行为 | 结果 |
+|---|---|---|---|
+| EX-001 | 已有进行中申请再提交 | 拒绝 | 提示已有申请 |
+| EX-002 | 文件类型/大小不符 | 拒绝上传 | 可重试 |
+| EX-003 | 图片安全校验失败 | 不可展示 | 提示原因 |
+
+---
+
+## 5. 字段表
+
+### 5.1 OnboardingApplication
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---:|---:|
+| id | 申请 ID | string | 是 | 入驻申请标识 | 系统生成 | 否 | 否 |
+| accountId | 账号 ID | string | 是 | 申请人账号 | 当前用户 | 是 | 否 |
+| realName | 姓名 | string(2..50) | 是 | 证件姓名 | 用户输入 | 是 | 驳回后 |
+| idNumber | 证件号码 | string | 是 | 加密保存、展示脱敏 | 用户输入 | 是 | 驳回后 |
+| practiceTitle | 执业身份 | string(2..100) | 是 | 职称/身份 | 用户输入 | 是 | 驳回后 |
+| specialties | 擅长领域 | array | 是 | 标签 | 用户选择 | 是 | 是 |
+| categoryIds | 服务分类 | array | 是 | 至少一个启用分类 | 分类字典 | 是 | 是 |
+| yearsOfPractice | 从业年限 | integer | 是 | 0..60 | 用户输入 | 是 | 是 |
+| expectedPrice | 期望定价 | decimal(10,2) | 是 | 人民币单次价格 | 用户输入 | 是 | 驳回后 |
+| applicationStatus | 申请状态 | enum | 是 | 状态 | draft / pending / approved / rejected | 是 | 系统 |
+| rejectReasonCode | 驳回原因码 | enum | 条件 | 驳回时必填 | 原因字典 | 否 | 系统 |
+| rejectNote | 驳回说明 | string(500) | 条件 | 驳回详情 | 管理员输入 | 否 | 系统 |
+| submittedAt | 提交时间 | datetime | 否 | 首次/最近提交时间 | 系统生成 | 否 | 否 |
+| reviewedAt | 审核时间 | datetime | 否 | 最近审核时间 | 系统生成 | 否 | 否 |
+
+### 5.2 ConsultantProfile
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---:|---:|
+| consultantId | 咨询师 ID | string | 是 | 档案所有者 | 系统生成 | 否 | 否 |
+| version | 档案版本 | integer | 是 | 单调递增 | 系统生成 | 否 | 否 |
+| displayName | 展示姓名 | string(2..50) | 是 | 对外名称 | 咨询师输入 | 是 | 再审 |
+| avatarFileId | 头像文件 ID | string | 是 | 已通过内容安全 | CredentialFile.id | 是 | 再审 |
+| practiceTitle | 执业身份 | string(2..100) | 是 | 对外职称 | 咨询师输入 | 是 | 再审 |
+| introduction | 个人简介 | string(20..2000) | 是 | 对外介绍 | 咨询师输入 | 是 | 是 |
+| serviceDescription | 服务说明 | string(20..2000) | 是 | 服务边界与方式 | 咨询师输入 | 是 | 是 |
+| categoryIds | 分类集合 | array | 是 | 至少一个启用分类 | 分类字典 | 是 | 再审 |
+| specialties | 擅长标签 | array | 是 | 1..10 个 | 标签字典 | 是 | 是 |
+| servicePrice | 服务价格 | decimal(10,2) | 是 | 单次人民币价格 | 咨询师输入 | 是 | 再审 |
+| reviewStatus | 审核状态 | enum | 是 | 版本状态 | draft / pending / approved / rejected | 是 | 系统 |
+| publishedVersion | 线上版本号 | integer | 否 | 当前公开版本 | 系统维护 | 否 | 否 |
+
+### 5.3 CredentialFile / WeeklySlotTemplate
+
+| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---|---:|---|---|---:|---:|
+| file.id | 文件 ID | string | 是 | 文件标识 | 系统生成 | 否 | 否 |
+| file.type | 文件用途 | enum | 是 | 资质类型 | idFront / idBack / license / certificate / avatar | 是 | 否 |
+| file.url | 存储地址 | string | 是 | 私有对象地址 | 上传服务 | 否 | 否 |
+| file.mimeType | MIME 类型 | enum | 是 | 文件格式 | image/jpeg / image/png / application/pdf | 否 | 否 |
+| file.sizeBytes | 文件大小 | integer | 是 | 最大 10 MiB | 上传服务 | 否 | 否 |
+| file.securityStatus | 安全状态 | enum | 是 | 内容检测结果 | pending / passed / blocked | 否 | 系统 |
+| template.weekday | 星期 | integer | 是 | 周几 | 1..7 | 是 | 是 |
+| template.startTime | 开始时间 | time | 是 | 30 分钟对齐 | 咨询师输入 | 是 | 是 |
+| template.endTime | 结束时间 | time | 是 | 晚于开始时间 | 咨询师输入 | 是 | 是 |
+| template.capacity | 默认容量 | integer | 是 | 每时段容量 | 1..10，默认 1 | 是 | 是 |
+
+---
+
+## 6. 字段变更说明
+
+无
+
+---
+
+## 7. 业务规则
+
+1. **R-CREATE-001（申请唯一）**：每个账号最多存在一份 draft 或 pending 申请；approved 后不可新建入驻申请。
+2. **R-CREATE-002（申请完整性）**：提交前必须填写身份、领域、分类、年限、定价并上传要求的资质文件。
+3. **R-CREATE-003（文件限制）**：仅接受 JPEG、PNG、PDF，单文件不超过 10 MiB；安全检测 passed 前不可提交或展示。
+4. **R-CREATE-004（周模板）**：模板时段须按 30 分钟对齐、起止合法且同一星期内不重叠，容量 1..10。
+5. **R-QUERY-001（进度可见）**：申请人仅可查看本人申请、审核状态及驳回原因；资质原件仅本人和有审核权限的管理员可见。
+6. **R-QUERY-002（线上版本）**：公开查询只返回最近 approved 的 publishedVersion，不返回 pending 草稿。
+7. **R-UPDATE-001（提交锁定）**：draft 提交后进入 pending，审核完成前申请人不可修改。
+8. **R-UPDATE-002（驳回重提）**：rejected 申请可修改并重提，重提后清空旧审核结果但保留历史。
+9. **R-UPDATE-003（授权开通）**：入驻 approved 后幂等授予 CONSULTANT 角色并初始化档案；重复审批不得重复创建。
+10. **R-UPDATE-004（关键字段再审）**：displayName、avatarFileId、practiceTitle、categoryIds、servicePrice 及资质文件为关键字段，变更后新版本进入 pending，旧 approved 版本继续公开。
+11. **R-UPDATE-005（非关键字段）**：introduction、serviceDescription、specialties 通过内容安全校验后可直接发布新版本。
+12. **R-DELETE-001（文件引用）**：已被申请或档案版本引用的文件不可物理删除，只能标记失效。
+13. **R-COMMON-001（版本审计）**：每次提交、审核与发布均记录版本、操作者、时间和结果。
+
+---
+
+## 8. 业务规则变更说明
+
+无
+
+---
+
+## 9. 状态流转规则
+
+| 当前状态 | 触发动作 | 目标状态 | 允许角色 | 规则编号 |
+|---|---|---|---|---|
+| draft | submit | pending | 申请人 | R-STATE-001 |
+| pending | approve | approved | ADMIN | R-STATE-002 |
+| pending | reject | rejected | ADMIN | R-STATE-003 |
+| rejected | resubmit | pending | 申请人 | R-STATE-004 |
+
+---
+
+## 10. 数据约束
+
+### 10.1 唯一性约束
+
+| 字段 | 唯一范围 | 说明 |
+|---|---|---|
+| pending application per account | 账号内 | 进行中申请唯一 |
+
+### 10.2 引用约束
+
+| 当前对象字段 | 引用对象 | 引用字段 | 约束说明 |
+|---|---|---|---|
+| categoryIds | Category | id | 分类须启用 |
+
+### 10.3 数据保留策略
+
+- DATA-001：驳回原因与历史申请保留可查。
+- DATA-002：资质文件访问需鉴权（见 platform-capability）。
+
+---
+
+## 11. 影响范围
+
+无
+
+---
+
+## 12. 验收标准
+
+- **AC-001**：Given 用户没有进行中申请且资料完整，When 上传合规资质并提交，Then 申请进入 pending、文件可供审核且提交内容被锁定。
+- **AC-002**：Given 申请被驳回并含原因，When 申请人查看、修改后重提，Then 原因可见、申请重新进入 pending 且旧审核历史保留。
+- **AC-003**：Given 账号已有 draft 或 pending 申请，When 再次新建申请，Then 系统拒绝且返回已有申请入口。
+- **AC-004**：Given 咨询师已有线上档案，When 修改关键字段并提交再审，Then 新版本为 pending，公开主页持续展示旧 approved 版本直至新版本通过。
+- **AC-005**：Given 咨询师已入驻，When 配置不重叠的周固定时段与容量，Then 模板保存并供排期生成使用；非 30 分钟对齐或重叠配置被拒绝。
+
+---
+
+## 13. 测试场景建议
+
+| 场景编号 | 场景名称 | 前置条件 | 操作 | 预期结果 |
+|---|---|---|---|---|
+| TC-001 | 提交申请 | 无进行中申请 | 提交 | pending |
+| TC-002 | 重复申请 | 已有 pending | 再提交 | 拒绝 |
+| TC-003 | 关键变更 | 已入驻 | 改定价 | 再审且旧版仍展示 |
+
+---
+
+## 14. 原型引用说明
+
+- 原型工程：`docs/features/iteration1/prototypes/`（`npm run dev` → :5174）
+- 路由：`/consultant/application`、`/consultant/profile`
+
+---
+
+## 15. 合并说明
+
+无
+
+---
+
+## 16. AI 实现提示
+
+1. 关键信息范围以 R-UPDATE-004 为准，新增关键字段须先更新规格。
+2. 审核动作实现依赖 admin-ops，本模块只定义咨询师侧行为。

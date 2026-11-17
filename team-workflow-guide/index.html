@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>团队 AI 编程工作流指南</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --surface: #ffffff;
+    --ink: #1a1d24;
+    --muted: #5c6570;
+    --line: #e3e6eb;
+    --line-strong: #cfd4dc;
+    --pre: #2563eb;
+    --pre-soft: #eff4ff;
+    --mid: #0f9f6e;
+    --mid-soft: #eefbf5;
+    --setup: #7c3aed;
+    --setup-soft: #f5f0ff;
+    --accent: #c2410c;
+    --gate: #b45309;
+    --gate-bg: #fff7ed;
+    --code-bg: #f0f2f5;
+    --shadow: 0 1px 2px rgba(16,24,40,.04), 0 8px 24px rgba(16,24,40,.06);
+    --radius: 12px;
+    --font: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Segoe UI", system-ui, sans-serif;
+    --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    font: 15px/1.65 var(--font);
+    color: var(--ink);
+    background: var(--bg);
+  }
+  a { color: var(--pre); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono {
+    font-family: var(--mono);
+    font-size: .9em;
+    background: var(--code-bg);
+    padding: .1em .35em;
+    border-radius: 4px;
+  }
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  header.doc-head {
+    margin-bottom: 28px;
+  }
+  header.doc-head h1 {
+    margin: 0 0 10px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+  }
+  header.doc-head .lead {
+    margin: 0;
+    color: var(--muted);
+    max-width: 720px;
+  }
+  nav.toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0 0;
+  }
+  nav.toc a {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 13px;
+  }
+  nav.toc a:hover { border-color: var(--pre); color: var(--pre); text-decoration: none; }
+  section {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 28px 32px;
+    margin-top: 20px;
+  }
+  section h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  section h3 {
+    margin: 24px 0 10px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  section .goal {
+    margin: 0 0 18px;
+    color: var(--muted);
+  }
+  .note {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    background: var(--pre-soft);
+    border-radius: 8px;
+    color: #1e3a5f;
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .gates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 14px 0 0;
+  }
+  .gate {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--gate-bg);
+    color: var(--gate);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .legend .l-setup { background: var(--setup); }
+  .legend .l-pre { background: var(--pre); }
+  .legend .l-mid { background: var(--mid); }
+
+  /* ===== Workflow matrix ===== */
+  .matrix-scroller {
+    overflow-x: auto;
+    margin: 8px 0 4px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  table.matrix {
+    width: 100%;
+    min-width: 920px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 13.5px;
+  }
+  table.matrix th,
+  table.matrix td {
+    border: 1px solid var(--line);
+    vertical-align: top;
+    padding: 12px 12px;
+  }
+  table.matrix thead th {
+    background: #f0f2f5;
+    font-weight: 600;
+    text-align: left;
+    color: var(--ink);
+  }
+  table.matrix .phase {
+    width: 44px;
+    padding: 0;
+    vertical-align: middle;
+    text-align: center;
+    color: #fff;
+    background-clip: padding-box;
+  }
+  table.matrix .phase-label {
+    display: inline-block;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-weight: 700;
+    letter-spacing: .16em;
+    line-height: 44px;
+    color: #fff;
+  }
+  table.matrix .phase.setup { background: var(--setup); }
+  table.matrix .phase.pre { background: var(--pre); }
+  table.matrix .phase.mid { background: var(--mid); }
+  table.matrix .role {
+    width: 88px;
+    background: #fff;
+    text-align: center;
+    vertical-align: middle;
+    font-weight: 700;
+  }
+  table.matrix .role small {
+    display: block;
+    margin-top: 4px;
+    font-weight: 500;
+    color: var(--muted);
+    font-size: 11px;
+  }
+  table.matrix tbody td {
+    background: #fafbfc;
+  }
+  table.matrix ul {
+    margin: 0;
+    padding-left: 1.1em;
+  }
+  table.matrix li { margin: 3px 0; }
+  table.matrix .tool-new {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  table.matrix .col-action { width: 28%; }
+  table.matrix .col-tool { width: 18%; }
+  table.matrix .col-in { width: 16%; }
+  table.matrix .col-out { width: 20%; }
+
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 8px 0 4px;
+  }
+  table.data th,
+  table.data td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.data th { background: #f0f2f5; font-weight: 600; }
+  table.data tr:nth-child(even) td { background: #fafbfc; }
+
+  ul.check { padding-left: 1.2em; }
+  ul.check li { margin: 4px 0; }
+
+  /* ===== Visual flowcharts ===== */
+  .flow {
+    margin: 12px 0 16px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: #fafbfc;
+    overflow-x: auto;
+  }
+  .flow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    min-width: min(100%, 640px);
+    margin: 0 auto;
+  }
+  .flow-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 12px;
+    width: 100%;
+  }
+  .flow-branch {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 12px;
+    width: auto;
+    max-width: 100%;
+    padding: 4px 0;
+  }
+  .flow-parallel-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    min-width: 36px;
+    padding: 4px 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    border: 1px dashed var(--line-strong);
+    border-radius: 8px;
+    background: #fff;
+    white-space: nowrap;
+  }
+  .flow-node {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+    max-width: 280px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line-strong);
+    background: #fff;
+    text-align: center;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04);
+  }
+  .flow-node .who {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: .02em;
+  }
+  .flow-node .what {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+  .flow-node .meta {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--mono);
+  }
+  .flow-node.gate {
+    border-color: #fdba74;
+    background: var(--gate-bg);
+  }
+  .flow-node.gate .who { color: var(--gate); }
+  .flow-node.ok {
+    border-color: #86efac;
+    background: var(--mid-soft);
+  }
+  .flow-node.ba { border-top: 3px solid #6366f1; }
+  .flow-node.pm { border-top: 3px solid #8b5cf6; }
+  .flow-node.tl { border-top: 3px solid var(--pre); }
+  .flow-node.qa { border-top: 3px solid var(--mid); }
+  .flow-node.dev { border-top: 3px solid #0ea5e9; }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: var(--muted);
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .flow-arrow.down::before { content: "↓"; }
+  .flow-arrow.right::before { content: "→"; }
+  .flow-split-label {
+    width: 100%;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .flow-lane {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .flow-lane .flow-node {
+    min-width: 168px;
+    max-width: 220px;
+  }
+  .flow-chain {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .flow-chain .flow-node {
+    min-width: 100px;
+    max-width: 160px;
+    flex: 0 1 auto;
+  }
+  .flow-loop {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 18px 10px;
+    border: 1.5px dashed #7dd3fc;
+    border-radius: 14px;
+    background: #f0f9ff;
+    min-width: 150px;
+  }
+  .flow-loop-tag {
+    position: absolute;
+    top: -9px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #0369a1;
+    background: #f0f9ff;
+    white-space: nowrap;
+  }
+  .flow-loop .flow-node {
+    min-width: 140px;
+    max-width: 200px;
+    border-style: solid;
+  }
+  .flow-loop-hint {
+    margin-top: 6px;
+    font-size: 11px;
+    color: #0369a1;
+  }
+
+  .callout {
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-left: 3px solid var(--pre);
+    background: var(--pre-soft);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+  }
+  .role-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-top: 12px;
+    background: #fff;
+  }
+  .role-card h3 { margin: 0 0 6px; }
+  .role-card .goal { margin-bottom: 10px; }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .pill {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: var(--code-bg);
+    color: var(--ink);
+  }
+  footer {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+  }
+  @media (max-width: 720px) {
+    .wrap { padding: 20px 14px 60px; }
+    section { padding: 20px 16px; }
+    header.doc-head h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="doc-head">
+  <h1>团队 AI 编程工作流指南</h1>
+  <p class="lead">团队级协作手册：项目怎么准备、迭代前怎么设计、迭代中怎么开发。规范硬约束在项目 <code>AGENTS.md</code>；本页讲<strong>人怎么配合</strong>，AI 只做执行。</p>
+  <nav class="toc" aria-label="目录">
+    <a href="#overview">0. 总览</a>
+    <a href="#setup">1. 项目准备</a>
+    <a href="#design">2. 迭代前设计</a>
+    <a href="#dev">3. 迭代中开发</a>
+    <a href="#testing">4. 测试归属</a>
+    <a href="#roles">5. 角色手册</a>
+    <a href="#skills">6. Skill 对照</a>
+  </nav>
+</header>
+
+<section id="overview">
+  <h2>0. 团队工作流程</h2>
+  <p class="goal">一张图看清：谁在哪个阶段、用什么 skill、吃什么输入、吐什么产物。</p>
+  <p class="note">原则：人做决策，AI 做执行。规格确认后，TL 高阶技术方案与 QA 文本用例可并行；迭代中由 DEV 编写 Plan 再实现。</p>
+
+  <div class="matrix-scroller" role="region" aria-label="团队工作流矩阵" tabindex="0">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th style="width:42px"></th>
+          <th style="width:88px">人</th>
+          <th class="col-action">AI 驱动动作</th>
+          <th class="col-tool">工具和技能</th>
+          <th class="col-in">输入</th>
+          <th class="col-out">输出物</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th class="phase setup" rowspan="2" scope="rowgroup"><span class="phase-label">项目准备</span></th>
+          <td class="role">TL<small>装机与定规</small></td>
+          <td>
+            <ul>
+              <li>初始化 harness 与 docs 骨架</li>
+              <li>安装 SDD skill 与 MCP 工具链</li>
+              <li>定架构边界、标准与 CI 闸门</li>
+            </ul>
+          </td>
+          <td>
+            <div><code>harness-installer</code></div>
+            <div><code>agile-team-sdd</code></div>
+            <div><code>tool-chain-installer</code></div>
+          </td>
+          <td>
+            <ul>
+              <li>空项目 / 存量仓库</li>
+              <li>团队技术选型</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>AGENTS.md</code> + <code>docs/</code></li>
+              <li><code>.agent/skills/</code></li>
+              <li>MCP 配置、测试闸门约定</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="role">BA / PM<small>定方向</small></td>
+          <td>
+            <ul>
+              <li>对齐业务目标与首迭范围</li>
+              <li>定迭代节奏</li>
+            </ul>
+          </td>
+          <td>—</td>
+          <td>业务背景、干系人预期</td>
+          <td>迭代目标一页纸</td>
+        </tr>
+
+        <tr>
+          <th class="phase pre" rowspan="3" scope="rowgroup"><span class="phase-label">迭代前</span></th>
+          <td class="role">BA<small>规格 + 原型</small></td>
+          <td>
+            <ul>
+              <li>拷问需求，消除歧义</li>
+              <li>落需求规格：字段、规则、权限、验收</li>
+              <li>输出 HTML 原型图</li>
+            </ul>
+          </td>
+          <td>
+            <div class="tool-new"><code>ba-grill-me</code></div>
+            <div class="tool-new"><code>ba-write-spec</code></div>
+            <div><code>pm-estimate</code>（配合 PM）</div>
+          </td>
+          <td>一句话需求 / 访谈材料</td>
+          <td>
+            <ul>
+              <li><code>docs/features/iteration[n]/*.md</code></li>
+              <li><code>docs/features/iteration[n]/prototypes/</code> 原型图</li>
+              <li>编号 <code>R-xxx</code> / <code>AC-xxx</code></li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="role">TL<small>高阶方案 ★</small></td>
+          <td>
+            <ul>
+              <li>需求 Review</li>
+              <li>编写高阶技术方案（TRD）+ Review</li>
+            </ul>
+          </td>
+          <td>自定义工具</td>
+          <td>
+            <ul>
+              <li><code>iteration[n]/*.md</code> 规格</li>
+              <li>原型图</li>
+              <li>现有 designs / 架构边界</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>TRD 文件</li>
+              <li>技术边界与取舍</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="role">QA<small>用例（并行）</small></td>
+          <td>
+            <ul>
+              <li>按 AC/R 写 QA 文本用例</li>
+              <li>与 TRD 并行，规格确认后即可开始</li>
+            </ul>
+          </td>
+          <td>
+            <div class="tool-new"><code>qa-write-cases</code></div>
+          </td>
+          <td>
+            <ul>
+              <li><code>iteration[n]/*.md</code> 中的 AC / R</li>
+              <li>原型图（辅助）</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>docs/test-cases/e2e-cases/</code>（验收）</li>
+              <li>编号 <code>TC-xxx</code> 映射表</li>
+            </ul>
+          </td>
+        </tr>
+
+        <tr>
+          <th class="phase mid" rowspan="3" scope="rowgroup"><span class="phase-label">迭代中</span></th>
+          <td class="role">DEV<small>Plan + 实现</small></td>
+          <td>
+            <ul>
+              <li>编写 Plan（对照 TRD / 规格）★确认</li>
+              <li>dev-build 循环：实现 ↔ 自测直至通过</li>
+              <li>UI / 代码评审、更新事实文档、开 MR</li>
+            </ul>
+          </td>
+          <td>
+            <div class="tool-new"><code>dev-plan</code></div>
+            <div><code>dev-build</code>（含自测循环）</div>
+            <div><code>dev-ui-review</code> / <code>dev-code-review</code></div>
+            <div><code>ba-gen-facts</code> · <code>dev-create-mr</code></div>
+            <div><code>overnight-runner</code>（可选）</div>
+          </td>
+          <td>
+            <ul>
+              <li>TRD + 规格 + 原型图</li>
+              <li>TC 文本基线</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li><code>docs/plans/YYYYMMDD-*.md</code></li>
+              <li>业务代码 + 开发自测</li>
+              <li>更新后的事实文档、MR / PR</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="role">QA<small>验收 ★</small></td>
+          <td>
+            <ul>
+              <li>跑 E2E 验收 + 文本勾选</li>
+              <li>手工 / 冒烟补测</li>
+            </ul>
+          </td>
+          <td>
+            <div><code>qa-run-e2e</code></div>
+            <div><code>qa-write-manual-plan</code></div>
+          </td>
+          <td>
+            <ul>
+              <li>实现产物</li>
+              <li>TC 文本用例</li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>验收结论（合并闸门）</li>
+              <li>E2E / 手动 / 冒烟报告</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="role">TL / PM<small>发布与复盘</small></td>
+          <td>
+            <ul>
+              <li>上线清单（DB 单独评估）</li>
+              <li>复盘并把改进回写 harness</li>
+            </ul>
+          </td>
+          <td>
+            <div><code>dev-release-plan</code></div>
+            <div><code>pm-retro</code></div>
+          </td>
+          <td>已合并变更 + 验收记录</td>
+          <td>
+            <ul>
+              <li><code>docs/releases/</code></li>
+              <li>harness 改进项（可验证）</li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="legend">
+    <span><i class="l-setup"></i>项目准备</span>
+    <span><i class="l-pre"></i>迭代前</span>
+    <span><i class="l-mid"></i>迭代中</span>
+  </div>
+  <div class="gates">
+    <span class="gate">★ TRD 确认 · 迭代前</span>
+    <span class="gate">★ Plan 确认 · 编码前（DEV）</span>
+    <span class="gate">★ QA 验收 · 合并前</span>
+  </div>
+</section>
+
+<section id="setup">
+  <h2>1. 项目准备</h2>
+  <p class="goal">目标：项目「可被 harness 管理」——规范、目录、工具齐。</p>
+  <p><strong>协作口诀</strong>：TL 装机与定规矩，QA 定闸门，BA 定方向。规矩未定不进迭代。</p>
+
+  <h3>1.1 谁做什么</h3>
+  <table class="data">
+    <thead><tr><th>步骤</th><th>主责</th><th>产物</th></tr></thead>
+    <tbody>
+      <tr><td>初始化 AGENTS.md + docs/</td><td>TL</td><td><code>AGENTS.md</code>、<code>docs/**</code></td></tr>
+      <tr><td>安装 SDD skill</td><td>TL</td><td><code>.agent/skills/</code></td></tr>
+      <tr><td>安装 MCP</td><td>TL</td><td><code>.mcp.json</code> / <code>opencode.jsonc</code></td></tr>
+      <tr><td>定架构与标准</td><td>TL</td><td><code>docs/standards/</code>、<code>docs/designs/</code></td></tr>
+      <tr><td>定测试闸门</td><td>QA + TL</td><td><code>test:qa</code> 进 CI</td></tr>
+      <tr><td>业务目标与首迭范围</td><td>BA / PM</td><td>迭代目标一页纸</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.2 接入顺序</h3>
+  <p>全部交给 <strong>AI Agent</strong> 按 skill 执行，人只确认目标项目路径与关键决策。顺序不能变：</p>
+  <ol>
+    <li>
+      <strong>铺 harness</strong> — 对 Agent 说：用 <code>harness-installer</code> 给目标项目初始化 <code>AGENTS.md</code> 与 <code>docs/</code> 骨架。<br />
+      完成后由 <strong>TL</strong> 补全 <code>AGENTS.md</code> 里的业务 / 架构 TODO（Agent 可起草，人必须拍板）。
+    </li>
+    <li>
+      <strong>装 SDD skills</strong> — 对 Agent 说：用 <code>agile-team-sdd</code> 把 16 个流程 skill 安装到目标项目的 <code>.agent/skills/</code>。
+    </li>
+    <li>
+      <strong>装 MCP 工具链</strong> — 对 Agent 说：用 <code>tool-chain-installer</code> 把 MCP 配置写入项目（如 <code>.mcp.json</code> / <code>opencode.jsonc</code>）。
+    </li>
+    <li>
+      <strong>（可选）装 overnight-runner</strong> — 需要夜跑 Plan 时，再让 Agent 安装并写好队列配置。
+    </li>
+  </ol>
+  <div class="callout">装完 skill / MCP 后必须<strong>重启 opencode</strong>（或等价 IDE Agent），配置才生效。不要跳步：先有 <code>AGENTS.md</code> 与 <code>docs/</code>，再装 skills，路径才指向真实目录。</div>
+
+  <h3>1.3 出口条件</h3>
+  <ul class="check">
+    <li><code>AGENTS.md</code> 关键 TODO 已填</li>
+    <li>skill + MCP 可用</li>
+    <li>文档树与测试归属约定写清</li>
+    <li>团队对齐三条铁律（规范先于代码 / 测试先于实现 / 文档同批次）</li>
+  </ul>
+</section>
+
+<section id="design">
+  <h2>2. 迭代前方案设计</h2>
+  <p class="goal">目标：进开发前，业务与技术都「可测、可估、可确认」。</p>
+
+  <h3>2.1 流水线</h3>
+  <div class="flow" role="img" aria-label="迭代前流水线：BA 规格与原型，PM 估算，随后 TL 的 TRD 与 QA 用例并行，两边就绪进入迭代中">
+    <div class="flow-col">
+      <div class="flow-node ba">
+        <span class="who">BA</span>
+        <span class="what">拷问 → 规格 + 原型图</span>
+        <span class="meta">ba-grill-me · ba-write-spec</span>
+      </div>
+      <div class="flow-arrow down" aria-hidden="true"></div>
+      <div class="flow-node pm">
+        <span class="who">PM</span>
+        <span class="what">估算与排期</span>
+        <span class="meta">pm-estimate</span>
+      </div>
+      <div class="flow-arrow down" aria-hidden="true"></div>
+      <div class="flow-split-label">规格确认后并行</div>
+      <div class="flow-branch">
+        <div class="flow-lane">
+          <div class="flow-node tl gate">
+            <span class="who">TL · ★</span>
+            <span class="what">高阶技术方案 TRD</span>
+            <span class="meta">人工确认</span>
+          </div>
+        </div>
+        <div class="flow-parallel-mark" aria-hidden="true">∥</div>
+        <div class="flow-lane">
+          <div class="flow-node qa">
+            <span class="who">QA</span>
+            <span class="what">文本用例 TC</span>
+            <span class="meta">qa-write-cases</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow-arrow down" aria-hidden="true"></div>
+      <div class="flow-node ok">
+        <span class="who">出口</span>
+        <span class="what">两边就绪 → 进入迭代中</span>
+        <span class="meta">DEV 再写 Plan</span>
+      </div>
+    </div>
+  </div>
+  <p>规格与原型落在 <code>docs/features/iteration[n]/</code>。TRD 未确认<strong>不得进入迭代中写 Plan</strong>；QA 文本用例未齐<strong>不得声称有验收基线</strong>。</p>
+
+  <h3>2.2 交接</h3>
+  <table class="data">
+    <thead><tr><th>从 → 到</th><th>交出什么</th></tr></thead>
+    <tbody>
+      <tr><td>BA → TL / QA / DEV</td><td><code>iteration[n]/*.md</code> 规格 + 原型图 + 范围边界 + AC/R</td></tr>
+      <tr><td>TL → DEV</td><td>已确认 TRD（技术边界与取舍）</td></tr>
+      <tr><td>QA → DEV</td><td>TC 映射表（自动化可代写）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.3 可进入迭代中 DoR</h3>
+  <ul class="check">
+    <li>本迭规格已确认（<code>docs/features/iteration[n]/*.md</code>，R / AC 齐）</li>
+    <li>本迭原型图已输出（<code>docs/features/iteration[n]/prototypes/</code>）</li>
+    <li>TRD 已人工确认</li>
+    <li>本迭 TC 文本用例齐，且映射到 AC/R</li>
+  </ul>
+</section>
+
+<section id="dev">
+  <h2>3. 迭代中开发</h2>
+  <p class="goal">目标：DEV 先写 Plan（对照 TRD），确认后再实现；经自测与 QA 验收后合并、可发布；复盘回写 harness。</p>
+
+  <h3>3.1 流水线</h3>
+  <div class="flow" role="img" aria-label="迭代中流水线：DEV 写 Plan 并确认后实现，QA 验收，然后开 MR、发布与复盘">
+    <div class="flow-col">
+      <div class="flow-split-label">DEV（+ AI）</div>
+      <div class="flow-chain">
+        <div class="flow-node dev gate">
+          <span class="who">★</span>
+          <span class="what">写 Plan</span>
+          <span class="meta">dev-plan</span>
+        </div>
+        <div class="flow-arrow right" aria-hidden="true"></div>
+        <div class="flow-loop" title="实现与自测在同一 skill 内循环直至通过">
+          <span class="flow-loop-tag">循环</span>
+          <div class="flow-node dev">
+            <span class="who">实现 + 自测</span>
+            <span class="what">dev-build</span>
+            <span class="meta">写码 ↔ 跑测</span>
+          </div>
+          <span class="flow-loop-hint">↻ 未通过则继续</span>
+        </div>
+        <div class="flow-arrow right" aria-hidden="true"></div>
+        <div class="flow-node dev">
+          <span class="who">评审</span>
+          <span class="what">UI / 代码 / 事实文档</span>
+          <span class="meta">review · ba-gen-facts</span>
+        </div>
+      </div>
+      <div class="flow-arrow down" aria-hidden="true"></div>
+      <div class="flow-node qa gate">
+        <span class="who">QA · ★ 合并闸门</span>
+        <span class="what">E2E + 文本勾选</span>
+        <span class="meta">qa-run-e2e</span>
+      </div>
+      <div class="flow-arrow down" aria-hidden="true"></div>
+      <div class="flow-chain">
+        <div class="flow-node dev">
+          <span class="who">DEV</span>
+          <span class="what">开 MR</span>
+          <span class="meta">dev-create-mr</span>
+        </div>
+        <div class="flow-arrow right" aria-hidden="true"></div>
+        <div class="flow-node tl">
+          <span class="who">TL</span>
+          <span class="what">上线清单</span>
+          <span class="meta">dev-release-plan</span>
+        </div>
+        <div class="flow-arrow right" aria-hidden="true"></div>
+        <div class="flow-node pm">
+          <span class="who">PM</span>
+          <span class="what">复盘回写</span>
+          <span class="meta">pm-retro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout">Plan 未确认<strong>不得写实现</strong>。overnight-runner 只跑<strong>已确认</strong>的 Plan；不做 Plan / TRD 闸门本身。</div>
+
+  <h3>3.2 并行边界</h3>
+  <ul>
+    <li>多 DEV 可并行，契约以已确认 Plan + <code>api.yaml</code> 为准（并服从 TRD 边界）</li>
+    <li>QA 自动化可由 DEV 代写，勾选与放行权在 QA</li>
+    <li>自测绿 ≠ 可合；QA 过 ≠ 可忽略自测红</li>
+    <li>规格外行为 = 缺陷（除非 BA 认可）</li>
+  </ul>
+
+  <h3>3.3 Definition of Done</h3>
+  <ul class="check">
+    <li>Plan 已确认且按 Plan 实现</li>
+    <li>每条 AC / R 都有对应 QA 用例且通过；文本用例勾选完毕</li>
+    <li>开发自测全绿；关键 API 覆盖 Happy Path + 失败分支</li>
+    <li>事实文档已更新；无遗留 TODO / 调试代码</li>
+    <li>上线清单完成（TL）；复盘改进已回写 harness（PM）</li>
+  </ul>
+</section>
+
+<section id="testing">
+  <h2>4. 测试分层与归属</h2>
+  <p class="goal"><strong>开发自测</strong>对「我写的代码」负责；<strong>QA 测试</strong>对「需求有没有被实现」负责。</p>
+
+  <table class="data">
+    <thead>
+      <tr><th>维度</th><th>开发自测</th><th>QA 测试</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>验证什么</td><td>代码按 Plan 工作</td><td>系统符合需求规格</td></tr>
+      <tr><td>判定人</td><td>开发本人</td><td><strong>QA</strong></td></tr>
+      <tr><td>编号</td><td>无</td><td><code>TC-xxx</code></td></tr>
+      <tr><td>位置</td><td>源码旁、<code>e2e/tests/dev/</code></td><td><code>docs/</code>、<code>e2e/tests/qa/</code></td></tr>
+      <tr><td>合并闸门</td><td>否</td><td><strong>是</strong></td></tr>
+    </tbody>
+  </table>
+
+  <p>编号映射：每条 <code>R-xxx</code>、<code>AC-xxx</code> 至少对应一条 <code>TC-xxx</code>。</p>
+</section>
+
+<section id="roles">
+  <h2>5. 角色手册（速查）</h2>
+
+  <div class="role-card">
+    <h3>BA · 业务分析</h3>
+    <p class="goal">让开发不需要猜就能开始做。规格写「做什么」，不写表名/SQL；同步输出 HTML 原型图。本迭产物放在 <code>docs/features/iteration[n]/</code>。</p>
+    <div class="pill-row">
+      <span class="pill">ba-grill-me</span><span class="pill">ba-write-spec</span>
+    </div>
+  </div>
+
+  <div class="role-card">
+    <h3>PM · 项目经理</h3>
+    <p class="goal">估算有据；复盘必须落到可验证的 harness 文件改动。</p>
+    <div class="pill-row">
+      <span class="pill">pm-estimate</span><span class="pill">pm-retro</span>
+    </div>
+  </div>
+
+  <div class="role-card">
+    <h3>TL · 技术负责人</h3>
+    <p class="goal">装机定规；迭代前写高阶技术方案（TRD）并确认；迭代中做代码评审与发布清单。工具链与密钥不落盘也归 TL。</p>
+    <div class="pill-row">
+      <span class="pill">dev-code-review</span><span class="pill">ba-gen-facts</span><span class="pill">dev-release-plan</span>
+    </div>
+  </div>
+
+  <div class="role-card">
+    <h3>DEV · 开发</h3>
+    <p class="goal">迭代中先写 Plan（对照 TRD / 规格），确认后再实现与自测。复用现有模式，不自创；自测不写 TC 编号。</p>
+    <div class="pill-row">
+      <span class="pill">dev-plan</span><span class="pill">dev-build</span><span class="pill">dev-ui-review</span><span class="pill">dev-debug</span>
+    </div>
+  </div>
+
+  <div class="role-card">
+    <h3>QA · 测试</h3>
+    <p class="goal">定义与判定权归 QA。先文本用例，再自动化；不过不能合。</p>
+    <div class="pill-row">
+      <span class="pill">qa-write-cases</span><span class="pill">qa-run-e2e</span><span class="pill">qa-write-manual-plan</span>
+    </div>
+  </div>
+
+  <div class="role-card">
+    <h3>AI Agent</h3>
+    <p class="goal">可靠执行者，不是打字机。需求/规范有歧义 → 停下来问。不把「自测全绿」写成「需求已满足」。</p>
+  </div>
+</section>
+
+<section id="skills">
+  <h2>6. Skill 与步骤对照</h2>
+  <table class="data">
+    <thead><tr><th>步骤</th><th>阶段</th><th>skill</th><th>产出</th></tr></thead>
+    <tbody>
+      <tr><td>拷问</td><td>§2</td><td><code>ba-grill-me</code></td><td>澄清纪要</td></tr>
+      <tr><td>写规格 + 原型</td><td>§2</td><td><code>ba-write-spec</code></td><td><code>docs/features/iteration[n]/*.md</code> + <code>prototypes/</code></td></tr>
+      <tr><td>估算</td><td>§2</td><td><code>pm-estimate</code></td><td>点数与人日</td></tr>
+      <tr><td>高阶技术方案</td><td>§2</td><td>自定义 / TRD</td><td>TRD（人工确认）</td></tr>
+      <tr><td>QA 文本用例</td><td>§2 并行</td><td><code>qa-write-cases</code></td><td><code>docs/test-cases/e2e-cases/</code></td></tr>
+      <tr><td>手动 / 冒烟</td><td>§3</td><td><code>qa-write-manual-plan</code></td><td><code>docs/test-cases/manual-cases/</code> · <code>smoking-cases/</code></td></tr>
+      <tr><td>开发自测索引</td><td>§3</td><td><code>dev-build</code></td><td><code>docs/test-cases/dev-self-cases/</code>（可选）</td></tr>
+      <tr><td>写 Plan</td><td>§3</td><td><code>dev-plan</code></td><td><code>docs/plans/</code>（人工确认）</td></tr>
+      <tr><td>实现（含自测循环）</td><td>§3</td><td><code>dev-build</code></td><td>代码 + 自测通过</td></tr>
+      <tr><td>评审 / 更新事实文档</td><td>§3</td><td><code>dev-code-review</code> / <code>ba-gen-facts</code></td><td>意见 + 事实文档</td></tr>
+      <tr><td>开 MR</td><td>§3</td><td><code>dev-create-mr</code></td><td>MR / PR</td></tr>
+      <tr><td>验收</td><td>§3</td><td><code>qa-run-e2e</code></td><td>验收报告</td></tr>
+      <tr><td>上线</td><td>§3</td><td><code>dev-release-plan</code></td><td><code>docs/releases/</code></td></tr>
+      <tr><td>复盘</td><td>§3</td><td><code>pm-retro</code></td><td>改进 → harness</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<footer>
+  team-workflow-guide · 打开本文件即可预览 · 规范细节见各项目 <code>AGENTS.md</code>
+</footer>
+
+</div>
+</body>
+</html>

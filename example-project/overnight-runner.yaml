@@ -1,0 +1,38 @@
+# overnight-runner 运行配置（项目级，全队列共享）
+#
+# 这里回答的是"这个项目怎么跑"：agent 是谁 / 看门狗多严 / 决策怎么处理。
+#
+# "跑哪些任务"不在这里 —— 队列定义在
+#   .overnight-runner/queue/<队列名>/queue.yaml
+# 用 `overnight-runner --queue <名字> add docs/plans/xxx.md` 追加。
+runner:
+  agent:
+    command: opencode
+    args:
+      - run
+      - "--dangerously-skip-permissions"
+    env: {}
+  watchdog:
+    maxRetries: 2
+    backoffSec: 60
+    idleTimeoutSec: 1800
+    totalTimeoutSec: 7200
+    killGraceSec: 15
+  # 决策策略：agent 抛 "QUESTION: <问题>" 时怎么办
+  decision:
+    # attended   —— 有人值守（白天）：打断 agent，TUI 弹决策窗口问你；
+    #               timeoutSec 内没回答就按默认决策规则自动决策
+    # unattended —— 无人值守（夜里）：不打断 agent，直接按默认决策规则决策
+    # 临时切换：overnight-runner run --mode unattended
+    mode: attended
+    timeoutSec: 600
+    resume: session
+    outputFormat: json
+    sessionArgs: ["--session", "{session}"]
+
+  state:
+    dir: .overnight-runner
+  workdir: .
+  ui:
+    refreshHz: 8
+    logTail: 400
