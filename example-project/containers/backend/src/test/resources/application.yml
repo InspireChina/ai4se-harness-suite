@@ -14,6 +14,26 @@ spring:
 jwt:
   secret: test-secret-key-for-mysql-tests-only
   expiration: 86400000
+phone:
+  crypto:
+    key: test-phone-crypto-key-for-local-tests
+sms:
+  mock:
+    fixed-code: "123456"
+    expose-code: true
+  code:
+    ttl-seconds: 300
+    # 测试环境放开重发间隔限制，便于连续发码
+    resend-interval-seconds: 0
+    max-failures: 5
+consultant:
+  displayable-ids: stub-consultant-001
+seed:
+  admin:
+    enabled: true
+    phone: "13900000000"
+    password: "Admin@12345"
 business-rules:
   public-endpoints:
     - /api/v1/health
+    - /api/v1/auth/**

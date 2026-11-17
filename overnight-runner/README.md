@@ -2,16 +2,12 @@
 
 把一串 **plan** 交给 coding agent 无人值守地跑。左边是任务队列，右边是 agent 的实时输出。
 
-```
-┌── 任务队列 ─────────────┬── Coding Agent ──────────────────────────┐
-│ ▶ 20261103-feature-a 运行中│ $ opencode run "…"                       │
-│   20261103-bugfix    成功 │ DECISION: 是否执行数据库迁移？ → 先写回滚 │
-│   20261103-docs      待跑 │ …                                        │
-│                         │                                            │
-│ 待跑 1 · 运行 1 · 成功 1 │ 最近决策                                   │
-│                         │ 是否执行数据库迁移 → 先写回滚脚本           │
-└─────────────────────────┴────────────────────────────────────────────┘
-```
+> **Agent skill**：已并入 `agile-team-sdd`（无前缀，安装后为 `.agents/skills/overnight-runner/`）。  
+> 本目录保留实现、安装脚本与人读文档；目标项目用 SDD 安装器装 skill，再用本目录的 `scripts/install.sh` 装运行时。
+
+![](./docs/screenshot.png)
+
+![](./docs/decision.jpg)
 
 ## 为什么
 
@@ -135,7 +131,7 @@ $OR run --mode attended     # 白天：有人盯着，弹窗问人
 $OR run --mode unattended   # 夜里：直接决策，不打扰
 ```
 
-**`--headless` 强制 `unattended`** —— 没人看面板，不该卡在等 600 秒上。
+`--headless` **强制** `unattended` —— 没人看面板，不该卡在等 600 秒上。
 
 ### 决策窗口
 

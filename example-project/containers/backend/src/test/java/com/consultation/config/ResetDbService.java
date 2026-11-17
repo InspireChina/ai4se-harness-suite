@@ -1,5 +1,6 @@
 package com.consultation.config;
 
+import com.consultation.infrastructure.config.AccountSeedInitializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,13 +14,15 @@ public class ResetDbService {
 
     private final JdbcTemplate jdbc;
     private final DataSource dataSource;
+    private final AccountSeedInitializer accountSeedInitializer;
 
     @Value("classpath:data.sql")
     private Resource dataScript;
 
-    public ResetDbService(JdbcTemplate jdbc, DataSource dataSource) {
+    public ResetDbService(JdbcTemplate jdbc, DataSource dataSource, AccountSeedInitializer accountSeedInitializer) {
         this.jdbc = jdbc;
         this.dataSource = dataSource;
+        this.accountSeedInitializer = accountSeedInitializer;
     }
 
     public void resetAll() {
@@ -33,6 +36,8 @@ public class ResetDbService {
         }
         jdbc.execute("SET FOREIGN_KEY_CHECKS = 1");
         reSeed();
+        // 管理员账号含环境相关密文，清库后需重建
+        accountSeedInitializer.ensureAdminAccount();
     }
 
     private void reSeed() {

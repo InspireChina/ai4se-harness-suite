@@ -52,11 +52,12 @@
     },
     {
       "name": "dev-build",
-      "description": "按四层 DDD 约定实现功能，并维护 plan 同目录的细化进度文件",
+      "description": "全栈实现编排：写前后端、维护 progress，并依次调用自测、界面评审、代码评审",
       "when": "Plan 已确认，进入实现阶段",
       "produces": [
         "代码变更",
-        "docs/features/<迭代>/<CODE>-<slug>/{planStem}-progress.md"
+        "docs/features/<迭代>/<CODE>-<slug>/{planStem}-progress.md",
+        "自测通过 + 评审自查通过"
       ],
       "dependsOn": [
         "dev-plan"
@@ -64,19 +65,17 @@
     },
     {
       "name": "dev-self-test",
-      "description": "运行并修复开发自测（单元/集成/E2E 自测）",
-      "when": "实现完成后、交给 QA 之前，需要自证代码按 Plan 工作",
+      "description": "运行并修复开发自测（单元/集成/E2E 自测）；通常由 dev-build 编排调用",
+      "when": "实现完成后、交给 QA 之前，需要自证代码按 Plan 工作；或在 build 编排中执行",
       "produces": [
         "测试报告"
       ],
-      "dependsOn": [
-        "dev-build"
-      ]
+      "dependsOn": []
     },
     {
       "name": "dev-code-review",
-      "description": "按项目规范做代码评审",
-      "when": "提交前自查，或评审别人的 PR/MR 时",
+      "description": "按项目规范做代码评审；通常由 dev-build 编排调用，也可单独评审他人 MR",
+      "when": "提交前自查、dev-build 编排中，或评审别人的 PR/MR 时",
       "produces": [
         "评审意见"
       ],
@@ -84,8 +83,8 @@
     },
     {
       "name": "dev-ui-review",
-      "description": "用 chrome-devtools-mcp 做界面与交互评审",
-      "when": "前端界面需要实机检查视觉、响应式、报错时",
+      "description": "用 chrome-devtools-mcp 做界面与交互评审；通常由 dev-build 编排调用",
+      "when": "前端界面需要实机检查视觉、响应式、报错时；或在 build 编排中执行",
       "produces": [
         "评审意见 + 截图证据"
       ],
@@ -181,6 +180,20 @@
       ],
       "dependsOn": [
         "ba-write-spec"
+      ]
+    }
+  ],
+  "runner": [
+    {
+      "name": "overnight-runner",
+      "description": "启动 overnight-runner：队列跑已确认 plan，多队列、看门狗、决策留痕",
+      "when": "夜间/无人值守跑一批已确认 plan，或白天用面板盯队列时",
+      "produces": [
+        ".overnight-runner/queue/<名>/state.json",
+        ".overnight-runner/queue/<名>/decisions.jsonl"
+      ],
+      "dependsOn": [
+        "dev-plan"
       ]
     }
   ]

@@ -1,6 +1,6 @@
 ---
 name: agile-team-sdd
-description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/开发/QA/PM 全流程）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
+description: 安装 Agile Team SDD 技能套件（18 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
 ---
 
 # Agile Team SDD：安装技能套件
@@ -8,7 +8,7 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 本目录是 **SDD（Spec-Driven Development）技能套件的模板源**。
 `skills/` 下每个子目录是一份带占位符的 `SKILL.md`，需要先渲染成目标项目的真实路径，再安装过去。
 
-## 技能清单（17 个）
+## 技能清单（18 个）
 
 完整元数据见 [`catalog.json`](catalog.json)。
 
@@ -25,10 +25,10 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `dev-plan` | 在 feature 目录写 `plan.md`（含粗实施步骤）再动手 | 新功能 / 重构 / 非简单变更 |
-| `dev-build` | 按四层 DDD 约定实现，并维护细化 `*-progress.md` | Plan 已确认，进入实现 |
-| `dev-self-test` | 运行并修复开发自测 | 实现完成、交给 QA 之前 |
-| `dev-code-review` | 按项目规范做代码评审 | 提交前自查，或评审别人的 MR |
-| `dev-ui-review` | 用 chrome-devtools-mcp 做界面评审 | 前端需要实机检查 |
+| `dev-build` | 全栈编排：实现 + 依次调用自测 / UI 评审 / 代码评审 | Plan 已确认，进入实现 |
+| `dev-self-test` | 运行并修复开发自测（build 编排调用，也可单跑） | 实现后 / build 编排中 |
+| `dev-code-review` | 按项目规范做代码评审（build 编排调用，也可单跑） | build 编排中 / 审他人 MR |
+| `dev-ui-review` | chrome-devtools-mcp 界面评审（build 编排调用） | 有 UI 改动时 / build 编排中 |
 | `dev-release-plan` | 整理当前迭代上线准备清单 | 迭代收尾，准备发版 |
 | `dev-create-mr` | 创建 Merge Request / Pull Request | 自测通过，准备提交评审 |
 
@@ -53,6 +53,12 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 | `pm-estimate` | 基于需求分类基线表估算工作量 | 需求进迭代前 |
 | `pm-retro` | 复盘并把改进项回写到 harness 本身 | 迭代结束，或流程反复出问题 |
 
+### Runner（无角色前缀）
+
+| Skill | 作用 | 触发时机 |
+|---|---|---|
+| `overnight-runner` | 队列跑已确认 plan（多队列、看门狗、决策留痕） | 夜间 / 无人值守，或白天用面板盯队列 |
+
 ### 全流程串起来
 
 ```
@@ -62,13 +68,11 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
                     ┌─ tl-high-level-design（HLD 确认）
                     └─ qa-write-cases（与 HLD 并行）
                                           ▼
-                       dev-plan ──▶ dev-build ──▶ dev-self-test
-                                          │              │
-                                          ▼              ▼
-                                     ba-gen-facts    dev-code-review / dev-ui-review
-                                                          │
-                                                          ▼
-                                                     dev-create-mr
+                       dev-plan ──▶ dev-build
+                                      │  编排：self-test → ui-review → code-review
+                                      │  （失败修 bug 回环）
+                                      ▼
+                                 ba-gen-facts / dev-create-mr
                                                           │
                                      qa-write-manual-plan / qa-run-e2e
                                                           │
@@ -98,7 +102,7 @@ description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/�
 | 参数 | 说明 |
 |---|---|
 | `--list` | 列出全部可用 skill 并退出 |
-| `--group <g>` | 只安装某一组（`ba` / `dev` / `qa` / `pm`），可重复 |
+| `--group <g>` | 只安装某一组（`ba` / `dev` / `qa` / `pm` / `tl` / `runner`），可重复 |
 | `--skill <name>` | 只安装指定 skill，可重复 |
 | `--dry-run` | 只打印将要发生的改动，不写文件（推荐先跑一次） |
 | `--force` | 覆盖目标项目里已存在的同名 skill |

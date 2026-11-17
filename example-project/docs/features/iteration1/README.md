@@ -3,7 +3,8 @@
 > 状态：**v0.1**（字段、规则、验收与原型已完成）  
 > 日期：2026-11-16  
 > 原型：独立 Vite Demo（Element Plus），见 [`prototypes/`](./prototypes/)（端口 5174）  
-> **实现**：业务代码已清空为工程骨架；请按各 feature 的 plan 重新落地（见 `_chores/plan-20261117-purge-demo-impl-for-iteration1.md`）。  
+> **实现**：按各 feature 的 plan 逐个落地。**ACC 已实现**（见 [`ACC-account/plan.md`](./ACC-account/plan.md) 与 [`ACC-account/plan-progress.md`](./ACC-account/plan-progress.md)）；
+> 其余 feature 仍为工程骨架（见 `_chores/plan-20261117-purge-demo-impl-for-iteration1.md`）。  
 > **高阶设计**：[high-level-design.md](./high-level-design.md) — **确认前不得写 feature Plan**。
 
 ## 1. 产品概述
@@ -17,7 +18,7 @@
 
 | Code | Spec | 覆盖源 REQ / 章节 | 角色 | 状态 |
 |---|---|---|---|---|
-| ACC | [ACC-account/spec.md](./ACC-account/spec.md) | §6.1 + REQ-006 | 三端 | v0.1 |
+| ACC | [ACC-account/spec.md](./ACC-account/spec.md) | §6.1 + REQ-006 | 三端 | v0.1 · **已实现** |
 | CDC | [CDC-consultant-discovery/spec.md](./CDC-consultant-discovery/spec.md) | REQ-001、002 | 用户 | v0.1 |
 | BKG | [BKG-booking/spec.md](./BKG-booking/spec.md) | REQ-003、004、005 | 用户 | v0.1 |
 | COB | [COB-consultant-onboarding/spec.md](./COB-consultant-onboarding/spec.md) | REQ-007、008 | 咨询师 | v0.1 |

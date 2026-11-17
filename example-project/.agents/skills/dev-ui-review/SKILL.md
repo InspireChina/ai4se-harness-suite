@@ -5,6 +5,8 @@ description: 用 chrome-devtools-mcp 做界面与交互评审。当前端界面�
 
 # Dev：界面评审
 
+通常由 **`dev-build` 编排调用**（有前端改动时）；也可单独触发。
+
 界面评审 **必须实机看**，不能只读代码。工具：chrome-devtools-mcp（配置在 `.mcp.json`）。
 
 ## 准备

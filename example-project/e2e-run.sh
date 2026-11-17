@@ -21,6 +21,12 @@ cleanup() {
 
 trap cleanup EXIT INT TERM
 
+# ── E2E 环境约定（ACC） ──
+# 短信验证码固定码：Mock 短信通道（后端 sms.mock.fixed-code）
+export SMS_MOCK_FIXED_CODE="${SMS_MOCK_FIXED_CODE:-123456}"
+# 放开重发间隔限制，便于连续发码
+export SMS_CODE_RESEND_INTERVAL_SECONDS="${SMS_CODE_RESEND_INTERVAL_SECONDS:-0}"
+
 # ── Start backend ──
 echo "🚀 Starting backend (port $BACKEND_PORT)..."
 cd "$BACKEND_DIR"
@@ -30,7 +36,7 @@ echo "  Backend PID: $BACKEND_PID"
 
 echo "  Waiting for backend..."
 for i in $(seq 1 60); do
-  if curl -s -o /dev/null -w "%{http_code}" "http://localhost:$BACKEND_PORT/api/v1/home/info" 2>/dev/null | grep -q 200; then
+  if curl -s -o /dev/null -w "%{http_code}" "http://localhost:$BACKEND_PORT/api/v1/health" 2>/dev/null | grep -q 200; then
     echo "  Backend ready after ${i}s"
     break
   fi

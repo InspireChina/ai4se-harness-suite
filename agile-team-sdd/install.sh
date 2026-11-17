@@ -4,7 +4,7 @@
 # 用法：
 #   ./install.sh <目标项目目录> [--group <g>] [--skill <name>] [--list] [--dry-run] [--force] [--no-config]
 #
-#   --group <g>     只安装某一组（ba / dev / qa / pm / tl），可重复
+#   --group <g>     只安装某一组（ba / dev / qa / pm / tl / runner），可重复
 #   --skill <name>  只安装指定 skill，可重复
 #   --list          列出全部可用 skill 并退出
 #   --dry-run       只打印将要发生的改动，不写文件
@@ -105,6 +105,7 @@ MANUAL_CASES_DIR="${MANUAL_CASES_DIR:-$TEST_CASES_DIR/manual-cases}"
 SMOKING_CASES_DIR="${SMOKING_CASES_DIR:-$TEST_CASES_DIR/smoking-cases}"
 DEV_SELF_CASES_DIR="${DEV_SELF_CASES_DIR:-$TEST_CASES_DIR/dev-self-cases}"
 RELEASES_DIR="${RELEASES_DIR:-$DOCS_DIR/releases}"
+OVERNIGHT_DIR="${OVERNIGHT_DIR:-.overnight-runner}"
 
 TARGET_BRANCH="${TARGET_BRANCH:-main}"
 BACKEND_PORT="${BACKEND_PORT:-8080}"
@@ -146,6 +147,7 @@ PAIRS=(
   "SPEC_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/spec.md")"
   "PLAN_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/plan.md")"
   "GLOSSARY_FILE=$(proj_path "$FEATURES_DIR/glossary.md")"
+  "OVERNIGHT_DIR=$(proj_path "$OVERNIGHT_DIR")"
   "DOMAIN_MODEL_DOC=$(proj_path "$FACTS_DIR/domain-model.md")"
   "API_SPEC=$(proj_path "$FACTS_DIR/api.yaml")"
   "DB_SCHEMA_DOC=$(proj_path "$FACTS_DIR/db-schema.md")"

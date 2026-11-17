@@ -116,7 +116,8 @@ DTO 约定：
 
 ## 8. 领域设计：聚合与规则
 
-> **现状（空壳）**：旧示例聚合已清除。目标模型以 `docs/features/iteration1/` 为准，按 feature plan 重建后回写本节与 `docs/facts/domain-model.md`。
+> **现状**：ACC（账号与个人中心）已落地，聚合见下；其余 feature 以 `docs/features/iteration1/` 为准，
+> 按 feature plan 重建后回写本节与 `docs/facts/domain-model.md`。
 
 业务规则引擎（`domain/businessrule/`）— **框架保留、规则未注册**：
 
@@ -124,10 +125,24 @@ DTO 约定：
 - `BusinessRuleConfig` + `BusinessRuleProvider`；注册入口 `BusinessRuleRegistration`（当前为空）
 - 规则 YAML 目录：`resources/business-rules/`（可按 feature 新增）
 
-数据字典（`domain/datadictionary/`）— **框架保留、类型未注册**：
+数据字典（`domain/datadictionary/`）— **框架保留、ACC 已注册**：
 
 - `Description` / `DataDictionaryType` / `DataDictionaryUtil`
+- ACC 注册 `AccDataDictionaryType`（账号状态 / 账号角色 / 协议类型）
 - 实现 feature 时新增枚举并回写 `docs/facts/tech-topic/data-dict.md`
+
+### 已落地聚合（ACC）
+
+聚合根 **Account**（`domain/aggregate/Account.java`）：角色集合（USER / CONSULTANT / ADMIN）、
+状态机（`ACTIVE` ⇄ `DISABLED`）、`tokenVersion`（禁用/启用时 +1，令旧 JWT 立即失效）、
+手机号摘要 + 密文。行为：`registerByPhone` / `createAdmin` / `grantConsultantRole`（幂等）/
+`disable` / `enable` / `touchLogin` / `assertUsable`。
+
+关联实体：`UserProfile` / `FavoriteConsultant` / `AgreementConsent` / `SmsVerificationCode`。
+
+领域端口（domain 定义、infrastructure 实现，可替换）：
+`PhoneCrypto` / `SmsSender` / `DisplayableConsultantPort` / `TokenIssuer` / `PasswordService`。
+
 
 ## 9. 预约状态机
 

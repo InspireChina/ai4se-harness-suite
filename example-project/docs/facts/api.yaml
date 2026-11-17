@@ -1,10 +1,11 @@
 openapi: 3.0.0
 info:
-  title: Consultation Platform API (skeleton)
-  version: 0.0.0
+  title: Consultation Platform API
+  version: 0.1.0
   description: |
-    业务 API 尚未实现。目标需求见 docs/features/iteration1/。
-    当前仅保留健康探针。
+    咨询预约平台 API。当前已实现 ACC（账号与个人中心）。
+    需求来源：docs/features/iteration1/ACC-account/spec.md
+    技术方案：docs/features/iteration1/ACC-account/plan.md
 paths:
   /api/v1/health:
     get:
@@ -20,3 +21,280 @@ paths:
                   status:
                     type: string
                     example: UP
+  /api/v1/auth/sms/send:
+    post:
+      summary: 发送登录 / 注册验证码
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone: { type: string, example: '13800138000' }
+      responses:
+        '204': { description: 已接受（不区分新老号，防枚举） }
+        '400': { description: 手机号非法 / 参数校验失败 }
+        '409': { description: 发送过于频繁 }
+  /api/v1/auth/sms/login:
+    post:
+      summary: 验证码登录或注册（默认 USER 角色）
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, code]
+              properties:
+                phone: { type: string }
+                code: { type: string }
+                nickname: { type: string, description: 新号可选，缺省生成 }
+      responses:
+        '200':
+          description: token + account + profile
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthLoginResponse' }
+        '400': { description: 验证码错误 / 过期 / 手机号非法 }
+        '409': { description: 账号不可用（已禁用） }
+  /api/v1/auth/admin/login:
+    post:
+      summary: 管理员密码登录
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, password]
+              properties:
+                phone: { type: string }
+                password: { type: string }
+      responses:
+        '200':
+          description: token + account
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthLoginResponse' }
+        '400': { description: 账号或密码不正确 }
+        '409': { description: 账号不可用（已禁用） }
+  /api/v1/me:
+    get:
+      summary: 当前账号与资料
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: MeResponse
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MeResponse' }
+        '401': { description: 未登录 / 登录失效 / 账号不可用 }
+  /api/v1/me/profile:
+    put:
+      summary: 更新本人资料
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname: { type: string, minLength: 2, maxLength: 30 }
+                avatarUrl: { type: string, maxLength: 500 }
+                email: { type: string, maxLength: 254 }
+                cityCode: { type: string, maxLength: 20 }
+                locale: { type: string, maxLength: 16, example: zh-CN }
+      responses:
+        '200':
+          description: UserProfileResponse
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProfileResponse' }
+        '400': { description: 参数校验失败 }
+        '401': { description: 未登录 / 登录失效 }
+  /api/v1/me/favorites:
+    get:
+      summary: 收藏列表
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: 收藏列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/FavoriteResponse' }
+        '401': { description: 未登录 / 登录失效 }
+    post:
+      summary: 收藏咨询师（幂等）
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consultantId]
+              properties:
+                consultantId: { type: string }
+      responses:
+        '200':
+          description: 收藏记录（重复收藏返回同一条）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/FavoriteResponse' }
+        '400': { description: 咨询师不存在或不可展示 }
+        '401': { description: 未登录 / 登录失效 }
+  /api/v1/me/favorites/{consultantId}:
+    delete:
+      summary: 取消收藏（幂等）
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: consultantId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: OK（未收藏也返回成功） }
+        '401': { description: 未登录 / 登录失效 }
+  /api/v1/me/agreements:
+    get:
+      summary: 查询本人协议同意记录
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: 同意记录
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/AgreementConsentResponse' }
+        '401': { description: 未登录 / 登录失效 }
+    post:
+      summary: 记录协议同意（按类型 + 版本幂等）
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [agreementType, agreementVersion]
+              properties:
+                agreementType: { type: string, enum: [service, privacy] }
+                agreementVersion: { type: string, maxLength: 20 }
+      responses:
+        '200':
+          description: 同意记录
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AgreementConsentResponse' }
+        '400': { description: 协议类型 / 版本不合法 }
+        '401': { description: 未登录 / 登录失效 }
+  /api/v1/admin/accounts/{id}/disable:
+    post:
+      summary: 禁用账号（使现有会话失效）
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, maxLength: 200 }
+      responses:
+        '200':
+          description: 账号视图（手机号脱敏）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountResponse' }
+        '400': { description: 账号不存在 / 原因缺失 }
+        '401': { description: 未登录 / 登录失效 }
+        '403': { description: 非管理员 }
+  /api/v1/admin/accounts/{id}/enable:
+    post:
+      summary: 启用账号
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: 账号视图（手机号脱敏）
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AccountResponse' }
+        '400': { description: 账号不存在 }
+        '401': { description: 未登录 / 登录失效 }
+        '403': { description: 非管理员 }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AuthLoginResponse:
+      type: object
+      properties:
+        token: { type: string }
+        account: { $ref: '#/components/schemas/AccountResponse' }
+        profile: { $ref: '#/components/schemas/ProfileResponse' }
+    MeResponse:
+      type: object
+      properties:
+        account: { $ref: '#/components/schemas/AccountResponse' }
+        profile: { $ref: '#/components/schemas/ProfileResponse' }
+    AccountResponse:
+      type: object
+      properties:
+        id: { type: string }
+        roles:
+          type: array
+          items: { type: string, enum: [USER, CONSULTANT, ADMIN] }
+        status: { type: string, enum: [ACTIVE, DISABLED] }
+        phone: { type: string, nullable: true, description: 本人明文，其他视角脱敏 }
+        phoneVerifiedAt: { type: string, format: date-time }
+        lastLoginAt: { type: string, format: date-time, nullable: true }
+        disabledReason: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    ProfileResponse:
+      type: object
+      properties:
+        accountId: { type: string }
+        nickname: { type: string }
+        avatarUrl: { type: string, nullable: true }
+        email: { type: string, nullable: true }
+        cityCode: { type: string, nullable: true }
+        locale: { type: string, example: zh-CN }
+        updatedAt: { type: string, format: date-time }
+    FavoriteResponse:
+      type: object
+      properties:
+        id: { type: string }
+        consultantId: { type: string }
+        createdAt: { type: string, format: date-time }
+    AgreementConsentResponse:
+      type: object
+      properties:
+        id: { type: string }
+        agreementType: { type: string, enum: [service, privacy] }
+        agreementVersion: { type: string }
+        consentedAt: { type: string, format: date-time }
+        sourceIp: { type: string }

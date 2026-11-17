@@ -27,7 +27,7 @@
 ```
 team-harness-suite/
 ├── .agents/              # 本仓库自用：verify.sh + plan/ + skills/
-├── agile-team-sdd/       # SDD 技能套件（17 个 skill 模板 + 安装器）
+├── agile-team-sdd/       # SDD 技能套件（18 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
@@ -57,7 +57,7 @@ team-harness-suite/
 |---|---|---|
 | **安装器型** | `harness-installer/`、`tool-chain-installer/` | 一个 skill，作用是把东西装进目标项目 |
 | **套件型** | `agile-team-sdd/` | 一个 skill（安装器）+ N 个 skill 模板，一次装一批 |
-| **运行时型** | `overnight-runner/` | 一个 skill，作用是 **启动** 一个长跑工具 |
+| **运行时型** | `overnight-runner/` | Python 运行时 + 安装脚本；**Agent skill** 在 `agile-team-sdd`（无前缀 `overnight-runner`） |
 | **维护型** | `.agents/skills/` | 本仓库自用：`work-in-example`（样例上下文）与 example↔harness 刷新（不装进目标项目） |
 | **文档型** | `team-workflow-guide/` | 不是 skill，是人读的指南 |
 
@@ -129,7 +129,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ┌──▼──────────┐ ┌▼───────────┐ ┌▼──────────────────┐
 │harness-     │ │agile-team- │ │tool-chain-        │
 │installer/   │ │sdd/       │ │installer/         │
-│AGENTS.md    │ │17 个 skill │ │MCP 工具链          │
+│AGENTS.md    │ │18 个 skill │ │MCP 工具链          │
 │docs/ 骨架    │ │模板 + 安装器│ │                   │
 └─────────────┘ └┬───────────┘ └──────────────────┘
                  │ 装进
@@ -138,7 +138,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
         └──────────────────┘
 
         ┌──────────────────┐
-        │ overnight-runner/│  运行时型：启动长跑工具
+        │ overnight-runner/│  运行时；skill 由 agile-team-sdd 下发
         └──────────────────┘
 ```
 
@@ -258,10 +258,8 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
   → ┬─ tl-high-level-design（迭代 high-level-design.md，人工确认 ← Plan 前强制闸门）
     └─ qa-write-cases（QA 文本用例，与 HLD 并行；规格确认后即可开始）
   → HLD 确认后 → dev-plan（技术方案 feature/plan.md 或 _chores/，人工确认 ← 编码前强制闸门）
-  → Plan 确认后 → dev-build（实现）
-  → dev-self-test（开发自测）
+  → Plan 确认后 → dev-build（全栈编排：实现 → self-test → ui-review → code-review；失败修 bug 回环）
   → ba-gen-facts（事实文档 docs/facts/ 同步）
-  → dev-code-review / dev-ui-review
   → dev-create-mr
   → qa-run-e2e / qa-write-manual-plan（QA 验收，合并闸门）
   → dev-release-plan（上线清单 docs/releases/）

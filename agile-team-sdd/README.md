@@ -1,7 +1,7 @@
 # agile-team-sdd
 
 SDD（Spec-Driven Development）技能套件的 **模板源**，覆盖 **BA → TL → PM → 开发 → QA → 发布 → 复盘** 全流程，
-共 17 个 skill。
+共 18 个 skill。
 
 ```
 agile-team-sdd/
@@ -25,7 +25,8 @@ agile-team-sdd/
     ├── qa-run-e2e-template/       # 运行 E2E
     ├── qa-write-manual-plan-template/ # 手动与冒烟用例
     ├── pm-estimate-template/      # 工作量估算（附 baseline.md 基线表）
-    └── pm-retro-template/         # 复盘并改进 harness
+    ├── pm-retro-template/         # 复盘并改进 harness
+    └── overnight-runner-template/ # 夜间/无人值守跑 plan（无角色前缀）
 ```
 
 ## 技能分组
@@ -37,10 +38,10 @@ agile-team-sdd/
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
-| | `dev-build` | 按四层 DDD 约定实现，并维护细化进度文件 |
-| | `dev-self-test` | 运行并修复开发自测 |
-| | `dev-code-review` | 按项目规范做代码评审 |
-| | `dev-ui-review` | 用 chrome-devtools-mcp 做界面评审 |
+| | `dev-build` | 全栈编排：实现 + 自测 / UI 评审 / 代码评审 |
+| | `dev-self-test` | 开发自测（由 build 编排，可单跑） |
+| | `dev-code-review` | 代码评审（由 build 编排，可单跑） |
+| | `dev-ui-review` | chrome-devtools-mcp 界面评审（由 build 编排） |
 | | `dev-release-plan` | 整理迭代上线准备清单 |
 | | `dev-create-mr` | 创建 Merge Request / Pull Request |
 | **QA** | `qa-write-cases` | 编写 QA 用例（`TC-xxx` 文本 + 自动化） |
@@ -48,6 +49,7 @@ agile-team-sdd/
 | | `qa-write-manual-plan` | 编写手动测试与冒烟用例计划 |
 | **PM** | `pm-estimate` | 基于需求分类基线表估算工作量 |
 | | `pm-retro` | 复盘并把改进项回写到 harness |
+| **Runner** | `overnight-runner` | 队列跑已确认 plan（多队列、看门狗、决策留痕；无角色前缀） |
 
 ## 为什么用占位符
 
