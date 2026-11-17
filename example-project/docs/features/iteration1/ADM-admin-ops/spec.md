@@ -124,65 +124,65 @@ NEW
 
 ### 5.1 OpsDashboardMetrics / ApplicationReview
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| metrics.periodType | 统计周期 | enum | 是 | 看板粒度 | day / week / month | 查询时 | — |
-| metrics.periodStart | 周期开始 | date | 是 | 对比基准 | 查询条件 | 查询时 | — |
-| metrics.userCount | 用户数 | integer | 是 | 有效用户总数 | 系统聚合 | 否 | 否 |
-| metrics.consultantCount | 咨询师数 | integer | 是 | approved 且 active | 系统聚合 | 否 | 否 |
-| metrics.orderCount | 订单量 | integer | 是 | 有效订单数量 | 系统聚合 | 否 | 否 |
-| metrics.gmv | 成交额 | decimal(14,2) | 是 | 支付成功金额 | 系统聚合 | 否 | 否 |
-| metrics.refundRate | 退款率 | decimal(5,2) | 是 | 退款单/支付单 | 系统聚合 | 否 | 否 |
-| metrics.comparisonRate | 环比 | decimal(7,2) | 是 | 对比上一周期 | 系统计算 | 否 | 否 |
-| review.applicationId | 申请 ID | string | 是 | 被审核申请 | OnboardingApplication.id | 审核时 | 否 |
-| review.result | 审核结果 | enum | 是 | 通过/驳回 | approved / rejected | 审核时 | 否 |
-| review.reasonCode | 驳回原因 | enum | 条件 | 驳回原因码 | 资料不全/资质无效/内容违规/其他 | 驳回时 | 否 |
-| review.note | 审核说明 | string(2..500) | 条件 | 驳回时必填 | 管理员输入 | 审核时 | 否 |
-| review.reviewerId | 审核人 | string | 是 | 当前管理员 | 系统上下文 | 否 | 否 |
-| review.reviewedAt | 审核时间 | datetime | 是 | 决策时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 统计周期 | enum | 是 | 看板粒度 | day / week / month | 查询时 | — |
+| 周期开始 | date | 是 | 对比基准 | 查询条件 | 查询时 | — |
+| 用户数 | integer | 是 | 有效用户总数 | 系统聚合 | 否 | 否 |
+| 咨询师数 | integer | 是 | approved 且 active | 系统聚合 | 否 | 否 |
+| 订单量 | integer | 是 | 有效订单数量 | 系统聚合 | 否 | 否 |
+| 成交额 | decimal(14,2) | 是 | 支付成功金额 | 系统聚合 | 否 | 否 |
+| 退款率 | decimal(5,2) | 是 | 退款单/支付单 | 系统聚合 | 否 | 否 |
+| 环比 | decimal(7,2) | 是 | 对比上一周期 | 系统计算 | 否 | 否 |
+| 申请 ID | string | 是 | 被审核申请 | OnboardingApplication.id | 审核时 | 否 |
+| 审核结果 | enum | 是 | 通过/驳回 | approved / rejected | 审核时 | 否 |
+| 驳回原因 | enum | 条件 | 驳回原因码 | 资料不全/资质无效/内容违规/其他 | 驳回时 | 否 |
+| 审核说明 | string(2..500) | 条件 | 驳回时必填 | 管理员输入 | 审核时 | 否 |
+| 审核人 | string | 是 | 当前管理员 | 系统上下文 | 否 | 否 |
+| 审核时间 | datetime | 是 | 决策时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 Category / Tag / UserGovernance
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| category.id | 分类 ID | string | 是 | 分类标识 | 系统生成 | 否 | 否 |
-| category.parentId | 父分类 ID | string | 否 | 根节点为空 | Category.id | 否 | 是 |
-| category.code | 分类编码 | string(2..50) | 是 | 稳定编码 | 管理员输入 | 是 | 否 |
-| category.name | 分类名 | string(2..50) | 是 | 同级唯一 | 管理员输入 | 是 | 是 |
-| category.sortOrder | 排序值 | integer | 是 | 升序展示 | 管理员输入 | 是 | 是 |
-| category.status | 分类状态 | enum | 是 | 启停 | enabled / disabled | 是 | 是 |
-| tag.id | 标签 ID | string | 是 | 标签标识 | 系统生成 | 否 | 否 |
-| tag.name | 标签名 | string(2..30) | 是 | 全局唯一 | 管理员输入 | 是 | 是 |
-| tag.status | 标签状态 | enum | 是 | 启停 | enabled / disabled | 是 | 是 |
-| governance.accountId | 用户账号 ID | string | 是 | 治理对象 | Account.id | 操作时 | 否 |
-| governance.action | 治理动作 | enum | 是 | 用户动作 | disable / enable | 操作时 | 否 |
-| governance.reason | 操作原因 | string(2..500) | 是 | 必填说明 | 管理员输入 | 操作时 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 分类 ID | string | 是 | 分类标识 | 系统生成 | 否 | 否 |
+| 父分类 ID | string | 否 | 根节点为空 | Category.id | 否 | 是 |
+| 分类编码 | string(2..50) | 是 | 稳定编码 | 管理员输入 | 是 | 否 |
+| 分类名 | string(2..50) | 是 | 同级唯一 | 管理员输入 | 是 | 是 |
+| 排序值 | integer | 是 | 升序展示 | 管理员输入 | 是 | 是 |
+| 分类状态 | enum | 是 | 启停 | enabled / disabled | 是 | 是 |
+| 标签 ID | string | 是 | 标签标识 | 系统生成 | 否 | 否 |
+| 标签名 | string(2..30) | 是 | 全局唯一 | 管理员输入 | 是 | 是 |
+| 标签状态 | enum | 是 | 启停 | enabled / disabled | 是 | 是 |
+| 用户账号 ID | string | 是 | 治理对象 | Account.id | 操作时 | 否 |
+| 治理动作 | enum | 是 | 用户动作 | disable / enable | 操作时 | 否 |
+| 操作原因 | string(2..500) | 是 | 必填说明 | 管理员输入 | 操作时 | 否 |
 
 ### 5.3 Refund / ReportCase / AuditLog
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| refund.id | 退款单 ID | string | 是 | 退款标识 | 系统生成 | 否 | 否 |
-| refund.orderId | 订单 ID | string | 是 | 被退款订单 | BookingOrder.id | 是 | 否 |
-| refund.amount | 退款金额 | decimal(10,2) | 是 | 不超过可退金额 | 管理员输入 | 是 | 否 |
-| refund.reason | 退款原因 | string(2..500) | 是 | 操作原因 | 管理员输入 | 是 | 否 |
-| refund.status | 退款状态 | enum | 是 | 网关进度 | pending / success / failed | 是 | 系统 |
-| report.id | 举报 ID | string | 是 | 举报标识 | 系统生成 | 否 | 否 |
-| report.reporterId | 举报人 ID | string | 是 | 用户或咨询师 | 当前账号 | 是 | 否 |
-| report.targetType | 对象类型 | enum | 是 | 举报对象 | order / consultant / user | 是 | 否 |
-| report.targetId | 对象 ID | string | 是 | 被举报对象 | 业务对象 | 是 | 否 |
-| report.type | 举报类型 | enum | 是 | 类型 | fraud / harassment / service / other | 是 | 否 |
-| report.description | 举报说明 | string(10..2000) | 是 | 事实描述 | 举报人输入 | 是 | 否 |
-| report.evidenceFileIds | 证据文件 | array | 否 | 安全校验文件 | 上传服务 | 否 | 否 |
-| report.status | 举报状态 | enum | 是 | 处理状态 | pending / processing / resolved / rejected | 是 | 系统 |
-| report.resolution | 处理结论 | string(2..1000) | 条件 | 结案必填 | 管理员输入 | 否 | 系统 |
-| audit.id | 审计日志 ID | string | 是 | 日志标识 | 系统生成 | 否 | 否 |
-| audit.operatorId | 操作人 | string | 是 | 管理员账号 | 系统上下文 | 否 | 否 |
-| audit.action | 操作类型 | string | 是 | 敏感动作编码 | 系统记录 | 否 | 否 |
-| audit.targetType/id | 对象类型/ID | string | 是 | 操作对象 | 系统记录 | 否 | 否 |
-| audit.before/after | 变更前后 | object | 是 | 脱敏快照 | 系统记录 | 否 | 否 |
-| audit.traceId | 链路 ID | string | 是 | 调用追踪 | 系统生成 | 否 | 否 |
-| audit.createdAt | 操作时间 | datetime | 是 | 发生时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 退款单 ID | string | 是 | 退款标识 | 系统生成 | 否 | 否 |
+| 订单 ID | string | 是 | 被退款订单 | BookingOrder.id | 是 | 否 |
+| 退款金额 | decimal(10,2) | 是 | 不超过可退金额 | 管理员输入 | 是 | 否 |
+| 退款原因 | string(2..500) | 是 | 操作原因 | 管理员输入 | 是 | 否 |
+| 退款状态 | enum | 是 | 网关进度 | pending / success / failed | 是 | 系统 |
+| 举报 ID | string | 是 | 举报标识 | 系统生成 | 否 | 否 |
+| 举报人 ID | string | 是 | 用户或咨询师 | 当前账号 | 是 | 否 |
+| 对象类型 | enum | 是 | 举报对象 | order / consultant / user | 是 | 否 |
+| 对象 ID | string | 是 | 被举报对象 | 业务对象 | 是 | 否 |
+| 举报类型 | enum | 是 | 类型 | fraud / harassment / service / other | 是 | 否 |
+| 举报说明 | string(10..2000) | 是 | 事实描述 | 举报人输入 | 是 | 否 |
+| 证据文件 | array | 否 | 安全校验文件 | 上传服务 | 否 | 否 |
+| 举报状态 | enum | 是 | 处理状态 | pending / processing / resolved / rejected | 是 | 系统 |
+| 处理结论 | string(2..1000) | 条件 | 结案必填 | 管理员输入 | 否 | 系统 |
+| 审计日志 ID | string | 是 | 日志标识 | 系统生成 | 否 | 否 |
+| 操作人 | string | 是 | 管理员账号 | 系统上下文 | 否 | 否 |
+| 操作类型 | string | 是 | 敏感动作编码 | 系统记录 | 否 | 否 |
+| 对象类型/ID | string | 是 | 操作对象 | 系统记录 | 否 | 否 |
+| 变更前后 | object | 是 | 脱敏快照 | 系统记录 | 否 | 否 |
+| 链路 ID | string | 是 | 调用追踪 | 系统生成 | 否 | 否 |
+| 操作时间 | datetime | 是 | 发生时间 | 系统生成 | 否 | 否 |
 
 ---
 

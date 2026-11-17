@@ -8,7 +8,7 @@
 |---|---|
 | 本目录根 | `api.yaml`、`db-schema.md`、`domain-model.md` |
 | [`business/`](./business/) | 业务事实（流程等） |
-| [`tech-topic/`](./tech-topic/) | 技术专题 / ADR / 实现说明 |
+| [`tech-topic/`](./tech-topic/) | 技术专题 / **ADR 正文** / 实现说明（写法见 [`../standards/adr.md`](../standards/adr.md)） |
 
 ## 现有文档
 

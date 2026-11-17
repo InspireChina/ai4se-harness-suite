@@ -7,6 +7,12 @@ description: 在编写任何代码之前为对应 feature 创建开发计划（p
 
 在实现前为需求写技术方案，并与规格放在同一 feature 目录。
 
+## 前置
+
+- 本迭代 `docs/features/<迭代>/high-level-design.md` **已人工确认**（由 `tl-high-level-design` 产出）
+- 已读对应 feature 的 `spec.md`，并对照 HLD 中的跨模块契约
+- HLD 未确认时 **停止**，不要写 `plan.md`
+
 ## 输出位置
 
 | 场景 | 路径 |
@@ -35,7 +41,8 @@ description: 在编写任何代码之前为对应 feature 创建开发计划（p
 
 ## 规则
 
-- 计划必须经用户审核确认后方可继续（AGENTS.md §14 第 1 步）
+- 计划必须经用户审核确认后方可继续（AGENTS.md §14 Plan 闸门）
+- Plan 不得推翻已确认 HLD 的技术边界与契约权属；若需变更，先修订 HLD 并重新确认
 - 包含每个需要变更的文件的路径
 - 参考现有模式（assembler、converter、service）以保持一致性
 - 考虑文档同步：本次变更是否会影响 `docs/facts/` 中的文件？

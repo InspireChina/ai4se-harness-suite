@@ -11,13 +11,13 @@
 
 | 目录 | 内容 | 谁来写 |
 |---|---|---|
-| `features/` | JIRA 风格 feature 文件夹：`spec.md` + `plan.md` / `plan-{slug}.md` | 产品 / BA / 开发 |
+| `features/` | JIRA 风格 feature 文件夹：`spec.md` + `plan.md`；迭代目录含 `high-level-design.md` | 产品 / BA / TL / 开发 |
 | `features/_chores/` | 无关联 feature 的横切技术方案 | 架构师 / 负责人 |
 | `facts/` | 技术事实：API、库表、领域模型 | 全员，随代码同步 |
 | `facts/business/` | 业务事实：流程等 | BA / 开发 |
-| `facts/tech-topic/` | 技术专题 / ADR / 实现说明 | 需要时新建 |
-| `standards/` | 代码规范（事实）：架构、命名、分层、安全、API、错误、测试 | 架构师 |
-| `standards/templates/` | 代码模版 / snippet，供参考复制 | 架构师 |
+| `facts/tech-topic/` | 技术专题 / ADR 正文 / 实现说明（写法见 `standards/adr.md`） | 需要时新建 |
+| `standards/` | 代码规范（事实）：架构、命名、分层、安全、API、错误、测试、ADR 写法 | 架构师 |
+| `standards/templates/` | 代码模版 / snippet / ADR 模板 | 架构师 |
 | `test-cases/` | 测试用例文本基线（见下） | QA / 开发 |
 
 ### `test-cases/` 子目录
@@ -37,6 +37,7 @@
 - 需求规格与 Plan **定稿后不改**；同一 feature 的二次改造新建 `plan-{slug}.md`。
 - 事实文档必须与代码一致；改了代码就要改文档。
 - 新建需求：复制 `features/_template/` 为 `features/<迭代>/<CODE>-<slug>/`，再改 `spec.md` / `plan.md`。
+- 每个迭代应有 `features/<迭代>/high-level-design.md`；**确认前不得写 feature Plan**。
 
 ## 同步检查点
 

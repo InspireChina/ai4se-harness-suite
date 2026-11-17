@@ -117,54 +117,54 @@ NEW
 
 ### 5.1 OnboardingApplication
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| id | 申请 ID | string | 是 | 入驻申请标识 | 系统生成 | 否 | 否 |
-| accountId | 账号 ID | string | 是 | 申请人账号 | 当前用户 | 是 | 否 |
-| realName | 姓名 | string(2..50) | 是 | 证件姓名 | 用户输入 | 是 | 驳回后 |
-| idNumber | 证件号码 | string | 是 | 加密保存、展示脱敏 | 用户输入 | 是 | 驳回后 |
-| practiceTitle | 执业身份 | string(2..100) | 是 | 职称/身份 | 用户输入 | 是 | 驳回后 |
-| specialties | 擅长领域 | array | 是 | 标签 | 用户选择 | 是 | 是 |
-| categoryIds | 服务分类 | array | 是 | 至少一个启用分类 | 分类字典 | 是 | 是 |
-| yearsOfPractice | 从业年限 | integer | 是 | 0..60 | 用户输入 | 是 | 是 |
-| expectedPrice | 期望定价 | decimal(10,2) | 是 | 人民币单次价格 | 用户输入 | 是 | 驳回后 |
-| applicationStatus | 申请状态 | enum | 是 | 状态 | draft / pending / approved / rejected | 是 | 系统 |
-| rejectReasonCode | 驳回原因码 | enum | 条件 | 驳回时必填 | 原因字典 | 否 | 系统 |
-| rejectNote | 驳回说明 | string(500) | 条件 | 驳回详情 | 管理员输入 | 否 | 系统 |
-| submittedAt | 提交时间 | datetime | 否 | 首次/最近提交时间 | 系统生成 | 否 | 否 |
-| reviewedAt | 审核时间 | datetime | 否 | 最近审核时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 申请 ID | string | 是 | 入驻申请标识 | 系统生成 | 否 | 否 |
+| 账号 ID | string | 是 | 申请人账号 | 当前用户 | 是 | 否 |
+| 姓名 | string(2..50) | 是 | 证件姓名 | 用户输入 | 是 | 驳回后 |
+| 证件号码 | string | 是 | 加密保存、展示脱敏 | 用户输入 | 是 | 驳回后 |
+| 执业身份 | string(2..100) | 是 | 职称/身份 | 用户输入 | 是 | 驳回后 |
+| 擅长领域 | array | 是 | 标签 | 用户选择 | 是 | 是 |
+| 服务分类 | array | 是 | 至少一个启用分类 | 分类字典 | 是 | 是 |
+| 从业年限 | integer | 是 | 0..60 | 用户输入 | 是 | 是 |
+| 期望定价 | decimal(10,2) | 是 | 人民币单次价格 | 用户输入 | 是 | 驳回后 |
+| 申请状态 | enum | 是 | 状态 | draft / pending / approved / rejected | 是 | 系统 |
+| 驳回原因码 | enum | 条件 | 驳回时必填 | 原因字典 | 否 | 系统 |
+| 驳回说明 | string(500) | 条件 | 驳回详情 | 管理员输入 | 否 | 系统 |
+| 提交时间 | datetime | 否 | 首次/最近提交时间 | 系统生成 | 否 | 否 |
+| 审核时间 | datetime | 否 | 最近审核时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 ConsultantProfile
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| consultantId | 咨询师 ID | string | 是 | 档案所有者 | 系统生成 | 否 | 否 |
-| version | 档案版本 | integer | 是 | 单调递增 | 系统生成 | 否 | 否 |
-| displayName | 展示姓名 | string(2..50) | 是 | 对外名称 | 咨询师输入 | 是 | 再审 |
-| avatarFileId | 头像文件 ID | string | 是 | 已通过内容安全 | CredentialFile.id | 是 | 再审 |
-| practiceTitle | 执业身份 | string(2..100) | 是 | 对外职称 | 咨询师输入 | 是 | 再审 |
-| introduction | 个人简介 | string(20..2000) | 是 | 对外介绍 | 咨询师输入 | 是 | 是 |
-| serviceDescription | 服务说明 | string(20..2000) | 是 | 服务边界与方式 | 咨询师输入 | 是 | 是 |
-| categoryIds | 分类集合 | array | 是 | 至少一个启用分类 | 分类字典 | 是 | 再审 |
-| specialties | 擅长标签 | array | 是 | 1..10 个 | 标签字典 | 是 | 是 |
-| servicePrice | 服务价格 | decimal(10,2) | 是 | 单次人民币价格 | 咨询师输入 | 是 | 再审 |
-| reviewStatus | 审核状态 | enum | 是 | 版本状态 | draft / pending / approved / rejected | 是 | 系统 |
-| publishedVersion | 线上版本号 | integer | 否 | 当前公开版本 | 系统维护 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 咨询师 ID | string | 是 | 档案所有者 | 系统生成 | 否 | 否 |
+| 档案版本 | integer | 是 | 单调递增 | 系统生成 | 否 | 否 |
+| 展示姓名 | string(2..50) | 是 | 对外名称 | 咨询师输入 | 是 | 再审 |
+| 头像文件 ID | string | 是 | 已通过内容安全 | CredentialFile.id | 是 | 再审 |
+| 执业身份 | string(2..100) | 是 | 对外职称 | 咨询师输入 | 是 | 再审 |
+| 个人简介 | string(20..2000) | 是 | 对外介绍 | 咨询师输入 | 是 | 是 |
+| 服务说明 | string(20..2000) | 是 | 服务边界与方式 | 咨询师输入 | 是 | 是 |
+| 分类集合 | array | 是 | 至少一个启用分类 | 分类字典 | 是 | 再审 |
+| 擅长标签 | array | 是 | 1..10 个 | 标签字典 | 是 | 是 |
+| 服务价格 | decimal(10,2) | 是 | 单次人民币价格 | 咨询师输入 | 是 | 再审 |
+| 审核状态 | enum | 是 | 版本状态 | draft / pending / approved / rejected | 是 | 系统 |
+| 线上版本号 | integer | 否 | 当前公开版本 | 系统维护 | 否 | 否 |
 
 ### 5.3 CredentialFile / WeeklySlotTemplate
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| file.id | 文件 ID | string | 是 | 文件标识 | 系统生成 | 否 | 否 |
-| file.type | 文件用途 | enum | 是 | 资质类型 | idFront / idBack / license / certificate / avatar | 是 | 否 |
-| file.url | 存储地址 | string | 是 | 私有对象地址 | 上传服务 | 否 | 否 |
-| file.mimeType | MIME 类型 | enum | 是 | 文件格式 | image/jpeg / image/png / application/pdf | 否 | 否 |
-| file.sizeBytes | 文件大小 | integer | 是 | 最大 10 MiB | 上传服务 | 否 | 否 |
-| file.securityStatus | 安全状态 | enum | 是 | 内容检测结果 | pending / passed / blocked | 否 | 系统 |
-| template.weekday | 星期 | integer | 是 | 周几 | 1..7 | 是 | 是 |
-| template.startTime | 开始时间 | time | 是 | 30 分钟对齐 | 咨询师输入 | 是 | 是 |
-| template.endTime | 结束时间 | time | 是 | 晚于开始时间 | 咨询师输入 | 是 | 是 |
-| template.capacity | 默认容量 | integer | 是 | 每时段容量 | 1..10，默认 1 | 是 | 是 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 文件 ID | string | 是 | 文件标识 | 系统生成 | 否 | 否 |
+| 文件用途 | enum | 是 | 资质类型 | idFront / idBack / license / certificate / avatar | 是 | 否 |
+| 存储地址 | string | 是 | 私有对象地址 | 上传服务 | 否 | 否 |
+| MIME 类型 | enum | 是 | 文件格式 | image/jpeg / image/png / application/pdf | 否 | 否 |
+| 文件大小 | integer | 是 | 最大 10 MiB | 上传服务 | 否 | 否 |
+| 安全状态 | enum | 是 | 内容检测结果 | pending / passed / blocked | 否 | 系统 |
+| 星期 | integer | 是 | 周几 | 1..7 | 是 | 是 |
+| 开始时间 | time | 是 | 30 分钟对齐 | 咨询师输入 | 是 | 是 |
+| 结束时间 | time | 是 | 晚于开始时间 | 咨询师输入 | 是 | 是 |
+| 默认容量 | integer | 是 | 每时段容量 | 1..10，默认 1 | 是 | 是 |
 
 ---
 

@@ -1,7 +1,7 @@
 # agile-team-sdd
 
-SDD（Spec-Driven Development）技能套件的 **模板源**，覆盖 **BA → PM → 开发 → QA → 发布 → 复盘** 全流程，
-共 16 个 skill。
+SDD（Spec-Driven Development）技能套件的 **模板源**，覆盖 **BA → TL → PM → 开发 → QA → 发布 → 复盘** 全流程，
+共 17 个 skill。
 
 ```
 agile-team-sdd/
@@ -13,6 +13,7 @@ agile-team-sdd/
     ├── ba-grill-me-template/      # 拷问需求
     ├── ba-write-spec-template/    # 编写需求规格
     ├── ba-gen-facts-template/     # 生成事实文档
+    ├── tl-high-level-design-template/ # 迭代高阶技术设计（HLD）
     ├── dev-plan-template/         # 先写计划再实现
     ├── dev-build-template/        # 按四层 DDD 约定实现
     ├── dev-self-test-template/    # 开发自测
@@ -34,6 +35,7 @@ agile-team-sdd/
 | **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
 | | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
+| **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
 | | `dev-build` | 按四层 DDD 约定实现 |
 | | `dev-self-test` | 运行并修复开发自测 |

@@ -111,36 +111,36 @@ NEW
 
 ### 5.1 TimeSlot
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| id | 时段 ID | string | 是 | 时段标识 | 系统生成 | 否 | 否 |
-| consultantId | 咨询师 ID | string | 是 | 时段所有者 | 当前咨询师 | 是 | 否 |
-| startAt | 开始时间 | datetime | 是 | 时段起点 | 咨询师设置 | 是 | 未占用时 |
-| endAt | 结束时间 | datetime | 是 | startAt + 30 分钟 | 系统计算 | 否 | 否 |
-| durationMin | 时长 | number | 是 | 分钟 | 固定 30 | 是 | 否 |
-| capacity | 容量 | integer | 是 | 总容量 | 1..10，默认 1 | 是 | 未占用时 |
-| bookedCount | 已占数量 | integer | 是 | 有效订单占用数 | 系统计算 | 否 | 否 |
-| status | 状态 | enum | 是 | 开放状态 | open / disabled / booked | 是 | 系统/咨询师 |
-| source | 来源 | enum | 是 | 生成方式 | template / manual / override | 是 | 否 |
-| disabledReason | 停用原因 | string(200) | 条件 | 停用时必填 | 咨询师输入 | 否 | 是 |
-| version | 乐观锁版本 | integer | 是 | 防并发超卖 | 系统生成 | 否 | 否 |
-| createdAt | 创建时间 | datetime | 是 | 记录时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 时段 ID | string | 是 | 时段标识 | 系统生成 | 否 | 否 |
+| 咨询师 ID | string | 是 | 时段所有者 | 当前咨询师 | 是 | 否 |
+| 开始时间 | datetime | 是 | 时段起点 | 咨询师设置 | 是 | 未占用时 |
+| 结束时间 | datetime | 是 | startAt + 30 分钟 | 系统计算 | 否 | 否 |
+| 时长 | number | 是 | 分钟 | 固定 30 | 是 | 否 |
+| 容量 | integer | 是 | 总容量 | 1..10，默认 1 | 是 | 未占用时 |
+| 已占数量 | integer | 是 | 有效订单占用数 | 系统计算 | 否 | 否 |
+| 状态 | enum | 是 | 开放状态 | open / disabled / booked | 是 | 系统/咨询师 |
+| 来源 | enum | 是 | 生成方式 | template / manual / override | 是 | 否 |
+| 停用原因 | string(200) | 条件 | 停用时必填 | 咨询师输入 | 否 | 是 |
+| 乐观锁版本 | integer | 是 | 防并发超卖 | 系统生成 | 否 | 否 |
+| 创建时间 | datetime | 是 | 记录时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 SlotException / BatchScheduleCommand
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| exception.id | 例外 ID | string | 是 | 例外标识 | 系统生成 | 否 | 否 |
-| exception.consultantId | 咨询师 ID | string | 是 | 例外所有者 | 当前咨询师 | 是 | 否 |
-| exception.date | 例外日期 | date | 是 | 生效日期 | 咨询师输入 | 是 | 否 |
-| exception.startTime | 开始时间 | time | 否 | 空表示全天 | 咨询师输入 | 否 | 否 |
-| exception.endTime | 结束时间 | time | 否 | 空表示全天 | 咨询师输入 | 否 | 否 |
-| exception.type | 例外类型 | enum | 是 | 不可约原因 | leave / occupied / other | 是 | 否 |
-| exception.reason | 原因说明 | string(200) | 是 | 例外说明 | 咨询师输入 | 是 | 否 |
-| batch.dateFrom | 起始日期 | date | 是 | 批量范围 | 咨询师输入 | 是 | 否 |
-| batch.dateTo | 截止日期 | date | 是 | 最长 90 天 | 咨询师输入 | 是 | 否 |
-| batch.weekdays | 星期集合 | array | 是 | 生效星期 | 1..7 | 是 | 否 |
-| batch.mode | 批量模式 | enum | 是 | 操作类型 | add / replace / disable | 是 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 例外 ID | string | 是 | 例外标识 | 系统生成 | 否 | 否 |
+| 咨询师 ID | string | 是 | 例外所有者 | 当前咨询师 | 是 | 否 |
+| 例外日期 | date | 是 | 生效日期 | 咨询师输入 | 是 | 否 |
+| 开始时间 | time | 否 | 空表示全天 | 咨询师输入 | 否 | 否 |
+| 结束时间 | time | 否 | 空表示全天 | 咨询师输入 | 否 | 否 |
+| 例外类型 | enum | 是 | 不可约原因 | leave / occupied / other | 是 | 否 |
+| 原因说明 | string(200) | 是 | 例外说明 | 咨询师输入 | 是 | 否 |
+| 起始日期 | date | 是 | 批量范围 | 咨询师输入 | 是 | 否 |
+| 截止日期 | date | 是 | 最长 90 天 | 咨询师输入 | 是 | 否 |
+| 星期集合 | array | 是 | 生效星期 | 1..7 | 是 | 否 |
+| 批量模式 | enum | 是 | 操作类型 | add / replace / disable | 是 | 否 |
 
 ---
 

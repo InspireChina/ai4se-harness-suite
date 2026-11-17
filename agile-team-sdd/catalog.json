@@ -168,5 +168,18 @@
       ],
       "dependsOn": []
     }
+  ],
+  "tl": [
+    {
+      "name": "tl-high-level-design",
+      "description": "为当前迭代编写高阶技术设计（HLD / TRD），等待人工确认",
+      "when": "迭代规格齐备、进入 feature Plan 之前，需要定技术边界与跨模块契约时",
+      "produces": [
+        "docs/features/<迭代>/high-level-design.md"
+      ],
+      "dependsOn": [
+        "ba-write-spec"
+      ]
+    }
   ]
 }

@@ -9,12 +9,15 @@ docs/features/
 │   └── plan-{slug}.md
 └── iteration1/
     ├── README.md
+    ├── high-level-design.md   # 迭代高阶技术设计（HLD / TRD，人工确认）
     ├── ACC-account/
     │   ├── spec.md            # 业务规格
-    │   ├── plan.md            # 主技术方案（可选）
+    │   ├── plan.md            # 主技术方案（可选；HLD 确认后）
     │   └── plan-{slug}.md     # 多份方案时
-    └── plan-{slug}.md         # 迭代级方案（可选）
+    └── prototypes/            # 迭代原型（可选）
 ```
+
+约定：每个迭代目录应有 `high-level-design.md`；**确认前不得写 feature Plan**。
 
 | 编码 | 文件夹 | 含义 |
 |---|---|---|

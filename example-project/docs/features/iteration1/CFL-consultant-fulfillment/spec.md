@@ -117,48 +117,48 @@ NEW
 
 ### 5.1 BookingOrder 履约视图
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| orderId | 订单 ID | string | 是 | 预约标识 | BookingOrder.id | 否 | 否 |
-| consultantId | 咨询师 ID | string | 是 | 履约人 | BookingOrder | 否 | 否 |
-| userDisplayName | 用户展示名 | string | 是 | 订单用户 | 资料快照 | 否 | 否 |
-| topic | 咨询主题 | string | 是 | 订单主题 | BookingOrder | 否 | 否 |
-| slotStartAt | 预约开始时间 | datetime | 是 | 当前生效时段 | TimeSlot | 否 | 否 |
-| status | 订单状态 | enum | 是 | 履约状态 | pendingConfirm / confirmed / reschedulePending / inProgress / completed / cancelled | 否 | 系统 |
-| rejectReason | 拒绝原因 | enum | 条件 | 拒单原因 | unavailable / scopeMismatch / conflict / other | 拒绝时 | 否 |
-| rejectNote | 拒绝说明 | string(2..500) | 条件 | 补充说明 | 咨询师输入 | 拒绝时 | 否 |
-| confirmedAt | 确认时间 | datetime | 否 | 接单时间 | 系统生成 | 否 | 否 |
-| startedAt | 开始时间 | datetime | 否 | 实际开始时间 | 系统生成 | 否 | 否 |
-| completedAt | 完成时间 | datetime | 否 | 实际完成时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 订单 ID | string | 是 | 预约标识 | BookingOrder.id | 否 | 否 |
+| 咨询师 ID | string | 是 | 履约人 | BookingOrder | 否 | 否 |
+| 用户展示名 | string | 是 | 订单用户 | 资料快照 | 否 | 否 |
+| 咨询主题 | string | 是 | 订单主题 | BookingOrder | 否 | 否 |
+| 预约开始时间 | datetime | 是 | 当前生效时段 | TimeSlot | 否 | 否 |
+| 订单状态 | enum | 是 | 履约状态 | pendingConfirm / confirmed / reschedulePending / inProgress / completed / cancelled | 否 | 系统 |
+| 拒绝原因 | enum | 条件 | 拒单原因 | unavailable / scopeMismatch / conflict / other | 拒绝时 | 否 |
+| 拒绝说明 | string(2..500) | 条件 | 补充说明 | 咨询师输入 | 拒绝时 | 否 |
+| 确认时间 | datetime | 否 | 接单时间 | 系统生成 | 否 | 否 |
+| 开始时间 | datetime | 否 | 实际开始时间 | 系统生成 | 否 | 否 |
+| 完成时间 | datetime | 否 | 实际完成时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 ConsultSummary / RescheduleRequest
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| summary.id | 小结 ID | string | 是 | 小结标识 | 系统生成 | 否 | 否 |
-| summary.orderId | 订单 ID | string | 是 | 一单一份小结 | BookingOrder.id | 是 | 否 |
-| summary.summaryText | 咨询小结 | string(20..3000) | 是 | 对用户可见 | 咨询师输入 | 是 | 否 |
-| summary.recommendations | 后续建议 | string(0..2000) | 否 | 可选建议 | 咨询师输入 | 否 | 否 |
-| summary.createdAt | 提交时间 | datetime | 是 | 完成凭据 | 系统生成 | 否 | 否 |
-| reschedule.id | 改期申请 ID | string | 是 | 申请标识 | 系统生成 | 否 | 否 |
-| reschedule.orderId | 订单 ID | string | 是 | 关联订单 | BookingOrder.id | 是 | 否 |
-| reschedule.originalSlotId | 原时段 ID | string | 是 | 原预约档期 | TimeSlot.id | 是 | 否 |
-| reschedule.proposedSlotId | 新时段 ID | string | 是 | 候选档期 | TimeSlot.id | 是 | 否 |
-| reschedule.reason | 改期原因 | string(2..500) | 是 | 用户可见 | 咨询师输入 | 是 | 否 |
-| reschedule.status | 申请状态 | enum | 是 | 用户处理状态 | pending / accepted / rejected / expired | 是 | 系统 |
-| reschedule.expireAt | 确认截止时间 | datetime | 是 | 最晚为原时段前 2 小时 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 小结 ID | string | 是 | 小结标识 | 系统生成 | 否 | 否 |
+| 小结.订单 ID | string | 是 | 一单一份小结 | BookingOrder.id | 是 | 否 |
+| 咨询小结 | string(20..3000) | 是 | 对用户可见 | 咨询师输入 | 是 | 否 |
+| 后续建议 | string(0..2000) | 否 | 可选建议 | 咨询师输入 | 否 | 否 |
+| 提交时间 | datetime | 是 | 完成凭据 | 系统生成 | 否 | 否 |
+| 改期申请 ID | string | 是 | 申请标识 | 系统生成 | 否 | 否 |
+| 改期.订单 ID | string | 是 | 关联订单 | BookingOrder.id | 是 | 否 |
+| 原时段 ID | string | 是 | 原预约档期 | TimeSlot.id | 是 | 否 |
+| 新时段 ID | string | 是 | 候选档期 | TimeSlot.id | 是 | 否 |
+| 改期原因 | string(2..500) | 是 | 用户可见 | 咨询师输入 | 是 | 否 |
+| 申请状态 | enum | 是 | 用户处理状态 | pending / accepted / rejected / expired | 是 | 系统 |
+| 确认截止时间 | datetime | 是 | 最晚为原时段前 2 小时 | 系统生成 | 否 | 否 |
 
 ### 5.3 ConsultantDashboard
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| todayConsultationCount | 今日咨询数 | integer | 是 | 今日有效订单 | 系统聚合 | 否 | 否 |
-| monthOrderCount | 本月订单数 | integer | 是 | 本月有效订单 | 系统聚合 | 否 | 否 |
-| averageRating | 平均评分 | decimal(2,1) | 是 | 已发布评价均值 | 0.0..5.0 | 否 | 否 |
-| pendingActionCount | 待处理数 | integer | 是 | 待确认+待履约 | 系统聚合 | 否 | 否 |
-| todayTasks | 今日待办 | array | 是 | 按开始时间排序 | 系统聚合 | 否 | 否 |
-| announcements | 公告列表 | array | 是 | 有效平台公告 | 管理端发布 | 否 | 否 |
-| generatedAt | 生成时间 | datetime | 是 | 指标口径时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 今日咨询数 | integer | 是 | 今日有效订单 | 系统聚合 | 否 | 否 |
+| 本月订单数 | integer | 是 | 本月有效订单 | 系统聚合 | 否 | 否 |
+| 平均评分 | decimal(2,1) | 是 | 已发布评价均值 | 0.0..5.0 | 否 | 否 |
+| 待处理数 | integer | 是 | 待确认+待履约 | 系统聚合 | 否 | 否 |
+| 今日待办 | array | 是 | 按开始时间排序 | 系统聚合 | 否 | 否 |
+| 公告列表 | array | 是 | 有效平台公告 | 管理端发布 | 否 | 否 |
+| 生成时间 | datetime | 是 | 指标口径时间 | 系统生成 | 否 | 否 |
 
 ---
 

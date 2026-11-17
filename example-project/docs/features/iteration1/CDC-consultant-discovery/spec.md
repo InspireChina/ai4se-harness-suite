@@ -114,50 +114,50 @@ NEW
 
 ### 5.1 ConsultantSearchQuery
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| keyword | 关键词 | string | 否 | 姓名/领域/服务词 | 用户输入 | 否 | — |
-| categoryId | 分类 | string | 否 | 咨询分类 | 分类字典 | 否 | — |
-| specialtyTags | 擅长标签 | array | 否 | 多标签筛选 | 标签字典 | 否 | — |
-| priceMin/Max | 价格区间 | number | 否 | 筛选 | 用户输入 | 否 | — |
-| minRating | 最低评分 | number | 否 | 筛选 | 用户输入 | 否 | — |
-| availableDate | 可约日期 | date | 否 | 指定日期有开放时段 | 用户输入 | 否 | — |
-| cityCode | 城市 | string | 否 | 咨询师服务城市 | 城市字典 | 否 | — |
-| sortBy | 排序 | enum | 否 | 排序字段 | score / bookingCount / priceAsc / priceDesc | 否 | — |
-| pageNo | 页码 | integer | 否 | 从 1 开始 | 默认 1 | 否 | — |
-| pageSize | 页大小 | number | 否 | 分页 | 默认 20 | 否 | — |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 关键词 | string | 否 | 姓名/领域/服务词 | 用户输入 | 否 | — |
+| 分类 | string | 否 | 咨询分类 | 分类字典 | 否 | — |
+| 擅长标签 | array | 否 | 多标签筛选 | 标签字典 | 否 | — |
+| 价格区间 | number | 否 | 筛选 | 用户输入 | 否 | — |
+| 最低评分 | number | 否 | 筛选 | 用户输入 | 否 | — |
+| 可约日期 | date | 否 | 指定日期有开放时段 | 用户输入 | 否 | — |
+| 城市 | string | 否 | 咨询师服务城市 | 城市字典 | 否 | — |
+| 排序 | enum | 否 | 排序字段 | score / bookingCount / priceAsc / priceDesc | 否 | — |
+| 页码 | integer | 否 | 从 1 开始 | 默认 1 | 否 | — |
+| 页大小 | number | 否 | 分页 | 默认 20 | 否 | — |
 
 ### 5.2 ConsultantPublicProfile
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| consultantId | 咨询师 ID | string | 是 | 公开主页标识 | Consultant.id | 否 | 否 |
-| displayName | 展示姓名 | string | 是 | 对外姓名 | 已审核档案 | 否 | 否 |
-| avatarUrl | 头像 | string | 是 | 安全校验后的头像 | 已审核档案 | 否 | 否 |
-| practiceTitle | 执业身份 | string | 是 | 职称/身份 | 已审核档案 | 否 | 否 |
-| introduction | 个人简介 | string | 是 | 对外简介 | 已审核档案 | 否 | 否 |
-| categoryIds | 分类集合 | array | 是 | 启用分类 | 已审核档案 | 否 | 否 |
-| specialties | 擅长标签 | array | 是 | 对外标签 | 已审核档案 | 否 | 否 |
-| servicePrice | 单次价格 | decimal(10,2) | 是 | 人民币含税展示价 | 已审核档案 | 否 | 否 |
-| yearsOfPractice | 从业年限 | integer | 是 | 非负整数 | 已审核档案 | 否 | 否 |
-| averageRating | 平均评分 | decimal(2,1) | 是 | 已发布评价均值 | 0.0..5.0 | 否 | 否 |
-| reviewCount | 评价数 | integer | 是 | 已发布评价数量 | 系统聚合 | 否 | 否 |
-| bookingCount | 已完成预约数 | integer | 是 | 排序指标 | 系统聚合 | 否 | 否 |
-| certificationStatus | 认证标识 | enum | 是 | 认证展示 | verified | 否 | 否 |
-| isFavorited | 是否已收藏 | boolean | 是 | 登录用户维度 | 系统计算 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 咨询师 ID | string | 是 | 公开主页标识 | Consultant.id | 否 | 否 |
+| 展示姓名 | string | 是 | 对外姓名 | 已审核档案 | 否 | 否 |
+| 头像 | string | 是 | 安全校验后的头像 | 已审核档案 | 否 | 否 |
+| 执业身份 | string | 是 | 职称/身份 | 已审核档案 | 否 | 否 |
+| 个人简介 | string | 是 | 对外简介 | 已审核档案 | 否 | 否 |
+| 分类集合 | array | 是 | 启用分类 | 已审核档案 | 否 | 否 |
+| 擅长标签 | array | 是 | 对外标签 | 已审核档案 | 否 | 否 |
+| 单次价格 | decimal(10,2) | 是 | 人民币含税展示价 | 已审核档案 | 否 | 否 |
+| 从业年限 | integer | 是 | 非负整数 | 已审核档案 | 否 | 否 |
+| 平均评分 | decimal(2,1) | 是 | 已发布评价均值 | 0.0..5.0 | 否 | 否 |
+| 评价数 | integer | 是 | 已发布评价数量 | 系统聚合 | 否 | 否 |
+| 已完成预约数 | integer | 是 | 排序指标 | 系统聚合 | 否 | 否 |
+| 认证标识 | enum | 是 | 认证展示 | verified | 否 | 否 |
+| 是否已收藏 | boolean | 是 | 登录用户维度 | 系统计算 | 否 | 否 |
 
 ### 5.3 ReviewSummary / AvailableSlot
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| review.id | 评价 ID | string | 是 | 公开评价标识 | Review.id | 否 | 否 |
-| review.rating | 总评分 | integer | 是 | 星级 | 1..5 | 否 | 否 |
-| review.content | 评价内容 | string | 否 | 审核后公开文本 | Review | 否 | 否 |
-| review.createdAt | 评价时间 | datetime | 是 | 展示时间 | Review | 否 | 否 |
-| slot.id | 时段 ID | string | 是 | 下单引用 | TimeSlot.id | 否 | 否 |
-| slot.startAt | 开始时间 | datetime | 是 | 按用户时区展示 | TimeSlot | 否 | 否 |
-| slot.endAt | 结束时间 | datetime | 是 | 时段结束时间 | TimeSlot | 否 | 否 |
-| slot.remainingCapacity | 剩余容量 | integer | 是 | 可下单数量 | 系统计算 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 评价 ID | string | 是 | 公开评价标识 | Review.id | 否 | 否 |
+| 总评分 | integer | 是 | 星级 | 1..5 | 否 | 否 |
+| 评价内容 | string | 否 | 审核后公开文本 | Review | 否 | 否 |
+| 评价时间 | datetime | 是 | 展示时间 | Review | 否 | 否 |
+| 时段 ID | string | 是 | 下单引用 | TimeSlot.id | 否 | 否 |
+| 开始时间 | datetime | 是 | 按用户时区展示 | TimeSlot | 否 | 否 |
+| 结束时间 | datetime | 是 | 时段结束时间 | TimeSlot | 否 | 否 |
+| 剩余容量 | integer | 是 | 可下单数量 | 系统计算 | 否 | 否 |
 
 ---
 

@@ -16,5 +16,7 @@
 | 8 | `08-ddd-converter.md` | Infrastructure | PO ⟷ Domain 转换器模版 |
 | 9 | `09-ddd-po-mapper.md` | Infrastructure | PO 与 Mapper 模版 |
 | 10 | `10-global-exception-handler.md` | Infrastructure | 全局异常处理模版 |
+| — | `adr.md` | 文档 | ADR 正文模板（落盘到 `docs/facts/tech-topic/`） |
 
 > 模版里的包名请统一替换成实际项目的包名后再复制使用。
+

@@ -119,44 +119,44 @@ NEW
 
 ### 5.1 Account
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| id | ID | string | 是 | 账号唯一标识 | 系统生成 | 否 | 否 |
-| phone | 手机号 | string(11) | 是 | 登录标识，库内加密 | 用户输入并规范化 | 是 | 否 |
-| roles | 角色集合 | array | 是 | 账号角色 | 枚举：USER / CONSULTANT / ADMIN | 是 | 是（系统） |
-| status | 状态 | enum | 是 | 账号状态 | active / disabled | 是 | 是（管理员） |
-| phoneVerifiedAt | 手机验证时间 | datetime | 是 | 最近一次成功验证时间 | 系统记录 | 否 | 否 |
-| lastLoginAt | 最近登录时间 | datetime | 否 | 成功登录时间 | 系统记录 | 否 | 否 |
-| disabledReason | 禁用原因 | string(200) | 条件 | 禁用时必填 | 管理员输入 | 否 | 是（管理员） |
-| createdAt | 创建时间 | datetime | 是 | 账号注册时间 | 系统生成 | 否 | 否 |
-| updatedAt | 更新时间 | datetime | 是 | 最近更新时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| ID | string | 是 | 账号唯一标识 | 系统生成 | 否 | 否 |
+| 手机号 | string(11) | 是 | 登录标识，库内加密 | 用户输入并规范化 | 是 | 否 |
+| 角色集合 | array | 是 | 账号角色 | 枚举：USER / CONSULTANT / ADMIN | 是 | 是（系统） |
+| 状态 | enum | 是 | 账号状态 | active / disabled | 是 | 是（管理员） |
+| 手机验证时间 | datetime | 是 | 最近一次成功验证时间 | 系统记录 | 否 | 否 |
+| 最近登录时间 | datetime | 否 | 成功登录时间 | 系统记录 | 否 | 否 |
+| 禁用原因 | string(200) | 条件 | 禁用时必填 | 管理员输入 | 否 | 是（管理员） |
+| 创建时间 | datetime | 是 | 账号注册时间 | 系统生成 | 否 | 否 |
+| 更新时间 | datetime | 是 | 最近更新时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 UserProfile
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| accountId | 账号 ID | string | 是 | 关联账号 | Account.id | 是 | 否 |
-| nickname | 昵称 | string(2..30) | 是 | 对外展示名 | 用户输入 | 是 | 是 |
-| avatarUrl | 头像地址 | string(500) | 否 | 已通过安全校验的图片 | 上传服务 | 否 | 是 |
-| email | 邮箱 | string(254) | 否 | 联系邮箱 | 用户输入 | 否 | 是 |
-| cityCode | 城市编码 | string(20) | 否 | 所在城市 | 城市字典 | 否 | 是 |
-| locale | 语言 | enum | 是 | 界面语言 | zh-CN | 是 | 是 |
-| profileUpdatedAt | 资料更新时间 | datetime | 是 | 资料最近修改时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 账号 ID | string | 是 | 关联账号 | Account.id | 是 | 否 |
+| 昵称 | string(2..30) | 是 | 对外展示名 | 用户输入 | 是 | 是 |
+| 头像地址 | string(500) | 否 | 已通过安全校验的图片 | 上传服务 | 否 | 是 |
+| 邮箱 | string(254) | 否 | 联系邮箱 | 用户输入 | 否 | 是 |
+| 城市编码 | string(20) | 否 | 所在城市 | 城市字典 | 否 | 是 |
+| 语言 | enum | 是 | 界面语言 | zh-CN | 是 | 是 |
+| 资料更新时间 | datetime | 是 | 资料最近修改时间 | 系统生成 | 否 | 否 |
 
 ### 5.3 FavoriteConsultant / AgreementConsent
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| favorite.id | 收藏 ID | string | 是 | 收藏记录标识 | 系统生成 | 否 | 否 |
-| favorite.accountId | 用户账号 ID | string | 是 | 收藏人 | 当前用户 | 是 | 否 |
-| favorite.consultantId | 咨询师 ID | string | 是 | 被收藏咨询师 | 用户选择 | 是 | 否 |
-| favorite.createdAt | 收藏时间 | datetime | 是 | 收藏发生时间 | 系统生成 | 否 | 否 |
-| consent.id | 同意记录 ID | string | 是 | 不可变记录 | 系统生成 | 否 | 否 |
-| consent.accountId | 用户账号 ID | string | 是 | 同意人 | 当前用户 | 是 | 否 |
-| consent.agreementType | 协议类型 | enum | 是 | 协议类别 | service / privacy | 是 | 否 |
-| consent.version | 协议版本 | string(20) | 是 | 同意的具体版本 | 协议中心 | 是 | 否 |
-| consent.acceptedAt | 同意时间 | datetime | 是 | 明示同意时间 | 系统生成 | 否 | 否 |
-| consent.sourceIp | 来源 IP | string(45) | 是 | 审计字段 | 请求上下文 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 收藏 ID | string | 是 | 收藏记录标识 | 系统生成 | 否 | 否 |
+| 收藏.用户账号 ID | string | 是 | 收藏人 | 当前用户 | 是 | 否 |
+| 咨询师 ID | string | 是 | 被收藏咨询师 | 用户选择 | 是 | 否 |
+| 收藏时间 | datetime | 是 | 收藏发生时间 | 系统生成 | 否 | 否 |
+| 同意记录 ID | string | 是 | 不可变记录 | 系统生成 | 否 | 否 |
+| 同意.用户账号 ID | string | 是 | 同意人 | 当前用户 | 是 | 否 |
+| 协议类型 | enum | 是 | 协议类别 | service / privacy | 是 | 否 |
+| 协议版本 | string(20) | 是 | 同意的具体版本 | 协议中心 | 是 | 否 |
+| 同意时间 | datetime | 是 | 明示同意时间 | 系统生成 | 否 | 否 |
+| 来源 IP | string(45) | 是 | 审计字段 | 请求上下文 | 否 | 否 |
 
 ---
 

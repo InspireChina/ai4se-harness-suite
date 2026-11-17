@@ -4,7 +4,7 @@
 # 用法：
 #   ./install.sh <目标项目目录> [--group <g>] [--skill <name>] [--list] [--dry-run] [--force] [--no-config]
 #
-#   --group <g>     只安装某一组（ba / dev / qa / pm），可重复
+#   --group <g>     只安装某一组（ba / dev / qa / pm / tl），可重复
 #   --skill <name>  只安装指定 skill，可重复
 #   --list          列出全部可用 skill 并退出
 #   --dry-run       只打印将要发生的改动，不写文件

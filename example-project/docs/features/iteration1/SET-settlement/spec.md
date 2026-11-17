@@ -111,44 +111,44 @@ NEW
 
 ### 5.1 IncomeOverview / SettlementBill
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| overview.todayIncome | 今日收入 | decimal(12,2) | 是 | 今日完成订单净收入 | 系统聚合 | 否 | 否 |
-| overview.monthIncome | 本月收入 | decimal(12,2) | 是 | 本月完成订单净收入 | 系统聚合 | 否 | 否 |
-| overview.pendingSettlement | 待结算金额 | decimal(12,2) | 是 | 未出账净收入 | 系统聚合 | 否 | 否 |
-| overview.withdrawableBalance | 可提现余额 | decimal(12,2) | 是 | 已结算未冻结余额 | 系统计算 | 否 | 否 |
-| overview.frozenBalance | 冻结金额 | decimal(12,2) | 是 | 提现处理中金额 | 系统计算 | 否 | 否 |
-| bill.id | 结算单 ID | string | 是 | 月账单标识 | 系统生成 | 否 | 否 |
-| bill.consultantId | 咨询师 ID | string | 是 | 账单所有者 | Consultant.id | 否 | 否 |
-| bill.period | 账期 | string(7) | 是 | 月度账期 | YYYY-MM | 否 | 否 |
-| bill.status | 账单状态 | enum | 是 | 结算状态 | calculating / issued / adjusted | 系统 | 系统 |
-| bill.grossAmount | 订单总额 | decimal(12,2) | 是 | 成交合计 | 明细汇总 | 否 | 否 |
-| bill.platformFee | 服务费 | decimal(12,2) | 是 | 平台佣金 | 明细汇总 | 否 | 否 |
-| bill.refundAmount | 退款金额 | decimal(12,2) | 是 | 本期退款 | 明细汇总 | 否 | 否 |
-| bill.netAmount | 应结金额 | decimal(12,2) | 是 | gross-fee-refund | 系统计算 | 否 | 否 |
-| bill.issuedAt | 出账时间 | datetime | 否 | 账单生成完成时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 今日收入 | decimal(12,2) | 是 | 今日完成订单净收入 | 系统聚合 | 否 | 否 |
+| 本月收入 | decimal(12,2) | 是 | 本月完成订单净收入 | 系统聚合 | 否 | 否 |
+| 待结算金额 | decimal(12,2) | 是 | 未出账净收入 | 系统聚合 | 否 | 否 |
+| 可提现余额 | decimal(12,2) | 是 | 已结算未冻结余额 | 系统计算 | 否 | 否 |
+| 冻结金额 | decimal(12,2) | 是 | 提现处理中金额 | 系统计算 | 否 | 否 |
+| 结算单 ID | string | 是 | 月账单标识 | 系统生成 | 否 | 否 |
+| 咨询师 ID | string | 是 | 账单所有者 | Consultant.id | 否 | 否 |
+| 账期 | string(7) | 是 | 月度账期 | YYYY-MM | 否 | 否 |
+| 账单状态 | enum | 是 | 结算状态 | calculating / issued / adjusted | 系统 | 系统 |
+| 订单总额 | decimal(12,2) | 是 | 成交合计 | 明细汇总 | 否 | 否 |
+| 服务费 | decimal(12,2) | 是 | 平台佣金 | 明细汇总 | 否 | 否 |
+| 退款金额 | decimal(12,2) | 是 | 本期退款 | 明细汇总 | 否 | 否 |
+| 应结金额 | decimal(12,2) | 是 | gross-fee-refund | 系统计算 | 否 | 否 |
+| 出账时间 | datetime | 否 | 账单生成完成时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 SettlementLine / WithdrawalRequest
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| line.id | 明细 ID | string | 是 | 结算明细标识 | 系统生成 | 否 | 否 |
-| line.billId | 结算单 ID | string | 是 | 所属账单 | SettlementBill.id | 否 | 否 |
-| line.orderId | 订单 ID | string | 是 | 来源订单 | BookingOrder.id | 否 | 否 |
-| line.completedAt | 完成时间 | datetime | 是 | 归属账期依据 | BookingOrder | 否 | 否 |
-| line.grossAmount | 订单金额 | decimal(10,2) | 是 | 支付成功金额 | 订单快照 | 否 | 否 |
-| line.feeRateVersion | 费率版本 | string | 是 | 订单适用费率 | FeeRateVersion | 否 | 否 |
-| line.platformFee | 服务费 | decimal(10,2) | 是 | 按费率计算 | 系统计算 | 否 | 否 |
-| line.netAmount | 净收入 | decimal(10,2) | 是 | 可结算金额 | 系统计算 | 否 | 否 |
-| withdrawal.id | 提现单 ID | string | 是 | 提现标识 | 系统生成 | 否 | 否 |
-| withdrawal.amount | 提现金额 | decimal(12,2) | 是 | 大于 0 | 咨询师输入 | 是 | 否 |
-| withdrawal.accountSnapshot | 收款账户快照 | object | 是 | 脱敏展示、加密存储 | 已验证账户 | 是 | 否 |
-| withdrawal.status | 提现状态 | enum | 是 | 处理状态 | pending / processing / success / failed | 是 | 系统 |
-| withdrawal.gatewayTradeNo | 渠道流水号 | string | 否 | 出款凭据 | 支付网关 | 否 | 否 |
-| withdrawal.failureCode | 失败码 | string | 条件 | 失败原因编码 | 支付网关 | 否 | 否 |
-| withdrawal.failureReason | 失败原因 | string(500) | 条件 | 用户可见原因 | 系统映射 | 否 | 否 |
-| withdrawal.createdAt | 申请时间 | datetime | 是 | 提交时间 | 系统生成 | 否 | 否 |
-| withdrawal.completedAt | 完成时间 | datetime | 否 | 成功/失败时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 明细 ID | string | 是 | 结算明细标识 | 系统生成 | 否 | 否 |
+| 结算单 ID | string | 是 | 所属账单 | SettlementBill.id | 否 | 否 |
+| 订单 ID | string | 是 | 来源订单 | BookingOrder.id | 否 | 否 |
+| 明细.完成时间 | datetime | 是 | 归属账期依据 | BookingOrder | 否 | 否 |
+| 订单金额 | decimal(10,2) | 是 | 支付成功金额 | 订单快照 | 否 | 否 |
+| 费率版本 | string | 是 | 订单适用费率 | FeeRateVersion | 否 | 否 |
+| 服务费 | decimal(10,2) | 是 | 按费率计算 | 系统计算 | 否 | 否 |
+| 净收入 | decimal(10,2) | 是 | 可结算金额 | 系统计算 | 否 | 否 |
+| 提现单 ID | string | 是 | 提现标识 | 系统生成 | 否 | 否 |
+| 提现金额 | decimal(12,2) | 是 | 大于 0 | 咨询师输入 | 是 | 否 |
+| 收款账户快照 | object | 是 | 脱敏展示、加密存储 | 已验证账户 | 是 | 否 |
+| 提现状态 | enum | 是 | 处理状态 | pending / processing / success / failed | 是 | 系统 |
+| 渠道流水号 | string | 否 | 出款凭据 | 支付网关 | 否 | 否 |
+| 失败码 | string | 条件 | 失败原因编码 | 支付网关 | 否 | 否 |
+| 失败原因 | string(500) | 条件 | 用户可见原因 | 系统映射 | 否 | 否 |
+| 申请时间 | datetime | 是 | 提交时间 | 系统生成 | 否 | 否 |
+| 提现.完成时间 | datetime | 否 | 成功/失败时间 | 系统生成 | 否 | 否 |
 
 ---
 

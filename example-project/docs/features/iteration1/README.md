@@ -3,7 +3,8 @@
 > 状态：**v0.1**（字段、规则、验收与原型已完成）  
 > 日期：2026-11-16  
 > 原型：独立 Vite Demo（Element Plus），见 [`prototypes/`](./prototypes/)（端口 5174）  
-> **实现**：业务代码已清空为工程骨架；请按各 feature 的 plan 重新落地（见 `_chores/plan-20261117-purge-demo-impl-for-iteration1.md`）。
+> **实现**：业务代码已清空为工程骨架；请按各 feature 的 plan 重新落地（见 `_chores/plan-20261117-purge-demo-impl-for-iteration1.md`）。  
+> **高阶设计**：[high-level-design.md](./high-level-design.md) — **确认前不得写 feature Plan**。
 
 ## 1. 产品概述
 
@@ -26,13 +27,14 @@
 | ADM | [ADM-admin-ops/spec.md](./ADM-admin-ops/spec.md) | REQ-013～017 | 管理员 | v0.1 |
 | PLT | [PLT-platform-capability/spec.md](./PLT-platform-capability/spec.md) | §6.2～6.6 | 横切 | v0.1 |
 
-## 3. 迭代级 Plan
+## 3. 高阶设计与迭代级 Plan
 
-| Plan | 说明 |
+| 文档 | 说明 |
 |---|---|
-| [plan-20261116-iteration1-feature-skeletons.md](./plan-20261116-iteration1-feature-skeletons.md) | 特性骨架 |
-| [plan-20261116-iteration1-prototypes-and-specs.md](./plan-20261116-iteration1-prototypes-and-specs.md) | 原型与规格 |
-| [plan-20261116-iteration1-prototypes-vite.md](./plan-20261116-iteration1-prototypes-vite.md) | Vite 原型 |
+| [high-level-design.md](./high-level-design.md) | 本迭代 HLD / TRD（人工确认闸门） |
+| [plan-20261116-iteration1-feature-skeletons.md](../_chores/plan-20261116-iteration1-feature-skeletons.md) | 特性骨架 |
+| [plan-20261116-iteration1-prototypes-and-specs.md](../_chores/plan-20261116-iteration1-prototypes-and-specs.md) | 原型与规格 |
+| [plan-20261116-iteration1-prototypes-vite.md](../_chores/plan-20261116-iteration1-prototypes-vite.md) | Vite 原型 |
 
 横切 / 无 feature 归属的方案见 [`../_chores/`](../_chores/)。
 

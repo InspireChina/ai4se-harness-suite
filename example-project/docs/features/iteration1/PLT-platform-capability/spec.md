@@ -122,60 +122,60 @@ NEW
 
 ### 5.1 Notification / DeliveryAttempt
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| notification.id | 通知 ID | string | 是 | 消息标识 | 系统生成 | 否 | 否 |
-| notification.recipientId | 接收人 ID | string | 是 | 消息所有者 | 业务事件 | 是 | 否 |
-| notification.eventType | 事件类型 | enum | 是 | 业务节点 | orderPlaced / paid / confirmed / reminder / reviewReminder / governance | 是 | 否 |
-| notification.title | 标题 | string(1..100) | 是 | 站内信标题 | 模板渲染 | 是 | 否 |
-| notification.content | 内容 | string(1..2000) | 是 | 站内信正文 | 模板渲染 | 是 | 否 |
-| notification.businessType | 业务类型 | string | 是 | 跳转对象类型 | 系统事件 | 是 | 否 |
-| notification.businessId | 业务 ID | string | 是 | 跳转对象 ID | 系统事件 | 是 | 否 |
-| notification.readAt | 已读时间 | datetime | 否 | 空为未读 | 用户操作 | 否 | 系统 |
-| notification.createdAt | 创建时间 | datetime | 是 | 发送时间 | 系统生成 | 否 | 否 |
-| delivery.channel | 渠道 | enum | 是 | 投递渠道 | inbox / sms | 是 | 否 |
-| delivery.status | 投递状态 | enum | 是 | 渠道结果 | pending / success / failed | 是 | 系统 |
-| delivery.attemptCount | 尝试次数 | integer | 是 | 已尝试次数 | 0..3 | 否 | 系统 |
-| delivery.nextRetryAt | 下次重试时间 | datetime | 否 | 退避时间 | 系统计算 | 否 | 系统 |
-| delivery.failureCode | 失败码 | string | 否 | 渠道错误 | 供应商 | 否 | 系统 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 通知 ID | string | 是 | 消息标识 | 系统生成 | 否 | 否 |
+| 接收人 ID | string | 是 | 消息所有者 | 业务事件 | 是 | 否 |
+| 事件类型 | enum | 是 | 业务节点 | orderPlaced / paid / confirmed / reminder / reviewReminder / governance | 是 | 否 |
+| 标题 | string(1..100) | 是 | 站内信标题 | 模板渲染 | 是 | 否 |
+| 内容 | string(1..2000) | 是 | 站内信正文 | 模板渲染 | 是 | 否 |
+| 业务类型 | string | 是 | 跳转对象类型 | 系统事件 | 是 | 否 |
+| 业务 ID | string | 是 | 跳转对象 ID | 系统事件 | 是 | 否 |
+| 已读时间 | datetime | 否 | 空为未读 | 用户操作 | 否 | 系统 |
+| 创建时间 | datetime | 是 | 发送时间 | 系统生成 | 否 | 否 |
+| 渠道 | enum | 是 | 投递渠道 | inbox / sms | 是 | 否 |
+| 投递状态 | enum | 是 | 渠道结果 | pending / success / failed | 是 | 系统 |
+| 尝试次数 | integer | 是 | 已尝试次数 | 0..3 | 否 | 系统 |
+| 下次重试时间 | datetime | 否 | 退避时间 | 系统计算 | 否 | 系统 |
+| 失败码 | string | 否 | 渠道错误 | 供应商 | 否 | 系统 |
 
 ### 5.2 PaymentCallback / FeeRateVersion
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| callback.id | 记录 ID | string | 是 | 内部标识 | 系统生成 | 否 | 否 |
-| callback.callbackId | 回调单号 | string | 是 | 全局幂等键 | 网关 | 是 | 否 |
-| callback.type | 回调类型 | enum | 是 | 业务类型 | payment / refund / withdrawal | 是 | 否 |
-| callback.gateway | 网关 | enum | 是 | 渠道来源 | wechat / alipay | 是 | 否 |
-| callback.businessId | 业务单 ID | string | 是 | 支付/退款/提现单 | 回调载荷 | 是 | 否 |
-| callback.amount | 金额 | decimal(12,2) | 是 | 回调金额 | 网关 | 是 | 否 |
-| callback.signatureValid | 验签结果 | boolean | 是 | 是否通过 | 系统校验 | 否 | 否 |
-| callback.processStatus | 处理状态 | enum | 是 | 处理结果 | received / processed / rejected | 是 | 系统 |
-| callback.receivedAt | 接收时间 | datetime | 是 | 首次接收 | 系统生成 | 否 | 否 |
-| fee.version | 费率版本 | string | 是 | 唯一版本号 | 管理配置 | 是 | 否 |
-| fee.rate | 服务费率 | decimal(5,4) | 是 | 0..1 | 合同配置 | 是 | 否 |
-| fee.effectiveAt | 生效时间 | datetime | 是 | 生效点 | 管理配置 | 是 | 否 |
-| fee.expireAt | 失效时间 | datetime | 否 | 下一版本生效点 | 系统维护 | 否 | 系统 |
-| fee.createdBy | 创建人 | string | 是 | 管理员 ID | 系统上下文 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 记录 ID | string | 是 | 内部标识 | 系统生成 | 否 | 否 |
+| 回调单号 | string | 是 | 全局幂等键 | 网关 | 是 | 否 |
+| 回调类型 | enum | 是 | 业务类型 | payment / refund / withdrawal | 是 | 否 |
+| 网关 | enum | 是 | 渠道来源 | wechat / alipay | 是 | 否 |
+| 业务单 ID | string | 是 | 支付/退款/提现单 | 回调载荷 | 是 | 否 |
+| 金额 | decimal(12,2) | 是 | 回调金额 | 网关 | 是 | 否 |
+| 验签结果 | boolean | 是 | 是否通过 | 系统校验 | 否 | 否 |
+| 处理状态 | enum | 是 | 处理结果 | received / processed / rejected | 是 | 系统 |
+| 接收时间 | datetime | 是 | 首次接收 | 系统生成 | 否 | 否 |
+| 费率版本 | string | 是 | 唯一版本号 | 管理配置 | 是 | 否 |
+| 服务费率 | decimal(5,4) | 是 | 0..1 | 合同配置 | 是 | 否 |
+| 生效时间 | datetime | 是 | 生效点 | 管理配置 | 是 | 否 |
+| 失效时间 | datetime | 否 | 下一版本生效点 | 系统维护 | 否 | 系统 |
+| 创建人 | string | 是 | 管理员 ID | 系统上下文 | 否 | 否 |
 
 ### 5.3 AuditLog / RateLimitPolicy / DataRequest
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---|---:|---:|
-| audit.id | 日志 ID | string | 是 | 审计标识 | 系统生成 | 否 | 否 |
-| audit.operatorId | 操作人 | string | 是 | 用户/管理员/系统 | 上下文 | 否 | 否 |
-| audit.action | 动作编码 | string | 是 | 关键操作 | 系统记录 | 否 | 否 |
-| audit.targetType/id | 对象类型/ID | string | 是 | 操作对象 | 系统记录 | 否 | 否 |
-| audit.result | 结果 | enum | 是 | 执行结果 | success / failed | 否 | 否 |
-| audit.ipAddress | 来源 IP | string(45) | 是 | 安全审计 | 请求上下文 | 否 | 否 |
-| audit.traceId | 链路追踪 ID | string | 是 | 全链路关联 | 系统生成 | 否 | 否 |
-| audit.createdAt | 操作时间 | datetime | 是 | 发生时间 | 系统生成 | 否 | 否 |
-| rateLimit.key | 策略键 | string | 是 | 接口/主体维度 | 配置 | 是 | 否 |
-| rateLimit.limit | 限额 | integer | 是 | 窗口内次数 | 配置 | 是 | 是 |
-| rateLimit.windowSec | 窗口秒数 | integer | 是 | 统计窗口 | 配置 | 是 | 是 |
-| dataRequest.type | 数据请求类型 | enum | 是 | 隐私请求 | export / cancellation | 是 | 否 |
-| dataRequest.status | 处理状态 | enum | 是 | 请求进度 | pending / processing / completed / rejected | 是 | 系统 |
-| dataRequest.completedAt | 完成时间 | datetime | 否 | 完成节点 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 日志 ID | string | 是 | 审计标识 | 系统生成 | 否 | 否 |
+| 操作人 | string | 是 | 用户/管理员/系统 | 上下文 | 否 | 否 |
+| 动作编码 | string | 是 | 关键操作 | 系统记录 | 否 | 否 |
+| 对象类型/ID | string | 是 | 操作对象 | 系统记录 | 否 | 否 |
+| 结果 | enum | 是 | 执行结果 | success / failed | 否 | 否 |
+| 来源 IP | string(45) | 是 | 安全审计 | 请求上下文 | 否 | 否 |
+| 链路追踪 ID | string | 是 | 全链路关联 | 系统生成 | 否 | 否 |
+| 操作时间 | datetime | 是 | 发生时间 | 系统生成 | 否 | 否 |
+| 策略键 | string | 是 | 接口/主体维度 | 配置 | 是 | 否 |
+| 限额 | integer | 是 | 窗口内次数 | 配置 | 是 | 是 |
+| 窗口秒数 | integer | 是 | 统计窗口 | 配置 | 是 | 是 |
+| 数据请求类型 | enum | 是 | 隐私请求 | export / cancellation | 是 | 否 |
+| 处理状态 | enum | 是 | 请求进度 | pending / processing / completed / rejected | 是 | 系统 |
+| 完成时间 | datetime | 否 | 完成节点 | 系统生成 | 否 | 否 |
 
 ---
 

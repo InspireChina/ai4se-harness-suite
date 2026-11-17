@@ -26,7 +26,7 @@
 
 | 模块 | 目录 | 目的 | 形态 |
 |---|---|---|---|
-| **SDD 技能套件** | [`agile-team-sdd/`](agile-team-sdd/) | 团队统一的开发流程 skill，16 个覆盖 BA→PM→开发→QA→发布→复盘全流程。模板带占位符，可安装到任意项目 | skill + 安装脚本 |
+| **SDD 技能套件** | [`agile-team-sdd/`](agile-team-sdd/) | 团队统一的开发流程 skill，17 个覆盖 BA→TL→PM→开发→QA→发布→复盘全流程。模板带占位符，可安装到任意项目 | skill + 安装脚本 |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/) | 为任意项目铺好工程底座：`AGENTS.md`（架构与工程规范）+ `docs/` 文档骨架 + `opencode.jsonc` | skill + 模板 + 脚本 |
 | **工具链安装器** | [`tool-chain-installer/`](tool-chain-installer/) | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态 | skill + 工具清单 + 脚本 |
 | **团队工作流指南** | [`team-workflow-guide/index.html`](team-workflow-guide/index.html) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门 | 文档 |
@@ -42,7 +42,7 @@
         ┌───────────────────────┼───────────────────────┐
         │                       │                       │
  harness-installer       agile-team-sdd       tool-chain-installer
-  AGENTS.md 规范          16 个 SDD skill        MCP 工具链
+  AGENTS.md 规范          17 个 SDD skill        MCP 工具链
   docs/ 文档骨架          BA·Dev·QA·PM 全流程
         │                       │                       │
         └───────────────────────┼───────────────────────┘
@@ -52,13 +52,14 @@
                      （参考实现 · 已装好全套）
 ```
 
-## SDD 技能套件（16 个）
+## SDD 技能套件（17 个）
 
 | 组 | Skill | 作用 |
 |---|---|---|
 | **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
 | | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
+| **TL** | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案，等待人工确认 |
 | | `dev-build` | 按四层 DDD 约定实现 |
 | | `dev-self-test` | 运行并修复开发自测 |
@@ -78,10 +79,11 @@
 ba-grill-me → ba-write-spec → pm-estimate
                     ↓
         ┌───────────┴───────────┐
-   dev-plan（人工确认）    qa-write-cases   ← 规格确认后并行
+ tl-high-level-design     qa-write-cases   ← 规格确认后并行
+   （HLD 人工确认）
         └───────────┬───────────┘
                     ↓
-              dev-build → dev-self-test
+              dev-plan（人工确认）→ dev-build → dev-self-test
                     ↓
       ba-gen-facts / dev-code-review / dev-ui-review
                     ↓
@@ -101,7 +103,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 ```bash
 cd example-project
 cat AGENTS.md          # 一份填满的工程规范范本
-ls .agents/skills/      # 已安装的 16 个 SDD skills
+ls .agents/skills/      # 已安装的 17 个 SDD skills
 ```
 
 ### 装到自己的新项目
@@ -138,7 +140,7 @@ node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browse
 ```
 team-harness-suite/
 ├── AGENTS.md             # 本仓库的架构与工程规范（改代码前先读）
-├── agile-team-sdd/       # SDD 技能套件（16 个模板 + catalog.json + 安装脚本）
+├── agile-team-sdd/       # SDD 技能套件（17 个模板 + catalog.json + 安装脚本）
 ├── harness-installer/    # AGENTS.md / docs 骨架初始化
 ├── tool-chain-installer/ # MCP 工具链安装
 ├── team-workflow-guide/  # 团队流程与角色手册
@@ -164,7 +166,7 @@ team-harness-suite/
 
 | 模块 | 状态 |
 |---|---|
-| `agile-team-sdd/` | ✅ 可用（16 个 skill） |
+| `agile-team-sdd/` | ✅ 可用（17 个 skill） |
 | `harness-installer/` | ✅ 可用（`AGENTS.md` 模板含 TODO，需人工补全） |
 | `tool-chain-installer/` | ✅ 可用 |
 | `team-workflow-guide/` | ✅ 可用 |

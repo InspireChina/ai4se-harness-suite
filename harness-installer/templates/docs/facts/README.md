@@ -10,7 +10,7 @@
 | `db-schema.md` | 数据库表结构与索引说明 |
 | `domain-model.md` | 领域模型：聚合、实体、值对象、关系 |
 | `business/` | 业务事实（流程等） |
-| `tech-topic/` | 技术专题（鉴权、状态机、业务规则、数据字典……） |
+| `tech-topic/` | 技术专题 / **ADR 正文** / 实现说明（写法见 `docs/standards/adr.md`） |
 
 ## 维护规则
 

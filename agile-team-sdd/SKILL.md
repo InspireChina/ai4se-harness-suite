@@ -1,6 +1,6 @@
 ---
 name: agile-team-sdd
-description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开发/QA/PM 全流程）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
+description: 安装 Agile Team SDD 技能套件（17 个 skill，覆盖 BA/TL/开发/QA/PM 全流程）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
 ---
 
 # Agile Team SDD：安装技能套件
@@ -8,7 +8,7 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 本目录是 **SDD（Spec-Driven Development）技能套件的模板源**。
 `skills/` 下每个子目录是一份带占位符的 `SKILL.md`，需要先渲染成目标项目的真实路径，再安装过去。
 
-## 技能清单（16 个）
+## 技能清单（17 个）
 
 完整元数据见 [`catalog.json`](catalog.json)。
 
@@ -40,6 +40,12 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 | `qa-run-e2e` | 运行 E2E 用例集并定位失败 | 验收前，或用例失败排查 |
 | `qa-write-manual-plan` | 编写手动测试与冒烟用例计划 | 自动化覆盖不到的场景 / 发版前 |
 
+### TL — 技术领导
+
+| Skill | 作用 | 触发时机 |
+|---|---|---|
+| `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD） | 规格齐备、写 feature Plan 之前 |
+
 ### PM
 
 | Skill | 作用 | 触发时机 |
@@ -53,7 +59,8 @@ description: 安装 Agile Team SDD 技能套件（16 个 skill，覆盖 BA/开�
 需求
  └─ ba-grill-me ──▶ ba-write-spec ──▶ pm-estimate
                                           │
-                              qa-write-cases│
+                    ┌─ tl-high-level-design（HLD 确认）
+                    └─ qa-write-cases（与 HLD 并行）
                                           ▼
                        dev-plan ──▶ dev-build ──▶ dev-self-test
                                           │              │

@@ -27,7 +27,7 @@
 ```
 team-harness-suite/
 ├── .agents/              # 本仓库自用：verify.sh + plan/ + skills/
-├── agile-team-sdd/       # SDD 技能套件（16 个 skill 模板 + 安装器）
+├── agile-team-sdd/       # SDD 技能套件（17 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
@@ -129,7 +129,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ┌──▼──────────┐ ┌▼───────────┐ ┌▼──────────────────┐
 │harness-     │ │agile-team- │ │tool-chain-        │
 │installer/   │ │sdd/       │ │installer/         │
-│AGENTS.md    │ │16 个 skill │ │MCP 工具链          │
+│AGENTS.md    │ │17 个 skill │ │MCP 工具链          │
 │docs/ 骨架    │ │模板 + 安装器│ │                   │
 └─────────────┘ └┬───────────┘ └──────────────────┘
                  │ 装进
@@ -253,11 +253,12 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ```
 用户的一句话需求
   → ba-grill-me（拷问）
-  → ba-write-spec（需求规格 docs/features/<CODE>-<slug>/spec.md）
+  → ba-write-spec（需求规格 docs/features/<迭代>/<CODE>-<slug>/spec.md）
   → pm-estimate（估算）
-  → ┬─ dev-plan（技术方案 feature/plan.md 或 _chores/，人工确认 ← 编码前强制闸门）
-    └─ qa-write-cases（QA 文本用例，与 Plan 并行；规格确认后即可开始）
-  → 两边都就绪后 → dev-build（实现）
+  → ┬─ tl-high-level-design（迭代 high-level-design.md，人工确认 ← Plan 前强制闸门）
+    └─ qa-write-cases（QA 文本用例，与 HLD 并行；规格确认后即可开始）
+  → HLD 确认后 → dev-plan（技术方案 feature/plan.md 或 _chores/，人工确认 ← 编码前强制闸门）
+  → Plan 确认后 → dev-build（实现）
   → dev-self-test（开发自测）
   → ba-gen-facts（事实文档 docs/facts/ 同步）
   → dev-code-review / dev-ui-review
@@ -476,5 +477,5 @@ team-harness-suite/
 6. **同步文档**：按 §13 的同步要求逐条过。
 7. **提交**：提交描述里写清楚「改了什么 / 为什么 / 怎么验证的 / 文档同步检查」。
 
-> **AI Agent 注意**：`dev-plan` 的 **人工确认** 是唯一强制闸门。
-> 不要自己写完 Plan 就接着写代码。
+> **AI Agent 注意**：目标/业务项目有两道强制闸门——迭代 `high-level-design.md`（`tl-high-level-design`）与 feature `plan.md`（`dev-plan`）。
+> 本 harness 仓库自身仍用 `.agents/plan/`；不要自己写完 Plan 就接着写代码。

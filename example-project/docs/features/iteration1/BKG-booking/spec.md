@@ -120,57 +120,57 @@ NEW
 
 ### 5.1 BookingOrder
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| id | 订单号 | string | 是 | 唯一标识 | 系统生成 | 否 | 否 |
-| userId | 用户 ID | string | 是 | 下单用户 | 当前登录用户 | 是 | 否 |
-| consultantId | 咨询师 | string | 是 | 被预约方 | 用户选择 | 是 | 否 |
-| slotId | 时段 | string | 是 | 预约时段 | 用户选择 | 是 | 否 |
-| topic | 咨询主题 | string(2..80) | 是 | 主题 | 用户输入 | 是 | 否 |
-| description | 问题描述 | string(10..2000) | 是 | 详情 | 用户输入 | 是 | 否 |
-| contactPhone | 联系手机号 | string(11) | 是 | 预约联系 | 用户输入/账号带入 | 是 | 否 |
-| status | 状态 | enum | 是 | 订单状态 | pendingPay / pendingConfirm / confirmed / reschedulePending / inProgress / completed / cancelled / refunded | 是 | 系统 |
-| unitPrice | 服务单价 | decimal(10,2) | 是 | 下单时价格快照 | 档案线上版 | 否 | 否 |
-| discountAmount | 优惠金额 | decimal(10,2) | 是 | 优惠券抵扣 | 系统计算，默认 0 | 否 | 否 |
-| serviceFee | 服务费 | decimal(10,2) | 是 | 平台费用展示 | 费率版本计算 | 否 | 否 |
-| amountPayable | 应付金额 | decimal(10,2) | 是 | unitPrice-discountAmount | 系统计算 | 否 | 否 |
-| couponId | 优惠券 ID | string | 否 | 使用的券 | 用户选择 | 否 | 否 |
-| cancelReason | 取消原因 | string(2..200) | 条件 | 用户取消时必填 | 用户输入 | 否 | 否 |
-| createdAt | 下单时间 | datetime | 是 | 创建时间 | 系统生成 | 否 | 否 |
-| paidAt | 支付时间 | datetime | 否 | 支付成功时间 | 支付回调 | 否 | 否 |
-| cancelledAt | 取消时间 | datetime | 否 | 订单关闭时间 | 系统生成 | 否 | 否 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 订单号 | string | 是 | 唯一标识 | 系统生成 | 否 | 否 |
+| 用户 ID | string | 是 | 下单用户 | 当前登录用户 | 是 | 否 |
+| 咨询师 | string | 是 | 被预约方 | 用户选择 | 是 | 否 |
+| 时段 | string | 是 | 预约时段 | 用户选择 | 是 | 否 |
+| 咨询主题 | string(2..80) | 是 | 主题 | 用户输入 | 是 | 否 |
+| 问题描述 | string(10..2000) | 是 | 详情 | 用户输入 | 是 | 否 |
+| 联系手机号 | string(11) | 是 | 预约联系 | 用户输入/账号带入 | 是 | 否 |
+| 状态 | enum | 是 | 订单状态 | pendingPay / pendingConfirm / confirmed / reschedulePending / inProgress / completed / cancelled / refunded | 是 | 系统 |
+| 服务单价 | decimal(10,2) | 是 | 下单时价格快照 | 档案线上版 | 否 | 否 |
+| 优惠金额 | decimal(10,2) | 是 | 优惠券抵扣 | 系统计算，默认 0 | 否 | 否 |
+| 服务费 | decimal(10,2) | 是 | 平台费用展示 | 费率版本计算 | 否 | 否 |
+| 应付金额 | decimal(10,2) | 是 | unitPrice-discountAmount | 系统计算 | 否 | 否 |
+| 优惠券 ID | string | 否 | 使用的券 | 用户选择 | 否 | 否 |
+| 取消原因 | string(2..200) | 条件 | 用户取消时必填 | 用户输入 | 否 | 否 |
+| 下单时间 | datetime | 是 | 创建时间 | 系统生成 | 否 | 否 |
+| 支付时间 | datetime | 否 | 支付成功时间 | 支付回调 | 否 | 否 |
+| 取消时间 | datetime | 否 | 订单关闭时间 | 系统生成 | 否 | 否 |
 
 ### 5.2 Payment / CouponUsage
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| payment.id | 支付单 ID | string | 是 | 内部支付标识 | 系统生成 | 否 | 否 |
-| payment.orderId | 订单 ID | string | 是 | 关联订单 | BookingOrder.id | 是 | 否 |
-| payment.channel | 支付渠道 | enum | 是 | 支付方式 | wechat / alipay | 是 | 否 |
-| payment.gatewayTradeNo | 网关流水号 | string | 否 | 渠道交易号 | 支付网关 | 否 | 否 |
-| payment.status | 支付状态 | enum | 是 | 支付进度 | pending / success / failed / closed / refunded | 是 | 系统 |
-| payment.amount | 支付金额 | decimal(10,2) | 是 | 等于订单应付金额 | 系统计算 | 是 | 否 |
-| payment.expireAt | 支付截止时间 | datetime | 是 | 超时自动关闭 | 系统生成 | 否 | 否 |
-| couponUsage.couponId | 优惠券 ID | string | 是 | 使用券 | Coupon.id | 是 | 否 |
-| couponUsage.discountAmount | 抵扣金额 | decimal(10,2) | 是 | 本单实际抵扣 | 系统计算 | 否 | 否 |
-| couponUsage.status | 核销状态 | enum | 是 | 券占用状态 | locked / used / released | 是 | 系统 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 支付单 ID | string | 是 | 内部支付标识 | 系统生成 | 否 | 否 |
+| 订单 ID | string | 是 | 关联订单 | BookingOrder.id | 是 | 否 |
+| 支付渠道 | enum | 是 | 支付方式 | wechat / alipay | 是 | 否 |
+| 网关流水号 | string | 否 | 渠道交易号 | 支付网关 | 否 | 否 |
+| 支付状态 | enum | 是 | 支付进度 | pending / success / failed / closed / refunded | 是 | 系统 |
+| 支付金额 | decimal(10,2) | 是 | 等于订单应付金额 | 系统计算 | 是 | 否 |
+| 支付截止时间 | datetime | 是 | 超时自动关闭 | 系统生成 | 否 | 否 |
+| 优惠券 ID | string | 是 | 使用券 | Coupon.id | 是 | 否 |
+| 抵扣金额 | decimal(10,2) | 是 | 本单实际抵扣 | 系统计算 | 否 | 否 |
+| 核销状态 | enum | 是 | 券占用状态 | locked / used / released | 是 | 系统 |
 
 ### 5.3 Review / Complaint
 
-| 字段名 | 中文名 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
-|---|---|---|---:|---|---|---:|---:|
-| review.id | 评价 ID | string | 是 | 评价标识 | 系统生成 | 否 | 否 |
-| review.orderId | 订单 ID | string | 是 | 一单一评 | BookingOrder.id | 是 | 否 |
-| review.overallRating | 总评分 | integer | 是 | 总体星级 | 1..5 | 是 | 否 |
-| review.professionalRating | 专业度评分 | integer | 是 | 维度评分 | 1..5 | 是 | 否 |
-| review.communicationRating | 沟通评分 | integer | 是 | 维度评分 | 1..5 | 是 | 否 |
-| review.content | 文字评价 | string(0..1000) | 否 | 公开内容 | 用户输入并过敏感词 | 否 | 否 |
-| review.createdAt | 评价时间 | datetime | 是 | 提交时间 | 系统生成 | 否 | 否 |
-| complaint.id | 投诉 ID | string | 是 | 投诉标识 | 系统生成 | 否 | 否 |
-| complaint.orderId | 订单 ID | string | 是 | 被投诉订单 | BookingOrder.id | 是 | 否 |
-| complaint.type | 投诉类型 | enum | 是 | 问题类型 | noShow / service / other | 是 | 否 |
-| complaint.description | 投诉说明 | string(10..2000) | 是 | 事实描述 | 用户输入 | 是 | 否 |
-| complaint.status | 投诉状态 | enum | 是 | 处理状态 | pending / resolved / rejected | 是 | 系统 |
+| 字段 | 类型 | 必填 | 描述 | 取值 / 枚举 / 来源 | 创建时必填 | 可修改 |
+|---|---|---:|---|---|---:|---:|
+| 评价 ID | string | 是 | 评价标识 | 系统生成 | 否 | 否 |
+| 评价.订单 ID | string | 是 | 一单一评 | BookingOrder.id | 是 | 否 |
+| 总评分 | integer | 是 | 总体星级 | 1..5 | 是 | 否 |
+| 专业度评分 | integer | 是 | 维度评分 | 1..5 | 是 | 否 |
+| 沟通评分 | integer | 是 | 维度评分 | 1..5 | 是 | 否 |
+| 文字评价 | string(0..1000) | 否 | 公开内容 | 用户输入并过敏感词 | 否 | 否 |
+| 评价时间 | datetime | 是 | 提交时间 | 系统生成 | 否 | 否 |
+| 投诉 ID | string | 是 | 投诉标识 | 系统生成 | 否 | 否 |
+| 投诉.订单 ID | string | 是 | 被投诉订单 | BookingOrder.id | 是 | 否 |
+| 投诉类型 | enum | 是 | 问题类型 | noShow / service / other | 是 | 否 |
+| 投诉说明 | string(10..2000) | 是 | 事实描述 | 用户输入 | 是 | 否 |
+| 投诉状态 | enum | 是 | 处理状态 | pending / resolved / rejected | 是 | 系统 |
 
 ---
 
