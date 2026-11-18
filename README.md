@@ -202,6 +202,13 @@ team-harness-suite/
 | `overnight-runner/` | ✅ 可用（面板 / 看门狗 / 多队列 / 决策记录 / 决策窗口） |
 | `example-project/` | ✅ 完整可跑 |
 
+## TODO
+
+- 任务协调器（L4）
+- OpenWiki
+- ArchUnit
+- CodeGraph
+
 ## License
 
 见 [LICENSE](LICENSE)。
