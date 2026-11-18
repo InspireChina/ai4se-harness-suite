@@ -1,15 +1,15 @@
 ---
 name: dev-build-template
-description: 全栈实现编排：按 Plan 写前后端、维护 progress，并依次调用自测与 UI 评审（落盘记录）及代码评审；以记录为准修到通过。当 Plan 已确认、进入实现时使用。
+description: 全栈实现 LOOP：按 Plan 写前后端、维护 progress，并依次调用自测与 UI 评审（落盘记录）及代码评审；以记录为准修到通过。当 Plan 已确认、进入实现时使用。
 ---
 
 <!-- TEMPLATE-ONLY -->
 > **这是模板文件。** 路径由 `{{PLACEHOLDER}}` 占位符标记，执行 `agile-team-sdd/install.sh` 时会被替换为目标项目的真实路径。
 <!-- /TEMPLATE-ONLY -->
 
-# 开发：构建实现（全栈编排）
+# 开发：构建实现（全栈 LOOP）
 
-`dev-build` 是 **全栈实现编排器**，不是「只写代码」。Plan 已确认后方可动手。
+`dev-build` 是 **全栈实现 LOOP**，不是「只写代码」。Plan 已确认后方可动手。
 
 按 `{{AGENTS_FILE}}` 架构约定实现，并 **依次执行** 下列依赖 skill（读其已安装正文并照做，不要跳步）：
 
@@ -40,10 +40,10 @@ description: 全栈实现编排：按 Plan 写前后端、维护 progress，并�
 ### 开工前
 
 1. 读 plan 的 **「实施步骤（粗）」** 与 **DST / 界面对照基线**
-2. 细化 checklist；末尾追加编排阶段：
+2. 细化 checklist；末尾追加 LOOP 阶段：
 
 ```markdown
-### 编排
+### LOOP
 - [ ] 实现（前后端）
 - [ ] dev-self-test → 产物 `{planStem}-self-test.md` 通过
 - [ ] dev-ui-review → 产物 `{planStem}-ui-review.md` 通过（无 UI 注明跳过）
@@ -69,7 +69,7 @@ description: 全栈实现编排：按 Plan 写前后端、维护 progress，并�
 - [x] 细项 A
 - [ ] 细项 B ← 进行中
 
-### 编排
+### LOOP
 - [ ] 实现（前后端）
 - [ ] dev-self-test（./plan-self-test.md）
 - [ ] dev-ui-review（./plan-ui-review.md）
@@ -82,8 +82,8 @@ description: 全栈实现编排：按 Plan 写前后端、维护 progress，并�
 
 ### 执行中
 
-- 每完成细项或编排阶段：立刻勾选并刷新「更新」时间
-- 全部完成后（含编排）：总状态「已完成」
+- 每完成细项或 LOOP 阶段：立刻勾选并刷新「更新」时间
+- 全部完成后（含 LOOP）：总状态「已完成」
 
 ## ① 实现
 
@@ -126,7 +126,7 @@ description: 全栈实现编排：按 Plan 写前后端、维护 progress，并�
 
 ## 文档同步
 
-编排通过后检查：
+LOOP 通过后检查：
 
 - `{{FACTS_DIR}}/api.yaml`、`db-schema.md`
 - `{{TECH_TOPIC_DIR}}/businessrule.md`、`data-dict.md`
@@ -136,7 +136,7 @@ description: 全栈实现编排：按 Plan 写前后端、维护 progress，并�
 
 ## 自检清单
 
-- [ ] progress 已写，编排项已勾选（或合法跳过）
+- [ ] progress 已写，LOOP 项已勾选（或合法跳过）
 - [ ] `{planStem}-self-test.md` 存在且状态=通过
 - [ ] 有 UI 时 `{planStem}-ui-review.md` 存在且状态=通过；否则已注明跳过
 - [ ] `dev-code-review` 自查通过

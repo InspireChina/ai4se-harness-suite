@@ -44,10 +44,10 @@ agile-team-sdd/
 | | `tl-arch-sync-back` | 技术侧对齐 ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案（含 DST 自测用例与界面对照基线），等待人工确认 |
-| | `dev-build` | 全栈编排：实现 + 自测/UI 落盘修到绿 + 代码评审 |
-| | `dev-self-test` | 真实本地环境按 DST 自测并落盘（由 build 编排，可单跑） |
-| | `dev-code-review` | 代码评审（由 build 编排，可单跑） |
-| | `dev-ui-review` | 原型对照字段/控件与截图并落盘（由 build 编排） |
+| | `dev-build` | 全栈 LOOP：实现 + 自测/UI 落盘修到绿 + 代码评审 |
+| | `dev-self-test` | 真实本地环境按 DST 自测并落盘（由 build LOOP 调用，可单跑） |
+| | `dev-code-review` | 代码评审（由 build LOOP 调用，可单跑） |
+| | `dev-ui-review` | 原型对照字段/控件与截图并落盘（由 build LOOP 调用） |
 | | `dev-release-plan` | 整理迭代上线准备清单 |
 | | `dev-create-mr` | 创建 Merge Request / Pull Request |
 | **QA** | `qa-write-cases` | 编写 QA 用例（`TC-xxx` 文本 + 自动化） |

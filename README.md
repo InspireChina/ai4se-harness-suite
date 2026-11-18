@@ -68,9 +68,9 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | | `tl-arch-sync-back` | 技术侧对齐：ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 写技术方案（含 DST 自测 + 界面对照基线），等待确认 |
-| | `dev-build` | 全栈编排：实现 + 自测/UI 落盘修到绿 + 代码评审 |
+| | `dev-build` | 全栈 LOOP：实现 + 自测/UI 落盘修到绿 + 代码评审 |
 | | `dev-self-test` | 真实本地环境按 DST 自测并落盘 |
-| | `dev-code-review` | 代码评审（由 build 编排，可单跑） |
+| | `dev-code-review` | 代码评审（由 build LOOP 调用，可单跑） |
 | | `dev-ui-review` | 原型对照字段/控件与截图并落盘 |
 | | `dev-release-plan` | 整理迭代上线准备清单 |
 | | `dev-create-mr` | 创建 Merge Request / Pull Request |
@@ -93,7 +93,7 @@ ba-grill-me → ba-write-spec → pm-estimate
         └───────────┬───────────┘
                     ↓
               dev-plan（人工确认）→ dev-build
-                    │  编排 self-test → ui-review → code-review
+                    │  LOOP self-test → ui-review → code-review
                     ↓
      ba-gen-facts / arch sync-back / dev-create-mr
                     ↓

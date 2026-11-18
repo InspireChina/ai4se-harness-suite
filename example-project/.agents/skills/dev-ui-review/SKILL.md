@@ -1,11 +1,11 @@
 ---
 name: dev-ui-review
-description: 启动原型与实现环境，按 Plan 界面对照基线做字段/控件与截图对比并落盘；通常由 dev-build 编排，未通过则修到通过。当有前端改动需要实机对照时使用。
+description: 启动原型与实现环境，按 Plan 界面对照基线做字段/控件与截图对比并落盘；通常由 dev-build LOOP 调用，未通过则修到通过。当有前端改动需要实机对照时使用。
 ---
 
 # Dev：界面评审（原型对照）
 
-通常由 **`dev-build` 编排调用**（有前端改动时）；也可单独触发。
+通常由 **`dev-build` LOOP 调用**（有前端改动时）；也可单独触发。
 
 必须 **实机** 对照，不能只读代码。工具：chrome-devtools-mcp（`.mcp.json`）。
 

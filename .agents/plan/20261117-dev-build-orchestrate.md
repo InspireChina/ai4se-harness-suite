@@ -1,11 +1,11 @@
-# Plan：dev-build 编排依赖 skill（全栈闭环）
+# Plan：dev-build LOOP依赖 skill（全栈闭环）
 
 > 日期：2026-11-17  
 > 状态：已完成
 
 ## 约定
 
-`dev-build` 定位为 **全栈实现编排器**（非只写代码）：
+`dev-build` 定位为 **全栈实现 LOOP**（非只写代码）：
 
 ```
 实现（前后端）→ dev-self-test →（有 UI）dev-ui-review → dev-code-review

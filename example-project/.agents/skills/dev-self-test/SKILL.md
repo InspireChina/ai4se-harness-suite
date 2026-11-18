@@ -1,11 +1,11 @@
 ---
 name: dev-self-test
-description: 启动真实本地环境，按 Plan 的 DST 自测用例执行并落盘记录；通常由 dev-build 编排，失败则修到通过。当实现完成后、交给 QA 之前需要自证代码按 Plan 工作时使用。
+description: 启动真实本地环境，按 Plan 的 DST 自测用例执行并落盘记录；通常由 dev-build LOOP 调用，失败则修到通过。当实现完成后、交给 QA 之前需要自证代码按 Plan 工作时使用。
 ---
 
 # Dev：开发自测
 
-通常由 **`dev-build` 编排调用**；也可在实现后单独触发。
+通常由 **`dev-build` LOOP 调用**；也可在实现后单独触发。
 
 **自测**验证「代码按 Plan 的设计工作」。它 **不是** QA 测试，不能替代验收 —— 详见项目 `AGENTS.md` §10。
 

@@ -16,8 +16,8 @@
 | 产物 | 路径 | 谁写 |
 |---|---|---|
 | 自测用例设计 | feature `plan.md` 既有 §8～10（强化为「必须可执行、可勾选」）+ 实施后索引 `{{DEV_SELF_CASES_DIR}}/` | `dev-plan` |
-| 自测执行记录 | 同目录 `{planStem}-self-test.md` | `dev-self-test`（build 编排） |
-| UI 对照记录 | 同目录 `{planStem}-ui-review.md`（含截图相对路径） | `dev-ui-review`（build 编排） |
+| 自测执行记录 | 同目录 `{planStem}-self-test.md` | `dev-self-test`（build LOOP） |
+| UI 对照记录 | 同目录 `{planStem}-ui-review.md`（含截图相对路径） | `dev-ui-review`（build LOOP） |
 | 截图 | `{feature}/ui-review-artifacts/`（git 可忽略大图或仅保留关键帧；skill 要求路径写入记录） | `dev-ui-review` |
 
 原型默认：`{{FEATURES_DIR}}/<迭代>/prototypes/`（`npm run dev`，样例端口 5174）。实现前端仍为 `{{FRONTEND_PORT}}`。无原型时：记录「无原型可对」并改为仅对照 `spec` 字段表 + 截图实现页，不得假装通过。
@@ -52,7 +52,7 @@
 
 ### `dev-build`
 
-- progress 编排阶段增加显式产物勾选：`*-self-test.md`、`*-ui-review.md`
+- progress LOOP 阶段增加显式产物勾选：`*-self-test.md`、`*-ui-review.md`
 - 闭环写清：以记录文件为准，不是口头「应该过了」
 
 ## 文档同步

@@ -26,10 +26,10 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `dev-plan` | 写 `plan.md`（粗步骤 + **DST 自测用例** + 有 UI 时界面对照基线） | 新功能 / 重构 / 非简单变更 |
-| `dev-build` | 全栈编排：实现 → 自测/UI（**落盘记录修到绿**）→ 代码评审 | Plan 已确认，进入实现 |
-| `dev-self-test` | **真实本地环境** + 按 DST 执行并写 `*-self-test.md` | 实现后 / build 编排中 |
-| `dev-code-review` | 按项目规范做代码评审（build 编排调用，也可单跑） | build 编排中 / 审他人 MR |
-| `dev-ui-review` | 原型对照字段/控件与截图，写 `*-ui-review.md` | 有 UI 改动时 / build 编排中 |
+| `dev-build` | 全栈 LOOP：实现 → 自测/UI（**落盘记录修到绿**）→ 代码评审 | Plan 已确认，进入实现 |
+| `dev-self-test` | **真实本地环境** + 按 DST 执行并写 `*-self-test.md` | 实现后 / build LOOP 中 |
+| `dev-code-review` | 按项目规范做代码评审（build LOOP 调用，也可单跑） | build LOOP 中 / 审他人 MR |
+| `dev-ui-review` | 原型对照字段/控件与截图，写 `*-ui-review.md` | 有 UI 改动时 / build LOOP 中 |
 | `dev-release-plan` | 整理当前迭代上线准备清单 | 迭代收尾，准备发版 |
 | `dev-create-mr` | 创建 Merge Request / Pull Request | 自测通过，准备提交评审 |
 
@@ -73,7 +73,7 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
                     └─ qa-write-cases（与 HLD 并行）
                                           ▼
                        dev-plan ──▶ dev-build
-                                      │  编排：self-test → ui-review → code-review
+                                      │  LOOP：self-test → ui-review → code-review
                                       │  （失败修 bug 回环）
                                       ▼
                                  ba-gen-facts / arch sync-back / dev-create-mr

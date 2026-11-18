@@ -694,13 +694,13 @@
           <td>
             <ul>
               <li>编写 Plan（对照 TRD / 规格）★确认</li>
-              <li><code>dev-build</code> 全栈编排：实现 → 真实环境 DST 自测落盘 → 原型 UI 对照落盘 → 代码评审（以记录修到绿）</li>
+              <li><code>dev-build</code> 全栈 LOOP：实现 → 真实环境 DST 自测落盘 → 原型 UI 对照落盘 → 代码评审（以记录修到绿）</li>
               <li>更新事实文档、开 MR</li>
             </ul>
           </td>
           <td>
             <div class="tool-new"><code>dev-plan</code></div>
-            <div><code>dev-build</code>（编排 <code>dev-self-test</code> · <code>dev-ui-review</code> · <code>dev-code-review</code>；按需 <code>dev-debug</code>）</div>
+            <div><code>dev-build</code>（LOOP <code>dev-self-test</code> · <code>dev-ui-review</code> · <code>dev-code-review</code>；按需 <code>dev-debug</code>）</div>
             <div><code>ba-gen-facts</code> · <code>dev-create-mr</code></div>
             <div><code>overnight-runner</code>（可选）</div>
           </td>
@@ -898,10 +898,10 @@
 
 <section id="dev">
   <h2>3. 迭代中开发</h2>
-  <p class="goal">目标：DEV 先写 Plan（对照 TRD），确认后再由 <code>dev-build</code> 全栈编排（实现 → 自测 → UI 评审 → 代码评审）；经 QA 验收后合并、可发布；复盘回写 harness。</p>
+  <p class="goal">目标：DEV 先写 Plan（对照 TRD），确认后再由 <code>dev-build</code> 全栈 LOOP（实现 → 自测 → UI 评审 → 代码评审）；经 QA 验收后合并、可发布；复盘回写 harness。</p>
 
   <h3>3.1 流水线</h3>
-  <div class="flow" role="img" aria-label="迭代中流水线：DEV 写 Plan 并确认后由 dev-build 编排实现与评审，QA 验收，然后开 MR、发布与复盘">
+  <div class="flow" role="img" aria-label="迭代中流水线：DEV 写 Plan 并确认后由 dev-build LOOP 实现与评审，QA 验收，然后开 MR、发布与复盘">
     <div class="flow-col">
       <div class="flow-split-label">DEV（+ AI）</div>
       <div class="flow-chain">
@@ -911,8 +911,8 @@
           <span class="meta">dev-plan</span>
         </div>
         <div class="flow-arrow right" aria-hidden="true"></div>
-        <div class="flow-loop" title="dev-build 编排：实现 → self-test → ui-review → code-review；失败修 bug 回环">
-          <span class="flow-loop-tag">编排</span>
+        <div class="flow-loop" title="dev-build LOOP：实现 → self-test → ui-review → code-review；失败修 bug 回环">
+          <span class="flow-loop-tag">LOOP</span>
           <div class="flow-node dev">
             <span class="who">全栈实现</span>
             <span class="what">dev-build</span>
@@ -969,7 +969,7 @@
   <ul class="check">
     <li>Plan 已确认且按 Plan 实现</li>
     <li>每条 AC / R 都有对应 QA 用例且通过；文本用例勾选完毕</li>
-    <li><code>dev-build</code> 编排完成：<code>*-self-test.md</code> 通过（真实本地环境 + DST）、有 UI 则 <code>*-ui-review.md</code> 通过、code-review 自查通过</li>
+    <li><code>dev-build</code> LOOP 完成：<code>*-self-test.md</code> 通过（真实本地环境 + DST）、有 UI 则 <code>*-ui-review.md</code> 通过、code-review 自查通过</li>
     <li>关键 API 覆盖 Happy Path + 失败分支；事实文档已更新；无遗留 TODO / 调试代码</li>
     <li>上线清单完成（TL）；复盘改进已回写 harness（PM）</li>
   </ul>
@@ -1024,7 +1024,7 @@
 
   <div class="role-card">
     <h3>DEV · 开发</h3>
-    <p class="goal">迭代中先写 Plan（对照 TRD / 规格），确认后由 <code>dev-build</code> 编排实现、自测、UI 与代码评审。复用现有模式，不自创；自测不写 TC 编号。</p>
+    <p class="goal">迭代中先写 Plan（对照 TRD / 规格），确认后由 <code>dev-build</code> LOOP 实现、自测、UI 与代码评审。复用现有模式，不自创；自测不写 TC 编号。</p>
     <div class="pill-row">
       <span class="pill">dev-plan</span><span class="pill">dev-build</span><span class="pill">dev-self-test</span><span class="pill">dev-ui-review</span><span class="pill">dev-code-review</span><span class="pill">dev-debug</span>
     </div>
@@ -1056,7 +1056,7 @@
       <tr><td>QA 文本用例</td><td>§2 并行</td><td><code>qa-write-cases</code></td><td><code>docs/test-cases/e2e-cases/</code></td></tr>
       <tr><td>手动 / 冒烟</td><td>§3</td><td><code>qa-write-manual-plan</code></td><td><code>docs/test-cases/manual-cases/</code> · <code>smoking-cases/</code></td></tr>
       <tr><td>写 Plan</td><td>§3</td><td><code>dev-plan</code></td><td>feature <code>plan.md</code> / <code>_chores/</code>（人工确认）</td></tr>
-      <tr><td>全栈实现编排</td><td>§3</td><td><code>dev-build</code>（编排 <code>dev-self-test</code> → <code>dev-ui-review</code> → <code>dev-code-review</code>；按需 <code>dev-debug</code>）</td><td>代码 + progress + <code>*-self-test.md</code> / <code>*-ui-review.md</code> 通过</td></tr>
+      <tr><td>全栈实现 LOOP</td><td>§3</td><td><code>dev-build</code>（LOOP <code>dev-self-test</code> → <code>dev-ui-review</code> → <code>dev-code-review</code>；按需 <code>dev-debug</code>）</td><td>代码 + progress + <code>*-self-test.md</code> / <code>*-ui-review.md</code> 通过</td></tr>
       <tr><td>开发自测（可单跑）</td><td>§3</td><td><code>dev-self-test</code></td><td>真实本地环境 + DST；记录 <code>*-self-test.md</code></td></tr>
       <tr><td>更新事实文档</td><td>§3</td><td><code>ba-gen-facts</code></td><td><code>docs/facts/</code></td></tr>
       <tr><td>开 MR</td><td>§3</td><td><code>dev-create-mr</code></td><td>MR / PR</td></tr>
