@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "agents workflow graph",
+  "type": "object",
+  "required": ["id", "entry", "lanes", "nodes", "edges"],
+  "properties": {
+    "id": { "type": "string" },
+    "entry": { "type": "string" },
+    "lanes": { "type": "array" },
+    "models": { "type": "object" },
+    "loops": { "type": "array" },
+    "nodes": { "type": "array" },
+    "edges": { "type": "array" },
+    "extensions": { "type": "array" }
+  }
+}

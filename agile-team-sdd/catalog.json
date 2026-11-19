@@ -22,6 +22,28 @@
       ]
     },
     {
+      "name": "ba-write-prototype",
+      "description": "按 spec 做一版可点击原型，放到该迭代的 prototypes 目录",
+      "when": "规格写完、需求质量门之前，需要一版可对照的原型时",
+      "produces": [
+        "docs/features/<迭代>/prototypes/"
+      ],
+      "dependsOn": [
+        "ba-write-spec"
+      ]
+    },
+    {
+      "name": "ba-requirement-review",
+      "description": "用与写规格不同的模型审查 spec，只回答满意或不满意",
+      "when": "规格和原型已写完，人做需求决策之前",
+      "produces": [
+        "满意或不满意"
+      ],
+      "dependsOn": [
+        "ba-write-spec"
+      ]
+    },
+    {
       "name": "ba-gen-facts",
       "description": "从代码与文档生成/校准事实文档（API、库表、领域模型、专题）",
       "when": "实现发生变化后，docs/facts/ 与代码不一致时",
@@ -50,6 +72,28 @@
         "docs/features/<迭代>/<CODE>-<slug>/plan.md 或 docs/features/_chores/plan-{slug}.md"
       ],
       "dependsOn": []
+    },
+    {
+      "name": "dev-plan-review",
+      "description": "用与写 plan 不同的模型审查技术方案，只回答满意或不满意",
+      "when": "dev-plan 写出一批任务之后、人确认 plan 之前",
+      "produces": [
+        "满意或不满意"
+      ],
+      "dependsOn": [
+        "dev-plan"
+      ]
+    },
+    {
+      "name": "dev-plan-amend",
+      "description": "按人的修订意见改 plan，让它重新成为一批可执行任务",
+      "when": "构建决策不满意、人写完修订输入之后",
+      "produces": [
+        "docs/features/<迭代>/<CODE>-<slug>/plan.md"
+      ],
+      "dependsOn": [
+        "dev-plan"
+      ]
     },
     {
       "name": "dev-debug",
@@ -169,6 +213,15 @@
       "when": "需求进入迭代前需要给工作量与排期时",
       "produces": [
         "估算结论"
+      ],
+      "dependsOn": []
+    },
+    {
+      "name": "pm-start-iteration",
+      "description": "按人给出的版本名建立迭代目录",
+      "when": "主会话拿到版本名、编写规格之前",
+      "produces": [
+        "docs/features/<版本名>/iteration.md"
       ],
       "dependsOn": []
     },

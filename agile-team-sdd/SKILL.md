@@ -1,6 +1,6 @@
 ---
 name: agile-team-sdd
-description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
+description: 安装 Agile Team SDD 技能套件（26 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
 ---
 
 # Agile Team SDD：安装技能套件
@@ -8,7 +8,7 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
 本目录是 **SDD（Spec-Driven Development）技能套件的模板源**。
 `skills/` 下每个子目录是一份带占位符的 `SKILL.md`，需要先渲染成目标项目的真实路径，再安装过去。
 
-## 技能清单（21 个）
+## 技能清单（26 个）
 
 完整元数据见 [`catalog.json`](catalog.json)。
 
@@ -18,6 +18,8 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
 |---|---|---|
 | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时，写规格之前 |
 | `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准），维护项目级术语表 | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md`；术语写入 `docs/architecture/business/glossary.md` |
+| `ba-write-prototype` | 按 spec 做一版原型 | 规格写完、需求质量门之前 |
+| `ba-requirement-review` | 用另一个模型审查 spec，只回答满意或不满意 | 规格写完、人做需求决策之前 |
 | `ba-gen-facts` | 从代码生成/校准事实文档（API、库表、领域模型） | 实现变了，`docs/facts/` 与代码不一致 |
 | `ba-arch-sync-back` | 业务侧回写对齐术语/领域意图/产品 ↔ features 与 facts | 统一语言或领域结构相对 architecture 漂移时 |
 
@@ -26,6 +28,8 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `dev-plan` | 写 `plan.md`（粗步骤 + **DST 自测用例** + 有 UI 时界面对照基线） | 新功能 / 重构 / 非简单变更 |
+| `dev-plan-review` | 用另一个模型审查 plan，只回答满意或不满意 | plan 写成一批任务之后 |
+| `dev-plan-amend` | 按人的修订意见改 plan | 构建决策不满意之后 |
 | `dev-build` | 全栈 LOOP：实现 → 自测/UI（**落盘记录修到绿**）→ 代码评审 | Plan 已确认，进入实现 |
 | `dev-self-test` | **真实本地环境** + 按 DST 执行并写 `*-self-test.md` | 实现后 / build LOOP 中 |
 | `dev-code-review` | 按项目规范做代码评审（build LOOP 调用，也可单跑） | build LOOP 中 / 审他人 MR |
@@ -54,6 +58,7 @@ description: 安装 Agile Team SDD 技能套件（21 个 skill，覆盖 BA/TL/�
 | Skill | 作用 | 触发时机 |
 |---|---|---|
 | `pm-estimate` | 基于需求分类基线表估算工作量 | 需求进迭代前 |
+| `pm-start-iteration` | 按版本名建立迭代目录 | 主会话拿到版本名之后 |
 | `pm-retro` | 复盘并把改进项回写到 harness 本身 | 迭代结束，或流程反复出问题 |
 
 ### Runner（无角色前缀）

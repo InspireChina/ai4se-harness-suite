@@ -1,0 +1,85 @@
+id: iteration-to-test
+entry: graph-start
+lanes:
+  - { id: human, title: 人 }
+  - { id: master, title: graph-master }
+  - { id: subagent, title: 子 agent }
+models:
+  writer: { env: MODEL_WRITER }
+  reviewer: { env: MODEL_REVIEWER }
+loops:
+  - id: spec
+    maxIterations: 3
+    backEdges: [req-gate-reject, req-decision-reject]
+  - id: hld
+    maxIterations: 3
+    backEdges: [hld-reject]
+  - id: dev
+    maxIterations: 3
+    backEdges: [build-reject]
+nodes:
+  - { id: graph-start, actor: master, kind: entry, title: 会话启动 }
+  - { id: start-version, actor: human, kind: human_input, title: 开始版本 }
+  - { id: pm-start-iteration, actor: subagent, kind: action, skill: pm-start-iteration, title: 开始迭代, model: writer }
+  - { id: write-spec, actor: human, kind: human_input, title: 编写规格 }
+  - { id: ba-write-spec, actor: subagent, kind: action, skill: ba-write-spec, title: 需求规格, model: writer }
+  - { id: ba-write-prototype, actor: subagent, kind: action, skill: ba-write-prototype, title: 原型, once: true, model: writer }
+  - { id: ba-requirement-review, actor: subagent, kind: gate, skill: ba-requirement-review, title: 需求质量门, model: reviewer }
+  - { id: requirement-decision, actor: human, kind: decision, title: 需求决策, options: [满意, 不满意] }
+  - { id: tech-brief, actor: human, kind: human_input, title: 技术高阶 }
+  - { id: tl-high-level-design, actor: subagent, kind: action, skill: tl-high-level-design, title: 技术高阶设计, once: true, model: writer }
+  - { id: hld-decision, actor: human, kind: decision, title: 高阶决策, options: [满意, 不满意] }
+  - { id: dev-plan, actor: subagent, kind: action, skill: dev-plan, title: 详细规划, batch: true, model: writer }
+  - { id: dev-plan-review, actor: subagent, kind: gate, skill: dev-plan-review, title: plan 质量门, model: reviewer }
+  - { id: plan-confirm, actor: human, kind: human_input, title: plan 确认 }
+  - { id: plan-decision, actor: human, kind: decision, title: plan 决策, options: [满意, 不满意] }
+  - { id: overnight-runner, actor: subagent, kind: action, skill: overnight-runner, title: 排本批顺序, model: writer }
+  - id: dev-build
+    actor: subagent
+    kind: action
+    skill: dev-build
+    title: 构建与自测
+    sealed: true
+    repeatsBatch: dev-plan
+    model: writer
+    note: [后端 TDD, 前端 TDD, 构建/Lint, 前端 UI review, API 测试, 浏览器自测]
+  - { id: build-decision, actor: human, kind: decision, title: 构建决策, options: [满意, 不满意] }
+  - { id: amend-input, actor: human, kind: human_input, title: 修订输入 }
+  - { id: dev-plan-amend, actor: subagent, kind: action, skill: dev-plan-amend, title: 规划修订, model: writer }
+  - { id: handoff, actor: master, kind: end, title: 提测 }
+extensions:
+  - id: qa
+    title: 测试
+    linked: false
+    requires: pipeline
+    nodes:
+      - { id: qa-write-cases, kind: action, title: QA 用例 }
+      - { id: dev-create-mr, kind: action, title: 创建 MR/流水线部署 }
+      - { id: qa-run-e2e, kind: action, title: E2E 测试 }
+      - { id: manual-test, kind: human_input, title: 人工补测 }
+edges:
+  - { id: e0, from: graph-start, to: start-version }
+  - { id: e1, from: start-version, to: pm-start-iteration }
+  - { id: e2, from: pm-start-iteration, to: write-spec }
+  - { id: e3, from: write-spec, to: ba-write-spec }
+  - { id: e4, from: ba-write-spec, to: ba-write-prototype }
+  - { id: e5, from: ba-write-spec, to: ba-requirement-review }
+  - { id: e6, from: ba-write-prototype, to: ba-requirement-review }
+  - { id: req-pass, from: ba-requirement-review, to: requirement-decision, when: 满意 }
+  - { id: req-gate-reject, from: ba-requirement-review, to: write-spec, when: 不满意, back: true }
+  - { id: req-decision-reject, from: requirement-decision, to: write-spec, when: 不满意, back: true }
+  - { id: e7, from: tech-brief, to: tl-high-level-design }
+  - { id: e8, from: tl-high-level-design, to: hld-decision }
+  - { id: req-ok, from: requirement-decision, to: tech-brief, when: 满意 }
+  - { id: hld-reject, from: hld-decision, to: tech-brief, when: 不满意, back: true }
+  - { id: hld-ok, from: hld-decision, to: dev-plan, when: 满意 }
+  - { id: e9, from: dev-plan, to: dev-plan-review }
+  - { id: plan-pass, from: dev-plan-review, to: plan-confirm, when: 满意 }
+  - { id: e10, from: plan-confirm, to: plan-decision }
+  - { id: plan-ok, from: plan-decision, to: overnight-runner, when: 满意 }
+  - { id: e11, from: overnight-runner, to: dev-build }
+  - { id: e12, from: dev-build, to: build-decision }
+  - { id: build-pass, from: build-decision, to: handoff, when: 满意 }
+  - { id: build-reject, from: build-decision, to: amend-input, when: 不满意, back: true }
+  - { id: e13, from: amend-input, to: dev-plan-amend }
+  - { id: e14, from: dev-plan-amend, to: dev-plan, back: true }

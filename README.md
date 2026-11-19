@@ -30,11 +30,12 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 
 | 模块               | 目录                                                                                   | 目的                                                                                            | 形态                |
 | ---------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ----------------- |
-| **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，21 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
+| **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，26 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/)                                           | 为任意项目铺好工程底座：`AGENTS.md` + `docs/`（含 `architecture/` 高阶意图骨架、features / facts / standards） | skill + 模板 + 脚本   |
 | **工具链安装器**       | [`tool-chain-installer/`](tool-chain-installer/)                                     | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态                            | skill + 工具清单 + 脚本 |
 | **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门                                       | 文档                |
-| **持续运行面板**       | [`overnight-runner/`](overnight-runner/)                                             | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，**多队列**各自独立，决策全程留痕（白天弹窗问你、夜里自动决策）     | skill + Python 实现 |
+| **持续运行面板** | [`overnight-runner/`](overnight-runner/) | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，多队列各自独立，决策全程留痕 | skill + Python 实现 |
+| **工作流引擎** | [`agents-workflow-engine/`](agents-workflow-engine/) | 主会话按泳道图调度子 agent，从版本启动到提测。子 agent 可绑不同模型做对抗验证 | Python 实现 |
 | **参考实现**         | [`example-project/`](example-project/)                                               | 一份完整、可跑、已填满规范的全栈参考项目（Vue 3 + Spring Boot + DDD 四层），用来对照与教学                                    | 示例项目              |
 
 ## 关系图
@@ -46,7 +47,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
         ┌───────────────────────┼───────────────────────┐
         │                       │                       │
  harness-installer       agile-team-sdd       tool-chain-installer
-  AGENTS.md 规范          21 个 SDD skill        MCP 工具链
+  AGENTS.md 规范          26 个 SDD skill        MCP 工具链
   docs/ 含 architecture   BA·TL·Dev·QA·PM 全流程
         │                       │                       │
         └───────────────────────┼───────────────────────┘
@@ -56,18 +57,22 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
                      （参考实现 · 已装好全套）
 ```
 
-## SDD 技能套件（21 个）
+## SDD 技能套件（26 个）
 
 | 组 | Skill | 作用 |
 |---|---|---|
 | **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
 | | `ba-write-spec` | 编写需求规格；维护项目级术语表（`docs/architecture/business/glossary.md`） |
+| | `ba-write-prototype` | 按 spec 做原型，放到该迭代 prototypes |
+| | `ba-requirement-review` | 用另一个模型审查 spec，只回答满意或不满意 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | | `ba-arch-sync-back` | 业务侧对齐：术语 / 核心领域 / 产品 ↔ features 与 facts |
 | **TL** | `tl-arch-plan` | 项目准备写/更新 `docs/architecture/`（C4、ADR 一句话表、与业务侧） |
 | | `tl-arch-sync-back` | 技术侧对齐：ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 写技术方案（含 DST 自测 + 界面对照基线），等待确认 |
+| | `dev-plan-review` | 用另一个模型审查 plan，只回答满意或不满意 |
+| | `dev-plan-amend` | 按人的修订意见改 plan |
 | | `dev-build` | 全栈 LOOP：实现 + 自测/UI 落盘修到绿 + 代码评审 |
 | | `dev-self-test` | 真实本地环境按 DST 自测并落盘 |
 | | `dev-code-review` | 代码评审（由 build LOOP 调用，可单跑） |
@@ -78,6 +83,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | | `qa-run-e2e` | 运行 E2E 用例集并定位失败 |
 | | `qa-write-manual-plan` | 编写手动测试与冒烟用例计划 |
 | **PM** | `pm-estimate` | 基于需求分类基线表估算工作量 |
+| | `pm-start-iteration` | 按版本名建立迭代目录 |
 | | `pm-retro` | 复盘并把改进项回写到 harness 本身 |
 | **Runner** | `overnight-runner` | 队列跑已确认 plan（无角色前缀） |
 
@@ -127,7 +133,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 ```bash
 cd example-project
 cat AGENTS.md          # 一份填满的工程规范范本
-ls .agents/skills/      # 已安装的 21 个 SDD skills
+ls .agents/skills/      # 已安装的 26 个 SDD skills
 ```
 
 ### 装到自己的新项目
@@ -169,7 +175,7 @@ node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browse
 ```
 team-harness-suite/
 ├── AGENTS.md             # 本仓库的架构与工程规范（改代码前先读）
-├── agile-team-sdd/       # SDD 技能套件（21 个模板 + catalog.json + 安装脚本）
+├── agile-team-sdd/       # SDD 技能套件（26 个模板 + catalog.json + 安装脚本）
 ├── harness-installer/    # AGENTS.md / docs 骨架初始化
 ├── tool-chain-installer/ # MCP 工具链安装
 ├── team-workflow-guide/  # 团队流程与角色手册
@@ -195,7 +201,7 @@ team-harness-suite/
 
 | 模块 | 状态 |
 |---|---|
-| `agile-team-sdd/` | ✅ 可用（21 个 skill） |
+| `agile-team-sdd/` | ✅ 可用（26 个 skill） |
 | `harness-installer/` | ✅ 可用（`AGENTS.md` 模板含 TODO，需人工补全） |
 | `tool-chain-installer/` | ✅ 可用 |
 | `team-workflow-guide/` | ✅ 可用 |

@@ -17,7 +17,7 @@
 |---|---|---|
 | 文档 | Markdown | skill、指南、规范、模板 |
 | 脚本 | Bash 3.2+ | 安装脚本（安装器型 skill） |
-| 脚本 | Python 3.9+（**零第三方依赖**） | `overnight-runner` 的运行器 |
+| 脚本 | Python 3.9+（**零第三方依赖**） | `overnight-runner` 与 `agents-workflow-engine` |
 | 脚本 | Node.js 18+ | `tool-chain-installer` 的安装器 |
 | 配置 | YAML | 队列配置、项目配置、skill 清单 |
 | 配置 | JSON / JSONC | MCP 工具清单、opencode 配置 |
@@ -27,10 +27,11 @@
 ```
 team-harness-suite/
 ├── .agents/              # 本仓库自用：verify.sh + plan/ + skills/
-├── agile-team-sdd/       # SDD 技能套件（21 个 skill 模板 + 安装器）
+├── agile-team-sdd/       # SDD 技能套件（26 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
+├── agents-workflow-engine/ # 主会话按泳道图调度子 agent，到提测为止
 ├── team-workflow-guide/  # 团队流程与角色手册（纯文档）
 ├── example-project/      # 全栈参考实现（被这套 harness 管理的样子）
 └── opencode.jsonc        # 注册本仓库的 skills 路径
@@ -129,7 +130,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ┌──▼──────────┐ ┌▼───────────┐ ┌▼──────────────────┐
 │harness-     │ │agile-team- │ │tool-chain-        │
 │installer/   │ │sdd/       │ │installer/         │
-│AGENTS.md    │ │21 个 skill │ │MCP 工具链          │
+│AGENTS.md    │ │26 个 skill │ │MCP 工具链          │
 │docs/ 骨架    │ │模板 + 安装器│ │                   │
 └─────────────┘ └┬───────────┘ └──────────────────┘
                  │ 装进
@@ -245,6 +246,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | `harness-installer/` | 铺 `AGENTS.md` + `docs/` 骨架 | 不填 `AGENTS.md` 里的 TODO（那是人填的） |
 | `tool-chain-installer/` | 装 MCP 工具链 | 不装 npm/pip 依赖 |
 | `overnight-runner/` | 无人值守跑 plan 的运行时 | 不判断 plan 质量（人的责任） |
+| `agents-workflow-engine/` | 主会话按泳道图调度子 agent，跑到提测 | 不执行 QA 流水线，不拆 `dev-build` 内部六步 |
 | `team-workflow-guide/` | 流程与角色约定 | 不含可执行代码 |
 | `example-project/` | 参考实现 | 不参与本仓库的验证脚本 |
 

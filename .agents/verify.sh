@@ -366,6 +366,20 @@ PYEOF
   if [ $? -eq 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
 fi
 
+# ── 12. agents-workflow-engine ────────────────────────────────────
+head_ "12. agents-workflow-engine 测试"
+if [ -z "$PY" ]; then
+  skip "找不到 python"
+else
+  if "$PY" agents-workflow-engine/tests/test_units.py > /tmp/awe-units.log 2>&1 && grep -q '^OK$' /tmp/awe-units.log; then
+    grep '^Ran ' /tmp/awe-units.log | sed 's/^/  \033[32m✔\033[0m /'
+    PASSED=$((PASSED + 1))
+  else
+    sed 's/^/  /' /tmp/awe-units.log
+    bad "单元测试"
+  fi
+fi
+
 # ── 汇总 ───────────────────────────────────────────────────────────
 printf '\n\033[1m%s\033[0m\n' "────────────────────────────"
 if [ "$FAILED" -eq 0 ]; then

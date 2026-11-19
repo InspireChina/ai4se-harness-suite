@@ -1,7 +1,7 @@
 # agile-team-sdd
 
 SDD（Spec-Driven Development）技能套件的 **模板源**，覆盖 **BA → TL → PM → 开发 → QA → 发布 → 复盘** 全流程，
-共 21 个 skill。
+共 26 个 skill。
 
 ```
 agile-team-sdd/
@@ -38,12 +38,16 @@ agile-team-sdd/
 |---|---|---|
 | **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
 | | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准；维护项目级术语表 |
+| | `ba-write-prototype` | 按 spec 做原型 |
+| | `ba-requirement-review` | 用另一个模型审查 spec，只回答满意或不满意 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | | `ba-arch-sync-back` | 业务侧对齐术语/领域意图/产品 ↔ features 与 facts |
 | **TL** | `tl-arch-plan` | 写/更新项目级 `docs/architecture/`（C4、ADR） |
 | | `tl-arch-sync-back` | 技术侧对齐 ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案（含 DST 自测用例与界面对照基线），等待人工确认 |
+| | `dev-plan-review` | 用另一个模型审查 plan，只回答满意或不满意 |
+| | `dev-plan-amend` | 按人的修订意见改 plan |
 | | `dev-build` | 全栈 LOOP：实现 + 自测/UI 落盘修到绿 + 代码评审 |
 | | `dev-self-test` | 真实本地环境按 DST 自测并落盘（由 build LOOP 调用，可单跑） |
 | | `dev-code-review` | 代码评审（由 build LOOP 调用，可单跑） |
@@ -54,6 +58,7 @@ agile-team-sdd/
 | | `qa-run-e2e` | 运行 E2E 用例集并定位失败 |
 | | `qa-write-manual-plan` | 编写手动测试与冒烟用例计划 |
 | **PM** | `pm-estimate` | 基于需求分类基线表估算工作量 |
+| | `pm-start-iteration` | 按版本名建立迭代目录 |
 | | `pm-retro` | 复盘并把改进项回写到 harness |
 | **Runner** | `overnight-runner` | 队列跑已确认 plan（多队列、看门狗、决策留痕；无角色前缀） |
 
