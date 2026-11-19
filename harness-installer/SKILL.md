@@ -32,12 +32,27 @@ description: 初始化项目的工程 harness —— 生成/补齐 AGENTS.md（�
 | `--force` | 覆盖已存在的 `AGENTS.md` 与文档文件 |
 | `--no-agents` | 只生成 `docs/` 骨架，不动 `AGENTS.md` |
 
+环境变量：
+
+| 变量 | 说明 |
+|---|---|
+| `PATH_MODE=absolute`（默认） | 产物写绝对路径，agent 在任意 cwd 下可用 |
+| `PATH_MODE=relative` | 产物写项目相对路径（可随仓库分发，与 `agile-team-sdd` 同名参数一致） |
+| `BACKEND_DIR` / `FRONTEND_DIR` / `DOCS_DIR` / `TEST_CASES_DIR` / … | 覆盖目录探测结果 |
+| `TECH_STACK` / `BACKEND_DESC` / `FRONTEND_DESC` / `DATABASE` / … | 直接填进 `AGENTS.md`，减少人工 TODO |
+
+所有项目内路径统一由 `proj_path()` 展开，模板里 **不要** 自己拼 `{{PROJECT_ROOT}}`。
+
 脚本会：
 
 1. **探测项目结构**：找后端（有 `pom.xml`/`build.gradle`）、前端（有 `package.json`）、E2E 目录
 2. **渲染 `AGENTS.md`**：把模板里的 `{{...}}` 占位符替换成探测结果，写入 `<项目>/AGENTS.md`
-3. **铺 `docs/` 骨架**：复制 `templates/docs/**` 到 `<项目>/docs/**`
+3. **铺 `docs/` 骨架**：渲染 `templates/docs/**` 到 `<项目>/docs/**`
 4. **确保 `opencode.jsonc`**：不存在则创建（注册 `.agents/skills` 路径）
+
+骨架里 `docs/standards/` 只预置 **architecture / layers / naming / test** 四份（不绑技术栈也能写）；
+`api-design / db / error / security / business-rule / data-dictionary` 在对应能力落地时再建 ——
+空壳规范比没有规范更危险。
 
 ## 生成后必须做的事
 

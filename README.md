@@ -149,6 +149,10 @@ ls .agents/skills/      # 已安装的 26 个 SDD skills
 ./agile-team-sdd/install.sh ../my-project --group qa
 ./agile-team-sdd/install.sh ../my-project --skill dev-plan --skill pm-retro
 
+#    想让产物随仓库分发（不写死本机路径）→ 上面两步都加同一开关
+PATH_MODE=relative ./harness-installer/scripts/init-harness.sh ../my-project
+PATH_MODE=relative ./agile-team-sdd/install.sh ../my-project
+
 # 3. 装 MCP 工具链
 node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browser --group context
 
@@ -218,4 +222,3 @@ team-harness-suite/
 ## License
 
 见 [LICENSE](LICENSE)。
-# poc-company-a

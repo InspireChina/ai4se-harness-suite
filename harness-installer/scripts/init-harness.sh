@@ -7,6 +7,8 @@
 #   --dry-run     只打印将要发生的改动，不写文件
 #   --force       覆盖目标项目里已存在的 AGENTS.md / 文档文件
 #   --no-agents   不生成 AGENTS.md，只生成 docs/ 骨架
+#
+#   PATH_MODE=relative  渲染项目相对路径（默认 absolute；与 agile-team-sdd 一致）
 
 set -euo pipefail
 
@@ -16,9 +18,12 @@ TEMPLATE_DIR="$INSTALLER_DIR/templates"
 DRY_RUN=0
 FORCE=0
 NO_AGENTS=0
+# absolute（默认）：渲染成绝对路径，agent 在任意 cwd 下都可用
+# relative        ：渲染成项目相对路径，产物可随仓库分发（与 agile-team-sdd 的 PATH_MODE 一致）
+PATH_MODE="${PATH_MODE:-absolute}"
 
 usage() {
-  sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -47,6 +52,20 @@ fi
 PROJECT_ROOT="$(cd "$TARGET" && pwd)"
 PROJECT_NAME="${PROJECT_NAME:-$(basename "$PROJECT_ROOT")}"
 
+case "$PATH_MODE" in
+  absolute|relative) ;;
+  *) echo "错误：PATH_MODE 只能是 absolute 或 relative，当前为 $PATH_MODE" >&2; exit 1 ;;
+esac
+
+# 把项目内路径拼成最终渲染值
+proj_path() {
+  if [ "$PATH_MODE" = "relative" ]; then
+    printf '%s' "$1"
+  else
+    printf '%s/%s' "$PROJECT_ROOT" "$1"
+  fi
+}
+
 # ── 自动探测项目结构 ────────────────────────────────────────────────
 detect_dir() {
   # detect_dir <候选1> <候选2> ... <探测文件>
@@ -69,6 +88,11 @@ E2E_DIR="${E2E_DIR:-$(detect_dir e2e tests test package.json)}"
 [ -z "$E2E_DIR" ] && E2E_DIR="e2e"
 DOCS_DIR="${DOCS_DIR:-docs}"
 E2E_CASES_DIR="${E2E_CASES_DIR:-$DOCS_DIR/test-cases/e2e-cases}"
+TEST_CASES_DIR="${TEST_CASES_DIR:-$DOCS_DIR/test-cases}"
+MANUAL_CASES_DIR="${MANUAL_CASES_DIR:-$TEST_CASES_DIR/manual-cases}"
+SMOKING_CASES_DIR="${SMOKING_CASES_DIR:-$TEST_CASES_DIR/smoking-cases}"
+DEV_SELF_CASES_DIR="${DEV_SELF_CASES_DIR:-$TEST_CASES_DIR/dev-self-cases}"
+RELEASES_DIR="${RELEASES_DIR:-$DOCS_DIR/releases}"
 E2E_RUNNER="${E2E_RUNNER:-e2e-run.sh}"
 FEATURES_DIR="${FEATURES_DIR:-$DOCS_DIR/features}"
 CHORES_DIR="${CHORES_DIR:-$FEATURES_DIR/_chores}"
@@ -89,7 +113,9 @@ TECH_STACK="${TECH_STACK:-见项目 README}"
 ERROR_CODE_EXAMPLE="${ERROR_CODE_EXAMPLE:-BUSINESS_ERROR}"
 ERROR_MESSAGE_EXAMPLE="${ERROR_MESSAGE_EXAMPLE:-业务规则不满足}"
 
-# ── 占位符表（从长到短）──────────────────────────────────────────────
+# ── 占位符表 ─────────────────────────────────────────────────────
+# 值一律经 proj_path()（绝对模式加项目根前缀，相对模式原样），
+# 因此模板里不应自行拼接 {{PROJECT_ROOT}}。
 PAIRS=(
   "TECH_STACK=$TECH_STACK"
   "BACKEND_DESC=$BACKEND_DESC"
@@ -99,28 +125,33 @@ PAIRS=(
   "DATABASE=$DATABASE"
   "ERROR_CODE_EXAMPLE=$ERROR_CODE_EXAMPLE"
   "ERROR_MESSAGE_EXAMPLE=$ERROR_MESSAGE_EXAMPLE"
-  "TEST_CMD_BACKEND=cd $PROJECT_ROOT/$BACKEND_DIR && mvn test"
-  "TEST_CMD_FRONTEND=cd $PROJECT_ROOT/$FRONTEND_DIR && npm run build"
-  "E2E_CASES_DIR=$PROJECT_ROOT/$E2E_CASES_DIR"
-  "E2E_RUNNER=$PROJECT_ROOT/$E2E_RUNNER"
-  "E2E_DIR=$PROJECT_ROOT/$E2E_DIR"
-  "STANDARDS_DIR=$PROJECT_ROOT/$STANDARDS_DIR"
-  "TECH_TOPIC_DIR=$PROJECT_ROOT/$TECH_TOPIC_DIR"
-  "ADR_FILE=$PROJECT_ROOT/$ADR_FILE"
-  "ARCHITECTURE_DIR=$PROJECT_ROOT/$ARCHITECTURE_DIR"
-  "BUSINESS_FACTS_DIR=$PROJECT_ROOT/$BUSINESS_FACTS_DIR"
-  "FACTS_DIR=$PROJECT_ROOT/$FACTS_DIR"
-  "CHORES_DIR=$PROJECT_ROOT/$CHORES_DIR"
-  "PLANS_DIR=$PROJECT_ROOT/$PLANS_DIR"
-  "FEATURES_DIR=$PROJECT_ROOT/$FEATURES_DIR"
-  "PLAN_TEMPLATE=$PROJECT_ROOT/$FEATURES_DIR/_template/plan.md"
-  "SPEC_TEMPLATE=$PROJECT_ROOT/$FEATURES_DIR/_template/spec.md"
-  "GLOSSARY_FILE=$PROJECT_ROOT/$ARCHITECTURE_DIR/business/glossary.md"
-  "DOCS_DIR=$PROJECT_ROOT/$DOCS_DIR"
-  "FRONTEND_DIR=$PROJECT_ROOT/$FRONTEND_DIR"
-  "BACKEND_DIR=$PROJECT_ROOT/$BACKEND_DIR"
+  "TEST_CMD_BACKEND=cd $(proj_path "$BACKEND_DIR") && mvn test"
+  "TEST_CMD_FRONTEND=cd $(proj_path "$FRONTEND_DIR") && npm run build"
+  "E2E_CASES_DIR=$(proj_path "$E2E_CASES_DIR")"
+  "E2E_RUNNER=$(proj_path "$E2E_RUNNER")"
+  "E2E_DIR=$(proj_path "$E2E_DIR")"
+  "MANUAL_CASES_DIR=$(proj_path "$MANUAL_CASES_DIR")"
+  "SMOKING_CASES_DIR=$(proj_path "$SMOKING_CASES_DIR")"
+  "DEV_SELF_CASES_DIR=$(proj_path "$DEV_SELF_CASES_DIR")"
+  "TEST_CASES_DIR=$(proj_path "$TEST_CASES_DIR")"
+  "RELEASES_DIR=$(proj_path "$RELEASES_DIR")"
+  "STANDARDS_DIR=$(proj_path "$STANDARDS_DIR")"
+  "TECH_TOPIC_DIR=$(proj_path "$TECH_TOPIC_DIR")"
+  "ADR_FILE=$(proj_path "$ADR_FILE")"
+  "ARCHITECTURE_DIR=$(proj_path "$ARCHITECTURE_DIR")"
+  "BUSINESS_FACTS_DIR=$(proj_path "$BUSINESS_FACTS_DIR")"
+  "FACTS_DIR=$(proj_path "$FACTS_DIR")"
+  "CHORES_DIR=$(proj_path "$CHORES_DIR")"
+  "PLANS_DIR=$(proj_path "$PLANS_DIR")"
+  "FEATURES_DIR=$(proj_path "$FEATURES_DIR")"
+  "PLAN_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/plan.md")"
+  "SPEC_TEMPLATE=$(proj_path "$FEATURES_DIR/_template/spec.md")"
+  "GLOSSARY_FILE=$(proj_path "$ARCHITECTURE_DIR/business/glossary.md")"
+  "DOCS_DIR=$(proj_path "$DOCS_DIR")"
+  "FRONTEND_DIR=$(proj_path "$FRONTEND_DIR")"
+  "BACKEND_DIR=$(proj_path "$BACKEND_DIR")"
   "PROJECT_NAME=$PROJECT_NAME"
-  "PROJECT_ROOT=$PROJECT_ROOT"
+  "PROJECT_ROOT=$( [ "$PATH_MODE" = "relative" ] && printf '.' || printf '%s' "$PROJECT_ROOT" )"
 )
 
 escape_replacement() {
@@ -163,6 +194,7 @@ write_file() {
 echo "Harness 初始化器"
 echo "  模板目录 : $TEMPLATE_DIR"
 echo "  目标项目 : $PROJECT_ROOT"
+echo "  路径模式 : $PATH_MODE"
 echo "  探测结果 : backend=$BACKEND_DIR frontend=$FRONTEND_DIR e2e=$E2E_DIR docs=$DOCS_DIR"
 echo ""
 
@@ -195,6 +227,7 @@ fi
 
 echo ""
 echo "完成：生成 $created 个文件，跳过 $skipped 个。"
+echo "路径模式：$PATH_MODE$( [ "$PATH_MODE" = "relative" ] && printf '（产物可随仓库分发，agent 需在项目根运行）' || printf '（任意 cwd 可用，但路径绑定本机）' )"
 echo "下一步："
 echo "  1. 填写 AGENTS.md 中所有 TODO 段落（技术栈、分层、鉴权、测试规范等）"
 echo "  2. 执行 agile-team-sdd/install.sh $PROJECT_ROOT 安装 SDD skills"

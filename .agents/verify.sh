@@ -156,7 +156,7 @@ else
   skip "找不到 python"
 fi
 
-# ── 7. 占位符已登记 ───────────────────────────────────────────────
+# ── 7. 占位符已登记 + harness-installer 模板可渲染 ────────────────
 head_ "7. 模板占位符已登记"
 if [ -n "$PY" ]; then
   "$PY" - <<'PYEOF'
@@ -173,7 +173,31 @@ missing = sorted(used - declared)
 if missing:
     print(f'  \033[31m✘\033[0m 未登记的占位符：{missing}')
     sys.exit(1)
-print(f'  \033[32m✔\033[0m {len(used)} 个占位符全部已登记')
+
+# harness-installer：模板里用到的占位符必须能被 init-harness.sh 替换
+# （它的源码 PAIRS 才是这部分的事实源；placeholders.md 管的是 agile-team-sdd）
+tpl = pathlib.Path('harness-installer/templates')
+harness_used = set()
+for f in tpl.rglob('*'):
+    if not f.is_file():
+        continue
+    try:
+        harness_used |= set(re.findall(r'\{\{([A-Z_]+)\}\}', f.read_text(encoding='utf-8')))
+    except UnicodeDecodeError:
+        continue
+
+script = pathlib.Path('harness-installer/scripts/init-harness.sh').read_text(encoding='utf-8')
+substituted = set(re.findall(r'^\s*"([A-Z_]+)=', script, re.M))
+
+problems = []
+for ph in sorted(harness_used - substituted):
+    problems.append(f'harness-installer 模板里的 {{{{{ph}}}}} 不会被 init-harness.sh 替换')
+if problems:
+    for p in problems:
+        print(f'  \033[31m✘\033[0m {p}')
+    sys.exit(1)
+
+print(f'  \033[32m✔\033[0m {len(used)} + {len(harness_used)} 个占位符已登记且可渲染')
 PYEOF
   if [ $? -eq 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
 else
@@ -234,6 +258,55 @@ PYEOF
   if [ $? -eq 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
 else
   skip "找不到 python"
+fi
+
+# ── 9.1 harness-installer 骨架 ↔ AGENTS.md 声明一致 ──────────────
+head_ "9.1 harness-installer 骨架与声明一致"
+if [ -z "$PY" ]; then
+  skip "找不到 python"
+else
+  TMPI="$(mktemp -d)"
+  mkdir -p "$TMPI/abs" "$TMPI/rel"
+  if ./harness-installer/scripts/init-harness.sh "$TMPI/abs" >/dev/null 2>&1 \
+     && PATH_MODE=relative ./harness-installer/scripts/init-harness.sh "$TMPI/rel" >/dev/null 2>&1; then
+    "$PY" - "$TMPI" <<'PYEOF'
+import pathlib, re, sys
+
+tmp = pathlib.Path(sys.argv[1])
+bad = []
+
+abs_text = (tmp / 'abs' / 'AGENTS.md').read_text(encoding='utf-8')
+if str(tmp / 'abs') not in abs_text:
+    bad.append('absolute 模式未写入绝对路径')
+
+rel_root = tmp / 'rel'
+rel_text = (rel_root / 'AGENTS.md').read_text(encoding='utf-8')
+if str(tmp) in rel_text:
+    bad.append('relative 模式泄漏安装机绝对路径')
+for ph in sorted(set(re.findall(r'\{\{[A-Z_]+\}\}', rel_text))):
+    bad.append(f'AGENTS.md 残留占位符 {ph}')
+
+# 声明 ↔ 实物：引用的 docs 路径必须存在
+#   - docs/facts/ 是 as-built 产物，装机时本就不存在
+#   - 含 <...> 的目录每个迭代才创建
+for s in sorted(set(re.findall(r'(?<![\w/])docs/[^\s`)、，；,]+', rel_text))):
+    s = s.rstrip('/').rstrip('。')
+    if s.startswith('docs/facts/') or '<' in s:
+        continue
+    if not (rel_root / s).exists():
+        bad.append(f'AGENTS.md 声明了不存在的路径 {s}')
+
+if bad:
+    for b in bad:
+        print(f'  \033[31m✘\033[0m {b}')
+    sys.exit(1)
+print(f'  \033[32m✔\033[0m 骨架与 AGENTS.md 声明一致（abs / rel 双模式）')
+PYEOF
+    if [ $? -eq 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
+  else
+    bad "init-harness.sh 在临时目录安装失败"
+  fi
+  rm -rf "$TMPI"
 fi
 
 # ── 10. overnight-runner 冒烟测试 ─────────────────────────────────

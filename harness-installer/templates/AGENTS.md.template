@@ -131,7 +131,7 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 
 - 需求规格的每条验收标准、每条业务规则 → 至少 1 条 QA 用例
 - 编号统一 `TC-xxx`，文本用例与自动化用例共用同一编号
-- 四类产物：文本用例 `{{E2E_CASES_DIR}}/`、E2E 自动化 `{{E2E_DIR}}/tests/qa/`、手动用例 `{{DOCS_DIR}}/manual-cases/`、冒烟用例 `{{DOCS_DIR}}/smoking-cases/`
+- 四类产物：文本用例 `{{E2E_CASES_DIR}}/`、E2E 自动化 `{{E2E_DIR}}/tests/qa/`、手动用例 `{{MANUAL_CASES_DIR}}/`、冒烟用例 `{{SMOKING_CASES_DIR}}/`
 - 用例可独立重复执行，不依赖执行顺序
 
 ### E2E 测试
@@ -188,22 +188,26 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 │   ├── business/           # 业务事实
 │   └── tech-topic/         # 实现专题（非 ADR）
 ├── standards/              # 代码规范（事实文档）
-│   ├── architecture.md
-│   ├── naming.md
-│   ├── security.md
-│   ├── api-design.md
-│   ├── layers.md
-│   ├── db.md
-│   ├── error.md
-│   ├── test.md
+│   ├── README.md           # 规范索引（预置 / 按需创建）
+│   ├── architecture.md     # 预置：整体架构、模块边界、依赖方向
+│   ├── layers.md           # 预置：分层职责，每层允许/禁止做什么
+│   ├── naming.md           # 预置：包、类、方法、字段、REST 路径命名
+│   ├── test.md             # 预置：用例归属、覆盖要求、数据准备
+│   ├── security.md         # 按需创建（有认证/授权时）
+│   ├── api-design.md       # 按需创建（有对外 API 时）
+│   ├── db.md               # 按需创建（有数据库时）
+│   ├── error.md            # 按需创建（有统一错误码体系时）
+│   ├── business-rule.md    # 按需创建（有业务规则引擎时）
 │   ├── adr.md              # ADR 写法；正文在 architecture/tech/adr.md
 │   └── templates/
-├── e2e-cases/              # QA 用例：E2E 验收用例文本基线
-├── manual-cases/           # QA 用例：手动执行用例
-└── smoking-cases/          # QA 用例：快速回归（冒烟）用例
+└── test-cases/             # 测试用例文本基线
+    ├── e2e-cases/          # QA 用例：E2E 验收用例文本基线
+    ├── manual-cases/       # QA 用例：手动执行用例
+    ├── smoking-cases/      # QA 用例：快速回归（冒烟）用例
+    └── dev-self-cases/     # 开发自测场景索引
 ```
 
-> `{{DOCS_DIR}}/` 下的 `e2e-cases/`、`manual-cases/`、`smoking-cases/` 均为 **QA 测试** 产物（定义权与判定权归 QA）；
+> `{{DOCS_DIR}}/test-cases/` 下的 `e2e-cases/`、`manual-cases/`、`smoking-cases/` 均为 **QA 测试** 产物（定义权与判定权归 QA）；
 > 开发自测用例放在源码旁（`*Test.java`、`*.test.ts`）与 `{{E2E_DIR}}/tests/dev/`。归属详见 §10 与 `{{STANDARDS_DIR}}/test.md`。
 
 ### 同步要求
