@@ -213,8 +213,9 @@
         var STACK_GAP = 20;
         var LANE_TOP = 96;
         var LANE_BOTTOM = 816;
-        var FEEDBACK = [40, 62];
+        var FEEDBACK = [40, 62, 84];
         var BOTTOM_CORRIDOR = LANE_BOTTOM + 24;
+        var CASE_CORRIDOR = LANE_BOTTOM + 52;
 
         var lanes = {
           human: {
@@ -324,6 +325,38 @@
           ]
         });
 
+        joint.dia.Element.define("workflow.Plan", {
+          size: { width: NODEW, height: 128 },
+          attrs: {
+            body: { refWidth: "100%", refHeight: "100%", rx: 10, ry: 10, stroke: fg, strokeWidth: 2.5, fill: nodeAction },
+            title: {
+              text: "/dev-plan",
+              refX: "50%", refY: 16,
+              textAnchor: "middle", textVerticalAnchor: "middle",
+              fontSize: 13.5, fontFamily: "sans-serif", fontWeight: 600, fill: fg
+            },
+            badge: {
+              text: "一批任务 · 人确认",
+              refX: "50%", refY: 35,
+              textAnchor: "middle", textVerticalAnchor: "middle",
+              fontSize: 11.5, fontFamily: "sans-serif", fill: muted
+            },
+            bullets: {
+              text: "· 详细设计\n   API / DB 字段、文件改动\n· 任务清单\n· 自测用例（DST）",
+              refX: 12, refY: 52,
+              textAnchor: "start", textVerticalAnchor: "top",
+              fontSize: 11, fontFamily: "sans-serif", lineHeight: "1.5em", fill: fg
+            }
+          }
+        }, {
+          markup: [
+            { tagName: "rect", selector: "body" },
+            { tagName: "text", selector: "title" },
+            { tagName: "text", selector: "badge" },
+            { tagName: "text", selector: "bullets" }
+          ]
+        });
+
         joint.dia.Element.define("workflow.Tag", {
           attrs: {
             body: { refWidth: "100%", refHeight: "100%", rx: 5, ry: 5, fill: bg, stroke: "none" },
@@ -422,6 +455,16 @@
           return cell;
         }
 
+        function endNode(text) {
+          return new joint.shapes.standard.Ellipse({
+            size: { width: 110, height: 48 },
+            attrs: {
+              body: { stroke: fg, strokeWidth: 1.5, fill: nodeEnd },
+              label: { text: text, fill: fg, fontSize: 14, fontFamily: "sans-serif" }
+            }
+          });
+        }
+
         var cells = {
           graph: poly(hex, "/graph\n会话启动", 150, 54, nodeMaster, 12),
           start: poly(para, "开始版本", 156, 46, nodeInput),
@@ -433,8 +476,9 @@
           reqDec: poly(diamond, "需求决策", 120, 76, nodeDecision),
           tech: poly(para, "技术高阶", 156, 46, nodeInput),
           hld: box("/tl-high-level-design", "一次"),
+          qaCase: box("/qa-write-cases", "e2e-case"),
           hldDec: poly(diamond, "高阶决策", 120, 76, nodeDecision),
-          devPlan: box("/dev-plan", "一批任务", { batch: true }),
+          devPlan: new joint.shapes.workflow.Plan(),
           planGate: gate("plan 质量门", "/dev-plan-review"),
           planConfirm: poly(para, "plan 确认", 156, 46, nodeInput),
           planDec: poly(diamond, "plan 决策", 120, 76, nodeDecision),
@@ -443,13 +487,10 @@
           buildDec: poly(diamond, "构建决策", 120, 76, nodeDecision),
           amendIn: poly(para, "修订输入", 156, 46, nodeInput),
           amend: box("/dev-plan-amend"),
-          handoff: new joint.shapes.standard.Ellipse({
-            size: { width: 110, height: 48 },
-            attrs: {
-              body: { stroke: fg, strokeWidth: 1.5, fill: nodeEnd },
-              label: { text: "提测", fill: fg, fontSize: 14, fontFamily: "sans-serif" }
-            }
-          })
+          handoff: endNode("提测"),
+          e2eRun: box("编写并运行 E2E 测试", "/qa-run-e2e", { batch: true }),
+          e2eDec: poly(diamond, "测试决策", 120, 76, nodeDecision),
+          e2eDone: endNode("测试通过")
         };
 
         var columns = [
@@ -459,7 +500,7 @@
           [{ lane: "human", ids: ["writeSpec"] }],
           [{ lane: "sub", ids: ["baSpec", "proto", "reqGate"] }],
           [{ lane: "human", ids: ["reqDec"] }],
-          [{ lane: "human", ids: ["tech"] }, { lane: "sub", ids: ["hld"] }],
+          [{ lane: "human", ids: ["tech"] }, { lane: "sub", ids: ["hld", "qaCase"] }],
           [{ lane: "human", ids: ["hldDec"] }],
           [{ lane: "sub", ids: ["devPlan", "planGate"] }],
           [{ lane: "human", ids: ["planConfirm", "planDec"] }],
@@ -468,7 +509,10 @@
             { lane: "human", ids: ["buildDec", "amendIn"] },
             { lane: "sub", ids: ["amend"] }
           ],
-          [{ lane: "master", ids: ["handoff"] }]
+          [{ lane: "master", ids: ["handoff"] }],
+          [{ lane: "sub", ids: ["e2eRun"] }],
+          [{ lane: "human", ids: ["e2eDec"] }],
+          [{ lane: "master", ids: ["e2eDone"] }]
         ];
 
         var originX = GUTTER + 32;
@@ -604,6 +648,16 @@
         });
         link(c.reqGate, c.reqDec);
         link(c.reqDec, c.tech);
+        link(c.reqDec, c.qaCase, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.reqDec) + 26, y: midY(c.reqDec) },
+            { x: right(c.reqDec) + 26, y: midY(c.qaCase) }
+          ]
+        });
+        tag("并行", right(c.reqDec) + 44, (midY(c.reqDec) + midY(c.qaCase)) / 2, muted);
         link(c.tech, c.hld, { from: "bottom", to: "top", straight: true });
         link(c.hld, c.hldDec);
         link(c.hldDec, c.devPlan, {
@@ -658,6 +712,47 @@
           ]
         });
 
+        // 提测后：E2E 测试与人工决策
+        link(c.handoff, c.e2eRun, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.handoff) + 22, y: midY(c.handoff) },
+            { x: right(c.handoff) + 22, y: midY(c.e2eRun) }
+          ]
+        });
+        link(c.e2eRun, c.e2eDec, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.e2eRun) + 14, y: midY(c.e2eRun) },
+            { x: right(c.e2eRun) + 14, y: midY(c.e2eDec) }
+          ]
+        });
+        link(c.e2eDec, c.e2eDone, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.e2eDec) + 22, y: midY(c.e2eDec) },
+            { x: right(c.e2eDec) + 22, y: midY(c.e2eDone) }
+          ]
+        });
+
+        // 用例先行：与技术高阶并行产出，提测后汇入 E2E
+        link(c.qaCase, c.e2eRun, {
+          from: "bottom",
+          to: "bottom",
+          router: { name: "normal" },
+          vertices: [
+            { x: midX(c.qaCase), y: CASE_CORRIDOR },
+            { x: midX(c.e2eRun), y: CASE_CORRIDOR }
+          ]
+        });
+        tag("用例就绪", (midX(c.qaCase) + midX(c.e2eRun)) / 2, CASE_CORRIDOR, muted);
+
         // 打回边：每条独立走廊，避免重叠
         function backLink(source, target, y, text) {
           link(source, target, {
@@ -684,6 +779,31 @@
         backLink(c.reqDec, c.writeSpec, FEEDBACK[0], "不满意");
         backLink(c.hldDec, c.tech, FEEDBACK[1], "不满意");
 
+        // 测试决策：修订重跑 / 打回开发
+        link(c.e2eDec, c.e2eRun, {
+          back: true,
+          from: "bottom",
+          to: "top",
+          router: { name: "normal" },
+          vertices: [
+            { x: midX(c.e2eDec), y: top(c.e2eRun) - 16 },
+            { x: midX(c.e2eRun), y: top(c.e2eRun) - 16 }
+          ]
+        });
+        tag("修订 · 重跑", (midX(c.e2eDec) + midX(c.e2eRun)) / 2, top(c.e2eRun) - 16, danger);
+        link(c.e2eDec, c.amendIn, {
+          back: true,
+          from: "top",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: midX(c.e2eDec), y: FEEDBACK[2] },
+            { x: left(c.amendIn) - 14, y: FEEDBACK[2] },
+            { x: left(c.amendIn) - 14, y: midY(c.amendIn) }
+          ]
+        });
+        tag("打回开发", (midX(c.e2eDec) + left(c.amendIn)) / 2, FEEDBACK[2], danger);
+
         var backX = left(c.devPlan) - 110;
         link(c.amend, c.devPlan, {
           back: true,
@@ -705,6 +825,7 @@
         tag("满意", right(c.planGate) + 30, midY(c.planGate) - 12, muted);
         tag("满意", right(c.planDec) + 30, (midY(c.planDec) + midY(c.runner)) / 2, muted);
         tag("满意", right(c.buildDec) + 38, (midY(c.buildDec) + midY(c.handoff)) / 2, muted);
+        tag("通过", right(c.e2eDec) + 40, (midY(c.e2eDec) + midY(c.e2eDone)) / 2, muted);
         tag("不满意", midX(c.buildDec) + 38, (bottom(c.buildDec) + top(c.amendIn)) / 2, danger);
         tag("本批结束", between(c.devBuild, c.buildDec), (midY(c.devBuild) + midY(c.buildDec)) / 2, muted);
 
@@ -715,13 +836,15 @@
         var stages = [
           { from: GUTTER, to: boundaryX(6), title: "1  需求澄清" },
           { from: boundaryX(6), to: boundaryX(8), title: "2  技术设计" },
-          { from: boundaryX(8), to: laneWidth, title: "3  开发构建" }
+          { from: boundaryX(8), to: boundaryX(13), title: "3  开发构建" },
+          { from: boundaryX(13), to: laneWidth, title: "4  测试验收" }
         ];
         stages.forEach(function (stage) {
           caption(stage.title, (stage.from + stage.to) / 2, stage.to - stage.from);
         });
         separator(boundaryX(6));
         separator(boundaryX(8));
+        separator(boundaryX(13));
 
         // 适配与缩放
         var MIN_SCALE = 0.1;

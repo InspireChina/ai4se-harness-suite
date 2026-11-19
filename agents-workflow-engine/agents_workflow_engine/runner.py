@@ -9,11 +9,14 @@ from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Tuple
 
 from .errors import GraphError
 from .errors import NeedInput
 from .validate import REVIEW_PAIRS
 from .validate import node_map
+
+Token = Tuple[str, str]
 
 
 def _plain_edges(edges: List[dict], node_id: str) -> List[dict]:
@@ -47,11 +50,11 @@ def _can_reach(start: str, target: str, edges: List[dict]) -> bool:
     return False
 
 
-def _when_edge(edges: List[dict], node_id: str, answer: str) -> dict:
-    for edge in edges:
-        if edge.get("from") == node_id and edge.get("when") == answer:
-            return edge
-    raise GraphError("节点 %s 没有「%s」这条出边" % (node_id, answer))
+def _when_edges(edges: List[dict], node_id: str, answer: str) -> List[dict]:
+    return [
+        edge for edge in edges
+        if edge.get("from") == node_id and edge.get("when") == answer
+    ]
 
 
 def _loop_for(graph: dict, edge_id: str) -> Optional[dict]:
@@ -106,7 +109,7 @@ def _tasks(text: str) -> List[str]:
 
 
 class Runner:
-    def __init__(self, graph: dict, answers: Dict[str, List[str]], agent: Callable, master_model: str, log: List[dict], current: str = "", visits: Dict[str, int] = None, loop_counts: Dict[str, int] = None, tasks: List[str] = None, task_index: int = 0) -> None:
+    def __init__(self, graph: dict, answers: Dict[str, List[str]], agent: Callable, master_model: str, log: List[dict], current: str = "", visits: Dict[str, int] = None, loop_counts: Dict[str, int] = None, tasks: List[str] = None, task_index: int = 0, joined: Dict[str, set] = None) -> None:
         self.graph = graph
         self.answers = answers
         self.agent = agent
@@ -119,59 +122,76 @@ class Runner:
         self.loop_counts = loop_counts or {}
         self.tasks = list(tasks or [])
         self.task_index = task_index
+        self.joined = joined or {}
 
     def run(self) -> str:
-        current = self.current
+        # 一条 token 就是一股独立的执行流；决策的 parallel 分支会各分出一股。
+        work = [(self.current, "")]
         guard = 0
-        while guard < 500:
+        while work:
             guard += 1
+            if guard > 500:
+                raise GraphError("走了 500 步还没到终点，图里可能有死循环")
+            current, via = work.pop(0)
             self.current = current
             node = self.nodes[current]
+            if node.get("join") and not self._join_ready(current, via):
+                continue
             kind = node.get("kind")
             if kind == "end":
                 self.log.append({"node": current, "event": "end", "title": node.get("title")})
                 return current
-            if kind == "entry":
-                current = self._only(current)
+            if kind in ("entry", "milestone"):
+                if kind == "milestone":
+                    self.log.append({"node": current, "event": "milestone", "title": node.get("title")})
+                work.insert(0, self._only_token(current))
                 continue
             if kind == "human_input":
                 text = _take_answer(self.answers, current)
                 self.log.append({"node": current, "event": "human_input", "text": text})
-                current = self._only(current)
+                work.insert(0, self._only_token(current))
                 continue
             if kind == "decision":
                 choice = _take_answer(self.answers, current)
                 self.log.append({"node": current, "event": "decision", "choice": choice})
-                current = self._follow_when(current, choice)
+                tokens = self._decision_tokens(current, choice)
+                if len(tokens) > 1:
+                    self.log.append({"node": current, "event": "fork", "branches": [token[0] for token in tokens]})
+                work = tokens + work
                 continue
             if kind == "gate":
                 self._warn_pair(node)
                 result = self._call(node, None)
                 verdict = _verdict(result)
                 self.log.append({"node": current, "event": "gate", "verdict": verdict, "model": _resolve_model(self.graph, node, self.master_model)})
-                current = self._follow_when(current, verdict)
+                matches = _when_edges(self.edges, current, verdict)
+                if len(matches) != 1:
+                    raise GraphError("门禁 %s 的「%s」有 %s 条出边，必须恰好 1 条" % (current, verdict, len(matches)))
+                self._limit_back(matches[0], current)
+                work.insert(0, (matches[0]["to"], matches[0]["id"]))
                 continue
             if kind == "action":
-                current = self._run_action(node)
+                nxt = self._run_action(node)
+                work.insert(0, nxt if nxt is not None else (current, via))
                 continue
             raise GraphError("节点 %s 的 kind 无法执行：%s" % (current, kind))
-        raise GraphError("走了 500 步还没到终点，图里可能有死循环")
+        raise GraphError("调度队列空了还没到终点。检查图里是否有分支没有汇入")
 
-    def _run_action(self, node: dict) -> str:
+    def _run_action(self, node: dict) -> Optional[Token]:
         node_id = node["id"]
         if node.get("once") and self.visits.get(node_id):
-            return self._only(node_id)
+            return self._only_token(node_id)
         if node.get("repeatsBatch"):
             if self.task_index >= len(self.tasks):
-                return self._only(node_id)
+                return self._only_token(node_id)
             task = self.tasks[self.task_index]
             result = self._call(node, task)
             self.visits[node_id] = self.visits.get(node_id, 0) + 1
             self.task_index += 1
             self.log.append({"node": node_id, "event": "batch-step", "task": task, "output": result})
             if self.task_index < len(self.tasks):
-                return node_id
-            return self._only(node_id)
+                return None
+            return self._only_token(node_id)
         result = self._call(node, None)
         self.visits[node_id] = self.visits.get(node_id, 0) + 1
         self.log.append({"node": node_id, "event": "action", "output": result, "model": _resolve_model(self.graph, node, self.master_model)})
@@ -179,7 +199,7 @@ class Runner:
             self.tasks = _tasks(result)
             self.task_index = 0
             self.log.append({"node": node_id, "event": "batch", "tasks": list(self.tasks)})
-        return self._only(node_id)
+        return self._only_token(node_id)
 
     def _call(self, node: dict, task: Optional[str]) -> str:
         model = _resolve_model(self.graph, node, self.master_model)
@@ -204,26 +224,64 @@ class Runner:
                     "reviewerModel": right,
                 })
 
-    def _follow_when(self, node_id: str, answer: str) -> str:
-        edge = _when_edge(self.edges, node_id, answer)
-        if edge.get("back"):
-            loop = _loop_for(self.graph, edge["id"])
-            if loop is None:
-                raise GraphError("打回边 %s 没有上限" % edge["id"])
-            count = self.loop_counts.get(loop["id"], 0) + 1
-            self.loop_counts[loop["id"]] = count
-            if count > int(loop["maxIterations"]):
-                raise GraphError(
-                    "回路 %s 已打回 %s 次，达到上限 %s。请人工处理节点 %s 后再继续"
-                    % (loop["id"], count - 1, loop["maxIterations"], node_id)
-                )
-        return edge["to"]
+    def _decision_tokens(self, node_id: str, answer: str) -> List[Token]:
+        matches = _when_edges(self.edges, node_id, answer)
+        if not matches:
+            raise GraphError("节点 %s 没有「%s」这条出边" % (node_id, answer))
+        main = [edge for edge in matches if not edge.get("parallel")]
+        side = [edge for edge in matches if edge.get("parallel")]
+        if len(main) != 1:
+            raise GraphError(
+                "节点 %s 的「%s」需要恰好一条主出边，现在 %s 条；并行分支请标 parallel: true"
+                % (node_id, answer, len(main))
+            )
+        for edge in matches:
+            self._limit_back(edge, node_id)
+        # 侧分支先推进，主路径随后；两股都到汇入点时才执行汇入节点。
+        return [(edge["to"], edge["id"]) for edge in side] + [(main[0]["to"], main[0]["id"])]
 
-    def _only(self, node_id: str) -> str:
+    def _limit_back(self, edge: dict, node_id: str) -> None:
+        if not edge.get("back"):
+            return
+        loop = _loop_for(self.graph, edge["id"])
+        if loop is None:
+            raise GraphError("打回边 %s 没有上限" % edge["id"])
+        count = self.loop_counts.get(loop["id"], 0) + 1
+        self.loop_counts[loop["id"]] = count
+        if count > int(loop["maxIterations"]):
+            raise GraphError(
+                "回路 %s 已打回 %s 次，达到上限 %s。请人工处理节点 %s 后再继续"
+                % (loop["id"], count - 1, loop["maxIterations"], node_id)
+            )
+
+    def _join_ready(self, node_id: str, via: str) -> bool:
+        if not via:
+            return True
+        edge = self._edge(via)
+        if edge is None or edge.get("back"):
+            return True
+        forward = set(
+            item["id"] for item in self.edges
+            if item.get("to") == node_id and not item.get("back")
+        )
+        seen = self.joined.setdefault(node_id, set())
+        seen.add(via)
+        if forward <= seen:
+            return True
+        self.log.append({"node": node_id, "event": "join-wait", "waiting": sorted(forward - seen)})
+        return False
+
+    def _edge(self, edge_id: str) -> Optional[dict]:
+        for edge in self.edges:
+            if edge.get("id") == edge_id:
+                return edge
+        return None
+
+    def _only_token(self, node_id: str) -> Token:
         chosen = _plain_edges(self.edges, node_id)
         if len(chosen) != 1:
             raise GraphError("节点 %s 有 %s 条向前的边，调度不知道走哪条" % (node_id, len(chosen)))
-        return chosen[0]["to"]
+        return (chosen[0]["to"], chosen[0]["id"])
 
 
 def spawn_agent(command: str, node: dict, model: str, task: Optional[str]) -> str:

@@ -8,9 +8,57 @@
     "entry": { "type": "string" },
     "lanes": { "type": "array" },
     "models": { "type": "object" },
-    "loops": { "type": "array" },
-    "nodes": { "type": "array" },
-    "edges": { "type": "array" },
+    "loops": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "maxIterations", "backEdges"],
+        "properties": {
+          "id": { "type": "string" },
+          "maxIterations": { "type": "integer" },
+          "backEdges": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "actor", "kind"],
+        "properties": {
+          "id": { "type": "string" },
+          "actor": { "enum": ["human", "master", "subagent"] },
+          "kind": {
+            "enum": ["entry", "human_input", "action", "gate", "decision", "milestone", "end"]
+          },
+          "title": { "type": "string" },
+          "skill": { "type": "string" },
+          "model": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" } },
+          "batch": { "type": "boolean" },
+          "repeatsBatch": { "type": "string" },
+          "once": { "type": "boolean" },
+          "join": { "type": "boolean" },
+          "sealed": { "type": "boolean" },
+          "note": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "from", "to"],
+        "properties": {
+          "id": { "type": "string" },
+          "from": { "type": "string" },
+          "to": { "type": "string" },
+          "when": { "type": "string" },
+          "back": { "type": "boolean" },
+          "parallel": { "type": "boolean" }
+        }
+      }
+    },
     "extensions": { "type": "array" }
   }
 }

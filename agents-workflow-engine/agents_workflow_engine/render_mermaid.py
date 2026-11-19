@@ -9,7 +9,11 @@ def _shape(node: dict) -> str:
         title += " · 一批任务"
     if node.get("repeatsBatch"):
         title += " · 按批循环"
-    if node.get("sealed") and node.get("note"):
+    if node.get("join"):
+        title += " · 汇入"
+    if node.get("kind") == "milestone":
+        title += " · 里程碑"
+    if node.get("note"):
         title += " / " + "、".join(node["note"])
     node_id = node["id"]
     kind = node.get("kind")
@@ -21,7 +25,7 @@ def _shape(node: dict) -> str:
         return "%s{%s}" % (node_id, title)
     if kind == "human_input":
         return "%s[/%s/]" % (node_id, title)
-    if kind == "end":
+    if kind in ("end", "milestone"):
         return "%s([%s])" % (node_id, title)
     if kind == "entry":
         return "%s{{%s}}" % (node_id, title)
@@ -39,6 +43,9 @@ def render(graph: dict) -> str:
         lines.append("  end")
     for edge in graph.get("edges") or []:
         arrow = "-.->" if edge.get("back") else "-->"
-        label = "|%s|" % edge["when"] if edge.get("when") else ""
+        label_text = edge.get("when") or ""
+        if edge.get("parallel"):
+            label_text = (label_text + " · 并行").strip(" ·")
+        label = "|%s|" % label_text if label_text else ""
         lines.append("  %s %s%s %s" % (edge["from"], arrow, label, edge["to"]))
     return "\n".join(lines) + "\n"

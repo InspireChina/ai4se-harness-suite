@@ -17,7 +17,6 @@ from agents_workflow_engine.merge import merge  # noqa: E402
 from agents_workflow_engine.render_mermaid import render  # noqa: E402
 from agents_workflow_engine.runner import Runner  # noqa: E402
 from agents_workflow_engine.validate import validate  # noqa: E402
-from agents_workflow_engine.yaml_lite import loads  # noqa: E402
 
 
 def happy_answers():
@@ -30,6 +29,7 @@ def happy_answers():
         "plan-confirm": ["确认"],
         "plan-decision": ["满意"],
         "build-decision": ["满意"],
+        "test-decision": ["通过"],
     }
 
 
@@ -64,24 +64,50 @@ class PresetTest(unittest.TestCase):
         self.assertFalse(any("未做对抗验证" in item for item in warnings))
         self.assertFalse(any("未配置对抗模型" in item for item in warnings))
 
-    def test_render_shapes_and_hides_extensions(self):
+    def test_render_shapes(self):
         text = render(load_preset())
         self.assertIn("flowchart LR", text)
-        self.assertIn("dev-plan(详细规划 · 一批任务)", text)
+        self.assertIn(
+            "dev-plan(详细规划 · 一批任务 / 详细设计（API/DB 字段、文件改动）、任务清单、自测用例（DST）)",
+            text,
+        )
+        self.assertIn("qa-write-cases(编写 QA 用例)", text)
+        self.assertIn("qa-run-e2e(编写并运行 E2E 测试 · 汇入)", text)
+        self.assertIn("test-decision{测试决策}", text)
         self.assertIn("ba-requirement-review[[需求质量门]]", text)
         self.assertIn("start-version[/开始版本/]", text)
         self.assertIn("requirement-decision{需求决策}", text)
-        self.assertIn("handoff([提测])", text)
+        self.assertIn("handoff([提测 · 里程碑])", text)
+        self.assertIn("accepted([测试通过])", text)
         self.assertIn("graph-start{{会话启动}}", text)
         self.assertIn("后端 TDD", text)
-        self.assertNotIn("qa-write-cases", text)
         self.assertIn("-.->|不满意|", text)
+        self.assertIn("-->|满意 · 并行| qa-write-cases", text)
+
+    def test_render_hides_extensions(self):
+        graph = load_preset()
+        graph["extensions"] = [{
+            "id": "future",
+            "title": "未来",
+            "linked": False,
+            "nodes": [{"id": "future-node", "kind": "action", "title": "未来步骤"}],
+        }]
+        self.assertNotIn("future-node", render(graph))
 
     def test_disable_prototype_still_reaches_end(self):
         graph = merge(load_preset(), {"disable": ["ba-write-prototype"]})
         errors, _warnings = validate(graph)
         self.assertEqual(errors, [])
         self.assertNotIn("ba-write-prototype", {node["id"] for node in graph["nodes"]})
+
+    def test_disable_qa_cases_keeps_graph_runnable(self):
+        graph = merge(load_preset(), {"disable": ["qa-write-cases"]})
+        errors, _warnings = validate(graph)
+        self.assertEqual(errors, [])
+        calls = []
+        end = Runner(graph, happy_answers(), fake_agent(calls), "master", []).run()
+        self.assertEqual(end, "accepted")
+        self.assertNotIn("qa-write-cases", [item[0] for item in calls])
 
     def test_edge_into_sealed_step_fails(self):
         graph = load_preset()
@@ -91,7 +117,12 @@ class PresetTest(unittest.TestCase):
 
     def test_edge_into_extension_fails(self):
         graph = load_preset()
-        graph["edges"].append({"id": "bad", "from": "handoff", "to": "qa-write-cases"})
+        graph["extensions"] = [{
+            "id": "future",
+            "title": "未来",
+            "nodes": [{"id": "future-node", "kind": "action", "title": "未来步骤"}],
+        }]
+        graph["edges"].append({"id": "bad", "from": "handoff", "to": "future-node"})
         errors, _warnings = validate(graph)
         self.assertTrue(any("扩展" in item for item in errors))
 
@@ -100,6 +131,43 @@ class PresetTest(unittest.TestCase):
         graph["loops"] = [loop for loop in graph["loops"] if loop["id"] != "spec"]
         errors, _warnings = validate(graph)
         self.assertTrue(any("没有写入任何回路" in item for item in errors))
+
+    def test_parallel_branch_needs_one_main_edge(self):
+        graph = load_preset()
+        graph["edges"].append({
+            "id": "dup",
+            "from": "requirement-decision",
+            "to": "write-spec",
+            "when": "满意",
+        })
+        errors, _warnings = validate(graph)
+        self.assertTrue(any("主出边" in item for item in errors))
+
+    def test_parallel_edge_must_come_from_decision(self):
+        graph = load_preset()
+        graph["edges"] = [
+            dict(edge, parallel=True) if edge["id"] == "e13" else edge
+            for edge in graph["edges"]
+        ]
+        errors, _warnings = validate(graph)
+        self.assertTrue(any("parallel" in item for item in errors))
+
+    def test_join_rejects_conditional_input(self):
+        graph = load_preset()
+        graph["edges"] = [
+            dict(edge, when="满意") if edge["id"] == "qa-cases-ready" else edge
+            for edge in graph["edges"]
+        ]
+        errors, _warnings = validate(graph)
+        self.assertTrue(any("汇入" in item for item in errors))
+
+    def test_milestone_must_be_master(self):
+        graph = load_preset()
+        for node in graph["nodes"]:
+            if node["id"] == "handoff":
+                node["actor"] = "subagent"
+        errors, _warnings = validate(graph)
+        self.assertTrue(any("里程碑 handoff" in item for item in errors))
 
     def test_replace_skill(self):
         graph = merge(load_preset(), {"replace": {"ba-write-spec": {"skill": "my-write-spec"}}})
@@ -112,10 +180,25 @@ class RunTest(unittest.TestCase):
         calls = []
         log = []
         end = Runner(load_preset(), happy_answers(), fake_agent(calls), "master", log).run()
-        self.assertEqual(end, "handoff")
+        self.assertEqual(end, "accepted")
         build_calls = [item for item in calls if item[0] == "dev-build"]
         self.assertEqual([item[2] for item in build_calls], ["a", "b"])
         self.assertTrue(any(item.get("event") == "batch" for item in log))
+
+    def test_qa_branch_runs_before_design_and_joins(self):
+        calls = []
+        log = []
+        end = Runner(load_preset(), happy_answers(), fake_agent(calls), "master", log).run()
+        self.assertEqual(end, "accepted")
+        order = [item[0] for item in calls]
+        self.assertLess(order.index("qa-write-cases"), order.index("tl-high-level-design"))
+        self.assertEqual(order.count("qa-write-cases"), 1)
+        self.assertEqual(order.count("qa-run-e2e"), 1)
+        forks = [item for item in log if item.get("event") == "fork"]
+        self.assertEqual(forks[0]["branches"], ["qa-write-cases", "tech-brief"])
+        waits = [item for item in log if item.get("event") == "join-wait"]
+        self.assertEqual(waits[0]["node"], "qa-run-e2e")
+        self.assertEqual(waits[0]["waiting"], ["handoff-to-e2e"])
 
     def test_spec_reject_then_pass(self):
         calls = []
@@ -123,9 +206,40 @@ class RunTest(unittest.TestCase):
         answers["write-spec"] = ["第一稿", "第二稿"]
         answers["requirement-decision"] = ["不满意", "满意"]
         end = Runner(load_preset(), answers, fake_agent(calls), "master", []).run()
-        self.assertEqual(end, "handoff")
+        self.assertEqual(end, "accepted")
         self.assertEqual(sum(1 for item in calls if item[0] == "ba-write-spec"), 2)
         self.assertEqual(sum(1 for item in calls if item[0] == "ba-write-prototype"), 1)
+        self.assertEqual(sum(1 for item in calls if item[0] == "qa-write-cases"), 1)
+
+    def test_e2e_revise_then_pass(self):
+        answers = happy_answers()
+        answers["test-decision"] = ["修订", "通过"]
+        calls = []
+        end = Runner(load_preset(), answers, fake_agent(calls), "master", []).run()
+        self.assertEqual(end, "accepted")
+        self.assertEqual(sum(1 for item in calls if item[0] == "qa-run-e2e"), 2)
+
+    def test_e2e_reject_returns_to_dev(self):
+        answers = happy_answers()
+        answers["plan-confirm"] = ["确认", "再确认"]
+        answers["plan-decision"] = ["满意", "满意"]
+        answers["build-decision"] = ["满意", "满意"]
+        answers["amend-input"] = ["补字段"]
+        answers["test-decision"] = ["打回开发", "通过"]
+        calls = []
+        end = Runner(load_preset(), answers, fake_agent(calls), "master", []).run()
+        self.assertEqual(end, "accepted")
+        self.assertEqual(sum(1 for item in calls if item[0] == "dev-plan"), 2)
+        self.assertEqual(sum(1 for item in calls if item[0] == "dev-plan-amend"), 1)
+        self.assertEqual(sum(1 for item in calls if item[0] == "dev-build"), 4)
+        self.assertEqual(sum(1 for item in calls if item[0] == "qa-run-e2e"), 2)
+
+    def test_e2e_loop_cap_stops(self):
+        answers = happy_answers()
+        answers["test-decision"] = ["修订", "修订", "修订", "修订"]
+        with self.assertRaises(GraphError) as caught:
+            Runner(load_preset(), answers, fake_agent([]), "master", []).run()
+        self.assertIn("达到上限", str(caught.exception))
 
     def test_loop_cap_stops(self):
         answers = happy_answers()
@@ -156,8 +270,6 @@ class RunTest(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as folder:
             answers = os.path.join(folder, "answers.yaml")
-            with open(answers, "w", encoding="utf-8") as handle:
-                handle.write(loads and "")
             text = "\n".join("%s: %s" % (key, value[0]) for key, value in happy_answers().items()) + "\n"
             with open(answers, "w", encoding="utf-8") as handle:
                 handle.write(text)
@@ -178,7 +290,8 @@ class RunTest(unittest.TestCase):
             self.assertTrue(os.path.isfile(record))
             with open(record, encoding="utf-8") as handle:
                 body = handle.read()
-            self.assertIn("handoff", body)
+            self.assertIn('"node": "handoff"', body)
+            self.assertIn('"node": "accepted"', body)
             self.assertIn('"task": "b"', body)
 
 

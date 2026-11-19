@@ -77,7 +77,7 @@ def list_states(project: str) -> list:
 
 
 def open_instance(project: str, iteration: str, entry: str) -> dict:
-    """没有记录就创建。已有记录就返回它，用来接着跑。已到提测则拒绝再开一条。"""
+    """没有记录就创建。已有记录就返回它，用来接着跑。已到测试通过则拒绝再开一条。"""
     check_iteration(iteration)
     existing = load_state(project, iteration)
     if not existing:
@@ -96,7 +96,7 @@ def open_instance(project: str, iteration: str, entry: str) -> dict:
         return state
     if existing.get("status") == "completed":
         raise GraphError(
-            "迭代 %s 已经有一条 workflow，并且已经到提测。不能再创建一条。用 status --iteration %s 查看"
+            "迭代 %s 已经有一条 workflow，并且已经到测试通过。不能再创建一条。用 status --iteration %s 查看"
             % (iteration, iteration)
         )
     return existing

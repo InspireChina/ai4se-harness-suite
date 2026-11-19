@@ -16,7 +16,10 @@ loops:
     backEdges: [hld-reject]
   - id: dev
     maxIterations: 3
-    backEdges: [build-reject]
+    backEdges: [build-reject, e2e-reject]
+  - id: e2e
+    maxIterations: 3
+    backEdges: [e2e-revise]
 nodes:
   - { id: graph-start, actor: master, kind: entry, title: 会话启动 }
   - { id: start-version, actor: human, kind: human_input, title: 开始版本 }
@@ -26,10 +29,18 @@ nodes:
   - { id: ba-write-prototype, actor: subagent, kind: action, skill: ba-write-prototype, title: 原型, once: true, model: writer }
   - { id: ba-requirement-review, actor: subagent, kind: gate, skill: ba-requirement-review, title: 需求质量门, model: reviewer }
   - { id: requirement-decision, actor: human, kind: decision, title: 需求决策, options: [满意, 不满意] }
+  - { id: qa-write-cases, actor: subagent, kind: action, skill: qa-write-cases, title: 编写 QA 用例, model: writer }
   - { id: tech-brief, actor: human, kind: human_input, title: 技术高阶 }
   - { id: tl-high-level-design, actor: subagent, kind: action, skill: tl-high-level-design, title: 技术高阶设计, once: true, model: writer }
   - { id: hld-decision, actor: human, kind: decision, title: 高阶决策, options: [满意, 不满意] }
-  - { id: dev-plan, actor: subagent, kind: action, skill: dev-plan, title: 详细规划, batch: true, model: writer }
+  - id: dev-plan
+    actor: subagent
+    kind: action
+    skill: dev-plan
+    title: 详细规划
+    batch: true
+    model: writer
+    note: [详细设计（API/DB 字段、文件改动）, 任务清单, 自测用例（DST）]
   - { id: dev-plan-review, actor: subagent, kind: gate, skill: dev-plan-review, title: plan 质量门, model: reviewer }
   - { id: plan-confirm, actor: human, kind: human_input, title: plan 确认 }
   - { id: plan-decision, actor: human, kind: decision, title: plan 决策, options: [满意, 不满意] }
@@ -46,17 +57,10 @@ nodes:
   - { id: build-decision, actor: human, kind: decision, title: 构建决策, options: [满意, 不满意] }
   - { id: amend-input, actor: human, kind: human_input, title: 修订输入 }
   - { id: dev-plan-amend, actor: subagent, kind: action, skill: dev-plan-amend, title: 规划修订, model: writer }
-  - { id: handoff, actor: master, kind: end, title: 提测 }
-extensions:
-  - id: qa
-    title: 测试
-    linked: false
-    requires: pipeline
-    nodes:
-      - { id: qa-write-cases, kind: action, title: QA 用例 }
-      - { id: dev-create-mr, kind: action, title: 创建 MR/流水线部署 }
-      - { id: qa-run-e2e, kind: action, title: E2E 测试 }
-      - { id: manual-test, kind: human_input, title: 人工补测 }
+  - { id: handoff, actor: master, kind: milestone, title: 提测 }
+  - { id: qa-run-e2e, actor: subagent, kind: action, skill: qa-run-e2e, title: 编写并运行 E2E 测试, join: true, model: writer }
+  - { id: test-decision, actor: human, kind: decision, title: 测试决策, options: [修订, 通过, 打回开发] }
+  - { id: accepted, actor: master, kind: end, title: 测试通过 }
 edges:
   - { id: e0, from: graph-start, to: start-version }
   - { id: e1, from: start-version, to: pm-start-iteration }
@@ -68,9 +72,10 @@ edges:
   - { id: req-pass, from: ba-requirement-review, to: requirement-decision, when: 满意 }
   - { id: req-gate-reject, from: ba-requirement-review, to: write-spec, when: 不满意, back: true }
   - { id: req-decision-reject, from: requirement-decision, to: write-spec, when: 不满意, back: true }
+  - { id: req-qa, from: requirement-decision, to: qa-write-cases, when: 满意, parallel: true }
+  - { id: req-ok, from: requirement-decision, to: tech-brief, when: 满意 }
   - { id: e7, from: tech-brief, to: tl-high-level-design }
   - { id: e8, from: tl-high-level-design, to: hld-decision }
-  - { id: req-ok, from: requirement-decision, to: tech-brief, when: 满意 }
   - { id: hld-reject, from: hld-decision, to: tech-brief, when: 不满意, back: true }
   - { id: hld-ok, from: hld-decision, to: dev-plan, when: 满意 }
   - { id: e9, from: dev-plan, to: dev-plan-review }
@@ -83,3 +88,9 @@ edges:
   - { id: build-reject, from: build-decision, to: amend-input, when: 不满意, back: true }
   - { id: e13, from: amend-input, to: dev-plan-amend }
   - { id: e14, from: dev-plan-amend, to: dev-plan, back: true }
+  - { id: handoff-to-e2e, from: handoff, to: qa-run-e2e }
+  - { id: qa-cases-ready, from: qa-write-cases, to: qa-run-e2e }
+  - { id: e2e-to-decision, from: qa-run-e2e, to: test-decision }
+  - { id: e2e-revise, from: test-decision, to: qa-run-e2e, when: 修订, back: true }
+  - { id: e2e-pass, from: test-decision, to: accepted, when: 通过 }
+  - { id: e2e-reject, from: test-decision, to: amend-input, when: 打回开发, back: true }

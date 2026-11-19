@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from typing import Any
 
-WORK_KINDS = ("action", "gate", "decision", "human_input")
+WORK_KINDS = ("action", "gate", "decision", "human_input", "milestone")
 ACTORS = ("human", "master", "subagent")
 REVIEW_PAIRS = (
     ("ba-write-spec", "ba-requirement-review"),
@@ -63,17 +63,44 @@ def validate(graph: dict) -> tuple:
             errors.append("节点 %s 调用了 skill，actor 必须是 subagent" % node_id)
         if kind == "end" and _outgoing(edges, node_id):
             errors.append("终点 %s 不能有出边" % node_id)
+        if kind == "milestone":
+            if actor != "master":
+                errors.append("里程碑 %s 的 actor 必须是 master" % node_id)
+            if node.get("skill") or node.get("options"):
+                errors.append("里程碑 %s 不能带 skill 或 options" % node_id)
+            if len(_outgoing(edges, node_id)) != 1:
+                errors.append("里程碑 %s 必须恰好一条出边" % node_id)
         if kind == "human_input" and len(_outgoing(edges, node_id)) > 1:
             errors.append("人类输入 %s 只能有一条出边" % node_id)
         if kind == "decision":
             options = set(node.get("options") or [])
-            for edge in _outgoing(edges, node_id):
+            outgoing = _outgoing(edges, node_id)
+            for edge in outgoing:
                 if edge.get("when") not in options:
                     errors.append("决策 %s 的出边 %s 不在选项里" % (node_id, edge.get("id")))
+            for when in set(edge.get("when") for edge in outgoing):
+                group = [edge for edge in outgoing if edge.get("when") == when]
+                main = [edge for edge in group if not edge.get("parallel")]
+                if len(main) != 1:
+                    errors.append(
+                        "决策 %s 的「%s」需要恰好一条主出边；并行分支要标 parallel: true"
+                        % (node_id, when)
+                    )
+            for edge in outgoing:
+                if edge.get("parallel") and edge.get("back"):
+                    errors.append("并行边 %s 不能同时是打回边" % edge.get("id"))
         if kind == "gate":
             for edge in _outgoing(edges, node_id):
                 if edge.get("when") not in ("满意", "不满意"):
                     errors.append("门禁 %s 的出边 %s 只能是满意或不满意" % (node_id, edge.get("id")))
+        if node.get("join"):
+            if kind in ("entry", "end"):
+                errors.append("节点 %s 的 kind 不能做汇入点" % node_id)
+            for edge in edges:
+                if edge.get("to") != node_id or edge.get("back"):
+                    continue
+                if edge.get("when"):
+                    errors.append("汇入节点 %s 的入边 %s 不能带 when" % (node_id, edge.get("id")))
 
     entries = [node["id"] for node in nodes if node.get("kind") == "entry"]
     ends = [node["id"] for node in nodes if node.get("kind") == "end"]
@@ -111,9 +138,13 @@ def validate(graph: dict) -> tuple:
             errors.append("边 %s 的终点不存在：%s" % (edge_id, dst))
         if edge.get("back") and edge.get("when") and edge_id not in back_to_loop:
             errors.append("打回边 %s 没有写入任何回路的上限" % edge_id)
-        if src in by_id and by_id[src].get("kind") in ("decision", "gate"):
+        if src in by_id and by_id[src].get("kind") == "gate":
             if edge.get("when") not in ("满意", "不满意"):
-                errors.append("边 %s 从门禁或决策出发，when 只能是满意或不满意" % edge_id)
+                errors.append("边 %s 从门禁出发，when 只能是满意或不满意" % edge_id)
+        if src in by_id and by_id[src].get("kind") not in ("decision", "gate") and edge.get("when"):
+            errors.append("边 %s 从非决策/门禁节点出发，不能带 when" % edge_id)
+        if edge.get("parallel") and (src not in by_id or by_id[src].get("kind") != "decision"):
+            errors.append("边 %s 标了 parallel，但起点不是决策" % edge_id)
 
     batches = {node["id"] for node in nodes if node.get("batch")}
     consumed = {node.get("repeatsBatch") for node in nodes if node.get("repeatsBatch")}
