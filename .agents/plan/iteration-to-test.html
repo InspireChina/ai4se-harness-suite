@@ -3,59 +3,182 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <title>版本到提测</title>
   <style>
     :root {
-      --fg: #1c1c1c;
-      --muted: #5e5e5e;
+      --fg: #1b1b1b;
+      --muted: #5f5f5c;
       --card: #ffffff;
-      --bg: #f6f6f4;
-      --lane-human: #e7eef6;
-      --lane-master: #f4f0e6;
-      --lane-sub: #e7f2ea;
+      --bg: #f4f4f1;
+      --line: #c9c9c2;
+      --divider: rgba(27, 27, 27, 0.16);
+      --danger: #a4462f;
+      --lane-human: #e9f0f8;
+      --lane-bar-human: #d8e4f0;
+      --lane-master: #f5f0e5;
+      --lane-bar-master: #e9e0cd;
+      --lane-sub: #e8f2ea;
+      --lane-bar-sub: #d6e7da;
+      --node-input: #eef5fc;
+      --node-decision: #fdf4e4;
+      --node-action: #eef7f0;
+      --node-gate: #ffffff;
+      --node-master: #f1f1ed;
+      --node-end: #f6f6f3;
     }
     @media (prefers-color-scheme: dark) {
       :root {
-        --fg: #f2f2f0;
-        --muted: #b5b5b0;
+        --fg: #f0f0ee;
+        --muted: #b0b0ab;
         --card: #242424;
-        --bg: #111111;
-        --lane-human: #1c2833;
-        --lane-master: #2a261c;
-        --lane-sub: #1c2b22;
+        --bg: #141414;
+        --line: #454540;
+        --divider: rgba(240, 240, 238, 0.2);
+        --danger: #f09a84;
+        --lane-human: #1b2632;
+        --lane-bar-human: #223140;
+        --lane-master: #2a2619;
+        --lane-bar-master: #35301f;
+        --lane-sub: #1a2a20;
+        --lane-bar-sub: #213529;
+        --node-input: #1e2a36;
+        --node-decision: #332a1b;
+        --node-action: #1d2c23;
+        --node-gate: #242424;
+        --node-master: #262622;
+        --node-end: #232320;
       }
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--fg); font-family: sans-serif; }
-    header { padding: 16px 20px 0; }
-    h1 { margin: 0 0 8px; font-size: 20px; font-weight: 500; }
-    .legend { display: flex; flex-wrap: wrap; gap: 14px 18px; margin: 0; color: var(--muted); font-size: 13px; }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    header { flex: 0 0 auto; padding: 14px 20px 0; }
+    .head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    h1 { margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: 0.2px; }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px 16px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
     .legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .swatch { width: 18px; height: 12px; border: 1.5px solid var(--fg); background: var(--card); }
-    .swatch.action { border-radius: 4px; }
-    .swatch.gate { border-style: double; border-width: 3px; }
-    .swatch.decision { width: 12px; height: 12px; transform: rotate(45deg); }
-    .swatch.input { transform: skewX(-16deg); }
-    .swatch.loop { background: transparent; border-style: dashed; }
-    .swatch.batch { border-radius: 4px; box-shadow: inset 0 0 0 2px var(--fg); }
+    .legend .hint { color: var(--muted); opacity: 0.9; }
+    .swatch {
+      width: 18px;
+      height: 12px;
+      flex: 0 0 auto;
+      border: 1.5px solid var(--fg);
+      border-radius: 3px;
+      background: var(--node-action);
+    }
+    .swatch.input { background: var(--node-input); transform: skewX(-16deg); }
+    .swatch.decision { width: 12px; height: 12px; background: var(--node-decision); transform: rotate(45deg); }
+    .swatch.action { background: var(--node-action); }
+    .swatch.gate {
+      position: relative;
+      border: 1.5px solid var(--fg);
+      border-radius: 0;
+      background: var(--node-gate);
+    }
+    .swatch.gate::after {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border: 1px solid var(--fg);
+    }
+    .swatch.batch { background: var(--node-action); border-width: 2.5px; border-radius: 4px; }
+    .swatch.line { width: 24px; height: 0; border: none; border-top: 2px solid var(--fg); border-radius: 0; background: none; }
+    .swatch.line.dashed { border-top-color: var(--danger); border-top-style: dashed; }
+    #stage {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      margin: 10px 20px 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--bg);
+    }
+    #paper { position: absolute; inset: 0; cursor: grab; touch-action: none; }
+    #paper.panning { cursor: grabbing; }
     #paper svg { display: block; }
-    #status { margin: 12px 20px; color: var(--muted); }
+    #tools {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 0 0 auto;
+      margin-bottom: 6px;
+    }
+    #tools .scale {
+      min-width: 42px;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    #tools button {
+      appearance: none;
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--fg);
+      font: 12px/1 inherit;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    }
+    #tools button:hover { border-color: var(--fg); }
+    #status {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+    #status[hidden] { display: none; }
   </style>
 </head>
 <body>
   <header>
-    <h1>版本到提测</h1>
+    <div class="head-row">
+      <h1>版本到提测</h1>
+      <div id="tools">
+        <button type="button" data-act="fit" title="缩放到完整图">适应窗口</button>
+        <button type="button" data-act="reset" title="原始大小">100%</button>
+        <button type="button" data-act="in" title="放大">＋</button>
+        <button type="button" data-act="out" title="缩小">－</button>
+        <span class="scale" id="scale">100%</span>
+      </div>
+    </div>
     <p class="legend">
       <span><i class="swatch input"></i>人 · 输入</span>
       <span><i class="swatch decision"></i>人 · 决策</span>
-      <span><i class="swatch action"></i>子 agent · skill</span>
-      <span><i class="swatch gate"></i>子 agent · 门禁</span>
+      <span><i class="swatch action"></i>子 agent · 动作</span>
+      <span><i class="swatch gate"></i>质量门</span>
       <span><i class="swatch batch"></i>批量节点</span>
-      <span><i class="swatch loop"></i>回路</span>
+      <span><i class="swatch line"></i>正向 · 满意</span>
+      <span><i class="swatch line dashed"></i>打回 · 不满意</span>
+      <span class="hint">每条回路最多 3 次 · 滚轮缩放 · 拖拽平移</span>
     </p>
   </header>
-  <div id="paper"></div>
-  <p id="status" hidden>JointJS 没有加载。请联网后刷新。</p>
+  <div id="stage">
+    <div id="paper"></div>
+    <p id="status" hidden>JointJS 没有加载。请联网后刷新。</p>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@joint/core/dist/joint.js"></script>
   <script>
     (function () {
@@ -69,52 +192,95 @@
         function token(name, fallback) {
           return css.getPropertyValue(name).trim() || fallback;
         }
-        var fg = token("--fg", "#1c1c1c");
-        var muted = token("--muted", "#5e5e5e");
+
+        var fg = token("--fg", "#1b1b1b");
+        var muted = token("--muted", "#5f5f5c");
         var card = token("--card", "#ffffff");
-        var bg = token("--bg", "#f6f6f4");
+        var bg = token("--bg", "#f4f4f1");
+        var divider = token("--divider", "rgba(27,27,27,0.16)");
+        var danger = token("--danger", "#a4462f");
+        var nodeInput = token("--node-input", "#eef5fc");
+        var nodeDecision = token("--node-decision", "#fdf4e4");
+        var nodeAction = token("--node-action", "#eef7f0");
+        var nodeGate = token("--node-gate", "#ffffff");
+        var nodeMaster = token("--node-master", "#f1f1ed");
+        var nodeEnd = token("--node-end", "#f6f6f3");
+
+        var GUTTER = 108;
+        var PITCH = 210;
+        var COLW = 186;
+        var NODEW = 176;
+        var STACK_GAP = 20;
+        var LANE_TOP = 96;
+        var LANE_BOTTOM = 816;
+        var FEEDBACK = [40, 62];
+        var BOTTOM_CORRIDOR = LANE_BOTTOM + 24;
+
         var lanes = {
-          human: { title: "人", fill: token("--lane-human", "#e7eef6"), y: 0, h: 220 },
-          master: { title: "graph-master  主会话", fill: token("--lane-master", "#f4f0e6"), y: 220, h: 110 },
-          sub: { title: "子 agent", fill: token("--lane-sub", "#e7f2ea"), y: 330, h: 390 }
+          human: {
+            title: "人",
+            fill: token("--lane-human", "#e9f0f8"),
+            bar: token("--lane-bar-human", "#d8e4f0"),
+            y: LANE_TOP,
+            h: 220
+          },
+          master: {
+            title: "graph-master\n主会话",
+            fill: token("--lane-master", "#f5f0e5"),
+            bar: token("--lane-bar-master", "#e9e0cd"),
+            y: LANE_TOP + 220,
+            h: 110
+          },
+          sub: {
+            title: "子 agent",
+            fill: token("--lane-sub", "#e8f2ea"),
+            bar: token("--lane-bar-sub", "#d6e7da"),
+            y: LANE_TOP + 330,
+            h: 390
+          }
         };
 
         joint.dia.Element.define("workflow.Lane", {
           attrs: {
-            body: { refWidth: "100%", refHeight: "100%", stroke: fg, strokeWidth: 1, fill: bg },
+            body: { refWidth: "100%", refHeight: "100%", stroke: divider, strokeWidth: 1, fill: bg },
+            bar: { refX: 0, refY: 0, width: GUTTER, refHeight: "100%", stroke: "none", fill: bg },
+            divider: { refX: GUTTER, refY: 0, width: 1, refHeight: "100%", stroke: "none", fill: divider },
             label: {
               text: "",
               fill: fg,
-              fontSize: 14,
+              fontSize: 12.5,
               fontFamily: "sans-serif",
-              fontWeight: "600",
-              textAnchor: "start",
+              fontWeight: 600,
+              lineHeight: "1.3em",
+              textAnchor: "middle",
               textVerticalAnchor: "middle",
-              refX: 12,
+              refX: GUTTER / 2,
               refY: "50%"
             }
           }
         }, {
           markup: [
             { tagName: "rect", selector: "body" },
+            { tagName: "rect", selector: "bar" },
+            { tagName: "rect", selector: "divider" },
             { tagName: "text", selector: "label" }
           ]
         });
 
         joint.dia.Element.define("workflow.Gate", {
-          size: { width: 176, height: 58 },
+          size: { width: NODEW, height: 60 },
           attrs: {
-            outer: { refWidth: "100%", refHeight: "100%", stroke: fg, strokeWidth: 1.5, fill: card },
-            inner: { refX: 4, refY: 4, refWidth: -8, refHeight: -8, stroke: fg, strokeWidth: 1, fill: "none" },
+            outer: { refWidth: "100%", refHeight: "100%", stroke: fg, strokeWidth: 1.5, fill: nodeGate },
+            inner: { refX: 4, refY: 4, refWidth: "calc(w - 8)", refHeight: "calc(h - 8)", stroke: fg, strokeWidth: 1, fill: "none" },
             title: {
-              text: "", refX: "50%", refY: "34%",
+              text: "", refX: "50%", refY: "36%",
               textAnchor: "middle", textVerticalAnchor: "middle",
               fontSize: 13, fontFamily: "sans-serif", fill: fg
             },
             sub: {
               text: "", refX: "50%", refY: "70%",
               textAnchor: "middle", textVerticalAnchor: "middle",
-              fontSize: 11, fontFamily: "sans-serif", fill: muted
+              fontSize: 11.5, fontFamily: "sans-serif", fill: muted
             }
           }
         }, {
@@ -126,65 +292,27 @@
           ]
         });
 
-        var graph = new joint.dia.Graph({}, { cellNamespace: joint.shapes });
-        var paper = new joint.dia.Paper({
-          el: document.getElementById("paper"),
-          model: graph,
-          cellViewNamespace: joint.shapes,
-          width: 800,
-          height: 520,
-          gridSize: 1,
-          interactive: false,
-          async: false,
-          frozen: true,
-          background: { color: bg },
-          defaultConnectionPoint: { name: "boundary", args: { stroke: true } },
-          sorting: joint.dia.Paper.sorting.APPROX
-        });
-
         joint.dia.Element.define("workflow.Build", {
-          size: { width: 200, height: 236 },
+          size: { width: NODEW, height: 236 },
           attrs: {
-            body: {
-              refWidth: "100%",
-              refHeight: "100%",
-              rx: 10,
-              ry: 10,
-              stroke: fg,
-              strokeWidth: 2.5,
-              fill: card
-            },
+            body: { refWidth: "100%", refHeight: "100%", rx: 10, ry: 10, stroke: fg, strokeWidth: 2.5, fill: nodeAction },
             title: {
               text: "/dev-build",
-              refX: "50%",
-              refY: 16,
-              textAnchor: "middle",
-              textVerticalAnchor: "middle",
-              fontSize: 13,
-              fontFamily: "sans-serif",
-              fontWeight: "600",
-              fill: fg
+              refX: "50%", refY: 18,
+              textAnchor: "middle", textVerticalAnchor: "middle",
+              fontSize: 13.5, fontFamily: "sans-serif", fontWeight: 600, fill: fg
             },
             badge: {
-              text: "按批循环",
-              refX: "50%",
-              refY: 36,
-              textAnchor: "middle",
-              textVerticalAnchor: "middle",
-              fontSize: 11,
-              fontFamily: "sans-serif",
-              fill: muted
+              text: "按批循环 · 封死节点",
+              refX: "50%", refY: 38,
+              textAnchor: "middle", textVerticalAnchor: "middle",
+              fontSize: 11.5, fontFamily: "sans-serif", fill: muted
             },
             steps: {
-              text: "1  后端 TDD\n2  前端 TDD\n3  构建/Lint\n4  前端 UI review\n5  API 测试\n6  浏览器自测\n每条任务走一遍",
-              refX: 14,
-              refY: 52,
-              textAnchor: "start",
-              textVerticalAnchor: "top",
-              fontSize: 12,
-              fontFamily: "sans-serif",
-              lineHeight: "1.45em",
-              fill: fg
+              text: "1  后端 TDD\n2  前端 TDD\n3  构建 / Lint\n4  前端 UI review\n5  API 测试\n6  浏览器自测\n\n每条任务走一遍",
+              refX: 14, refY: 58,
+              textAnchor: "start", textVerticalAnchor: "top",
+              fontSize: 11.5, fontFamily: "sans-serif", lineHeight: "1.55em", fill: fg
             }
           }
         }, {
@@ -196,39 +324,93 @@
           ]
         });
 
+        joint.dia.Element.define("workflow.Tag", {
+          attrs: {
+            body: { refWidth: "100%", refHeight: "100%", rx: 5, ry: 5, fill: bg, stroke: "none" },
+            label: {
+              text: "", refX: "50%", refY: "50%",
+              textAnchor: "middle", textVerticalAnchor: "middle",
+              fontSize: 12, fontFamily: "sans-serif", fontWeight: 600, fill: fg
+            }
+          }
+        }, {
+          markup: [
+            { tagName: "rect", selector: "body" },
+            { tagName: "text", selector: "label" }
+          ]
+        });
+
+        joint.dia.Element.define("workflow.Caption", {
+          attrs: {
+            label: {
+              text: "", fill: muted, fontSize: 12.5, fontFamily: "sans-serif", fontWeight: 600,
+              textAnchor: "middle", textVerticalAnchor: "middle", refX: "50%", refY: "50%"
+            }
+          }
+        }, {
+          markup: [{ tagName: "text", selector: "label" }]
+        });
+
+        joint.dia.Element.define("workflow.Separator", {
+          attrs: {
+            body: { refWidth: "100%", refHeight: "100%", fill: divider, stroke: "none" }
+          }
+        }, {
+          markup: [{ tagName: "rect", selector: "body" }]
+        });
+
+        var graph = new joint.dia.Graph({}, { cellNamespace: joint.shapes });
+        var stageEl = document.getElementById("stage");
+        var paperEl = document.getElementById("paper");
+        var paper = new joint.dia.Paper({
+          el: paperEl,
+          model: graph,
+          cellViewNamespace: joint.shapes,
+          width: stageEl.clientWidth || 800,
+          height: stageEl.clientHeight || 520,
+          gridSize: 1,
+          interactive: false,
+          async: false,
+          frozen: true,
+          background: { color: bg },
+          defaultConnectionPoint: { name: "boundary", args: { stroke: true } },
+          sorting: joint.dia.Paper.sorting.APPROX
+        });
+
         var diamond = "calc(0.5 * w) 0 calc(w) calc(0.5 * h) calc(0.5 * w) calc(h) 0 calc(0.5 * h)";
         var para = "calc(0.16 * w) 0 calc(w) 0 calc(0.84 * w) calc(h) 0 calc(h)";
         var hex = "calc(0.22 * w) 0 calc(0.78 * w) 0 calc(w) calc(0.5 * h) calc(0.78 * w) calc(h) calc(0.22 * w) calc(h) 0 calc(0.5 * h)";
-        var route = { name: "manhattan", args: { padding: 8, step: 8, maximumLoops: 6000, excludeTypes: ["workflow.Lane"] } };
 
-        function box(text, sub, batch) {
+        function box(text, sub, opt) {
+          opt = opt || {};
+          var h = opt.batch ? 64 : (sub ? 52 : 48);
           return new joint.shapes.standard.Rectangle({
-            size: { width: 176, height: batch ? 62 : 52 },
+            size: { width: NODEW, height: h },
             attrs: {
               body: {
                 stroke: fg,
-                strokeWidth: batch ? 2.5 : 1.5,
-                fill: card,
+                strokeWidth: opt.batch ? 2.5 : 1.5,
+                fill: opt.fill || nodeAction,
                 rx: 10,
                 ry: 10
               },
               label: {
                 text: sub ? text + "\n" + sub : text,
                 fill: fg,
-                fontSize: 12,
+                fontSize: 13,
                 fontFamily: "sans-serif",
-                lineHeight: "1.25em"
+                lineHeight: "1.3em"
               }
             }
           });
         }
 
-        function poly(points, text, w, h) {
+        function poly(points, text, w, h, fill, fontSize) {
           return new joint.shapes.standard.Polygon({
             size: { width: w, height: h },
             attrs: {
-              body: { points: points, stroke: fg, strokeWidth: 1.5, fill: card },
-              label: { text: text, fill: fg, fontSize: 12, fontFamily: "sans-serif" }
+              body: { points: points, stroke: fg, strokeWidth: 1.5, fill: fill },
+              label: { text: text, fill: fg, fontSize: fontSize || 13, fontFamily: "sans-serif" }
             }
           });
         }
@@ -241,30 +423,30 @@
         }
 
         var cells = {
-          graph: poly(hex, "/graph\n会话启动", 150, 54),
-          start: poly(para, "开始版本", 150, 46),
+          graph: poly(hex, "/graph\n会话启动", 150, 54, nodeMaster, 12),
+          start: poly(para, "开始版本", 156, 46, nodeInput),
           pm: box("/pm-start-iteration"),
-          writeSpec: poly(para, "编写规格", 150, 46),
+          writeSpec: poly(para, "编写规格", 156, 46, nodeInput),
           baSpec: box("/ba-write-spec"),
           proto: box("/ba-write-prototype", "一次"),
           reqGate: gate("需求质量门", "/ba-requirement-review"),
-          reqDec: poly(diamond, "需求决策", 116, 76),
-          tech: poly(para, "技术高阶", 150, 46),
+          reqDec: poly(diamond, "需求决策", 120, 76, nodeDecision),
+          tech: poly(para, "技术高阶", 156, 46, nodeInput),
           hld: box("/tl-high-level-design", "一次"),
-          hldDec: poly(diamond, "高阶决策", 116, 76),
-          devPlan: box("/dev-plan", "一批任务", true),
+          hldDec: poly(diamond, "高阶决策", 120, 76, nodeDecision),
+          devPlan: box("/dev-plan", "一批任务", { batch: true }),
           planGate: gate("plan 质量门", "/dev-plan-review"),
-          planConfirm: poly(para, "plan 确认", 150, 46),
-          planDec: poly(diamond, "plan 决策", 116, 76),
+          planConfirm: poly(para, "plan 确认", 156, 46, nodeInput),
+          planDec: poly(diamond, "plan 决策", 120, 76, nodeDecision),
           runner: box("/overnight-runner", "排本批顺序"),
           devBuild: new joint.shapes.workflow.Build(),
-          buildDec: poly(diamond, "构建决策", 116, 76),
-          amendIn: poly(para, "修订输入", 150, 46),
+          buildDec: poly(diamond, "构建决策", 120, 76, nodeDecision),
+          amendIn: poly(para, "修订输入", 156, 46, nodeInput),
           amend: box("/dev-plan-amend"),
           handoff: new joint.shapes.standard.Ellipse({
             size: { width: 110, height: 48 },
             attrs: {
-              body: { stroke: fg, strokeWidth: 1.5, fill: card },
+              body: { stroke: fg, strokeWidth: 1.5, fill: nodeEnd },
               label: { text: "提测", fill: fg, fontSize: 14, fontFamily: "sans-serif" }
             }
           })
@@ -276,24 +458,21 @@
           [{ lane: "sub", ids: ["pm"] }],
           [{ lane: "human", ids: ["writeSpec"] }],
           [{ lane: "sub", ids: ["baSpec", "proto", "reqGate"] }],
-          [{ lane: "human", ids: ["reqDec", "tech"] }],
-          [{ lane: "sub", ids: ["hld"] }],
+          [{ lane: "human", ids: ["reqDec"] }],
+          [{ lane: "human", ids: ["tech"] }, { lane: "sub", ids: ["hld"] }],
           [{ lane: "human", ids: ["hldDec"] }],
           [{ lane: "sub", ids: ["devPlan", "planGate"] }],
           [{ lane: "human", ids: ["planConfirm", "planDec"] }],
           [{ lane: "sub", ids: ["runner", "devBuild"] }],
           [
-            { lane: "master", ids: ["handoff"] },
             { lane: "human", ids: ["buildDec", "amendIn"] },
             { lane: "sub", ids: ["amend"] }
-          ]
+          ],
+          [{ lane: "master", ids: ["handoff"] }]
         ];
 
-        var pitch = 236;
-        var colW = 210;
-        var originX = 156;
-        var stackGap = 20;
-        var laneWidth = originX + columns.length * pitch + 24;
+        var originX = GUTTER + 32;
+        var laneWidth = originX + columns.length * PITCH + 24;
 
         Object.keys(lanes).forEach(function (id) {
           var lane = lanes[id];
@@ -301,137 +480,368 @@
             position: { x: 0, y: lane.y },
             size: { width: laneWidth, height: lane.h },
             z: 0,
-            attrs: { body: { fill: lane.fill }, label: { text: lane.title } }
+            attrs: {
+              body: { fill: lane.fill },
+              bar: { fill: lane.bar },
+              label: { text: lane.title }
+            }
           }).addTo(graph);
         });
 
         columns.forEach(function (slots, index) {
-          var x = originX + index * pitch;
+          var x = originX + index * PITCH;
           slots.forEach(function (slot) {
             var lane = lanes[slot.lane];
-            var stackH = -stackGap;
+            var stackH = -STACK_GAP;
             slot.ids.forEach(function (id) {
-              stackH += cells[id].size().height + stackGap;
+              stackH += cells[id].size().height + STACK_GAP;
             });
             var y = lane.y + Math.max(12, (lane.h - stackH) / 2);
             slot.ids.forEach(function (id) {
               var cell = cells[id];
-              cell.position(x + (colW - cell.size().width) / 2, y);
+              cell.position(x + (COLW - cell.size().width) / 2, y);
               cell.set("z", 2);
               cell.addTo(graph);
-              y += cell.size().height + stackGap;
+              y += cell.size().height + STACK_GAP;
             });
           });
         });
 
-        function midY(cell) {
-          var b = cell.getBBox();
-          return b.y + b.height / 2;
-        }
-        function midX(cell) {
-          var b = cell.getBBox();
-          return b.x + b.width / 2;
-        }
+        function bbox(cell) { return cell.getBBox(); }
+        function midY(cell) { var b = bbox(cell); return b.y + b.height / 2; }
+        function midX(cell) { var b = bbox(cell); return b.x + b.width / 2; }
+        function right(cell) { var b = bbox(cell); return b.x + b.width; }
+        function left(cell) { var b = bbox(cell); return b.x; }
+        function top(cell) { return bbox(cell).y; }
+        function bottom(cell) { var b = bbox(cell); return b.y + b.height; }
+        function between(a, b) { return (midX(a) + midX(b)) / 2; }
 
-        function link(source, target, text, opt) {
+        var router = {
+          name: "manhattan",
+          args: {
+            padding: 16,
+            step: 10,
+            maximumLoops: 8000,
+            excludeTypes: ["workflow.Lane", "workflow.Tag", "workflow.Caption", "workflow.Separator"]
+          }
+        };
+
+        function link(source, target, opt) {
           opt = opt || {};
           var line = {
-            stroke: fg,
-            strokeWidth: 1.5,
+            stroke: opt.back ? danger : fg,
+            strokeWidth: 1.6,
             strokeLinejoin: "round",
-            targetMarker: { type: "path", d: "M 9 -4.5 0 0 9 4.5 Z", fill: fg }
+            targetMarker: {
+              type: "path",
+              d: "M 9 -4.5 0 0 9 4.5 Z",
+              fill: opt.back ? danger : fg,
+              stroke: "none"
+            }
           };
-          if (opt.back) line.strokeDasharray = "6 4";
+          if (opt.back) line.strokeDasharray = "6 5";
           var spec = {
-            source: { id: source.id, anchor: { name: opt.sourceAnchor || "perpendicular" } },
-            target: { id: target.id, anchor: { name: opt.targetAnchor || "perpendicular" } },
-            router: opt.router || route,
-            connector: { name: "rounded", args: { radius: 8 } },
+            source: { id: source.id, anchor: { name: opt.from || "right" } },
+            target: { id: target.id, anchor: { name: opt.to || "left" } },
+            router: opt.straight ? { name: "normal" } : (opt.router || router),
+            connector: { name: "rounded", args: { radius: opt.straight ? 0 : 8 } },
             attrs: { line: line },
             z: 3
           };
           if (opt.vertices) spec.vertices = opt.vertices;
-          if (text) {
-            spec.labels = [{
-              markup: [
-                { tagName: "rect", selector: "body" },
-                { tagName: "text", selector: "label" }
-              ],
-              attrs: {
-                label: {
-                  text: text,
-                  fill: fg,
-                  fontSize: 12,
-                  fontFamily: "sans-serif",
-                  textAnchor: "middle",
-                  textVerticalAnchor: "middle"
-                },
-                body: {
-                  ref: "label", refX: -5, refY: -3, refWidth: 10, refHeight: 6,
-                  rx: 3, ry: 3, fill: bg, stroke: "none"
-                }
-              },
-              position: { distance: opt.distance || 0.55 }
-            }];
-          }
           return new joint.shapes.standard.Link(spec).addTo(graph);
         }
 
+        var measureCtx = document.createElement("canvas").getContext("2d");
+        function tag(text, x, y, tone) {
+          measureCtx.font = "600 12px sans-serif";
+          var w = Math.ceil(measureCtx.measureText(text).width) + 14;
+          var h = 20;
+          var cell = new joint.shapes.workflow.Tag({
+            position: { x: x - w / 2, y: y - h / 2 },
+            size: { width: w, height: h },
+            attrs: { label: { text: text, fill: tone || muted } }
+          });
+          cell.set("z", 4);
+          return cell.addTo(graph);
+        }
+
+        function caption(text, x, width) {
+          var cell = new joint.shapes.workflow.Caption({
+            position: { x: x - width / 2, y: 6 },
+            size: { width: width, height: 20 },
+            attrs: { label: { text: text } }
+          });
+          cell.set("z", 1);
+          return cell.addTo(graph);
+        }
+
+        function separator(x) {
+          return new joint.shapes.workflow.Separator({
+            position: { x: x, y: LANE_TOP },
+            size: { width: 1, height: LANE_BOTTOM - LANE_TOP },
+            z: 1
+          }).addTo(graph);
+        }
+
         var c = cells;
+
+        // 正向主链路
         link(c.graph, c.start);
         link(c.start, c.pm);
         link(c.pm, c.writeSpec);
         link(c.writeSpec, c.baSpec);
-        link(c.baSpec, c.proto);
-        link(c.baSpec, c.reqGate);
-        link(c.proto, c.reqGate);
-        link(c.reqGate, c.reqDec, "满意");
-        link(c.reqDec, c.tech, "满意");
-        link(c.tech, c.hld);
-        link(c.hld, c.hldDec);
-        link(c.hldDec, c.devPlan, "满意");
-        link(c.devPlan, c.planGate);
-        link(c.planGate, c.planConfirm, "满意");
-        link(c.planConfirm, c.planDec);
-        link(c.planDec, c.runner, "满意");
-        link(c.runner, c.devBuild);
-        link(c.devBuild, c.buildDec, "本批结束");
-        link(c.buildDec, c.handoff, "满意");
-        link(c.buildDec, c.amendIn, "不满意");
-        link(c.amendIn, c.amend);
-
-        var topY = 18;
-        function overTop(source, target, text) {
-          link(source, target, text, {
-            back: true,
-            sourceAnchor: "top",
-            targetAnchor: "top",
-            router: { name: "normal" },
-            vertices: [
-              { x: midX(source), y: topY },
-              { x: midX(target), y: topY }
-            ]
-          });
-        }
-        overTop(c.reqGate, c.writeSpec, "不满意");
-        overTop(c.reqDec, c.writeSpec, "不满意");
-        overTop(c.hldDec, c.tech, "不满意");
-
-        var bottomY = lanes.sub.y + lanes.sub.h - 10;
-        link(c.amend, c.devPlan, "回到规划", {
-          back: true,
-          sourceAnchor: "bottom",
-          targetAnchor: "bottom",
+        link(c.baSpec, c.proto, { from: "bottom", to: "top", straight: true });
+        link(c.proto, c.reqGate, { from: "bottom", to: "top", straight: true });
+        link(c.baSpec, c.reqGate, {
+          from: "right",
+          to: "right",
           router: { name: "normal" },
           vertices: [
-            { x: midX(c.amend), y: bottomY },
-            { x: midX(c.devPlan), y: bottomY }
+            { x: right(c.baSpec) + 14, y: midY(c.baSpec) },
+            { x: right(c.reqGate) + 14, y: midY(c.reqGate) }
+          ]
+        });
+        link(c.reqGate, c.reqDec);
+        link(c.reqDec, c.tech);
+        link(c.tech, c.hld, { from: "bottom", to: "top", straight: true });
+        link(c.hld, c.hldDec);
+        link(c.hldDec, c.devPlan, {
+          from: "right",
+          to: "top",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.hldDec) + 30, y: midY(c.hldDec) },
+            { x: right(c.hldDec) + 30, y: top(c.devPlan) - 22 },
+            { x: midX(c.devPlan), y: top(c.devPlan) - 22 }
+          ]
+        });
+        link(c.devPlan, c.planGate, { from: "bottom", to: "top", straight: true });
+        link(c.planGate, c.planConfirm, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.planGate) + 30, y: midY(c.planGate) },
+            { x: right(c.planGate) + 30, y: midY(c.planConfirm) }
+          ]
+        });
+        link(c.planConfirm, c.planDec, { from: "bottom", to: "top", straight: true });
+        link(c.planDec, c.runner, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.planDec) + 30, y: midY(c.planDec) },
+            { x: right(c.planDec) + 30, y: midY(c.runner) }
+          ]
+        });
+        link(c.runner, c.devBuild, { from: "bottom", to: "top", straight: true });
+        link(c.devBuild, c.buildDec, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.devBuild) + 24, y: midY(c.devBuild) },
+            { x: right(c.devBuild) + 24, y: midY(c.buildDec) }
+          ]
+        });
+        link(c.buildDec, c.amendIn, { from: "bottom", to: "top", straight: true });
+        link(c.amendIn, c.amend, { from: "bottom", to: "top", straight: true });
+        link(c.buildDec, c.handoff, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.buildDec) + 38, y: midY(c.buildDec) },
+            { x: right(c.buildDec) + 38, y: midY(c.handoff) }
           ]
         });
 
+        // 打回边：每条独立走廊，避免重叠
+        function backLink(source, target, y, text) {
+          link(source, target, {
+            back: true,
+            from: "top",
+            to: "top",
+            router: { name: "normal" },
+            vertices: [
+              { x: midX(source), y: y },
+              { x: midX(target), y: y }
+            ]
+          });
+          tag(text, (midX(source) + midX(target)) / 2, y, danger);
+        }
+
+        link(c.reqGate, c.writeSpec, {
+          back: true,
+          from: "left",
+          to: "bottom",
+          router: { name: "normal" },
+          vertices: [{ x: midX(c.writeSpec), y: midY(c.reqGate) }]
+        });
+        tag("不满意", midX(c.writeSpec) + 34, (midY(c.reqGate) + bottom(c.writeSpec)) / 2, danger);
+        backLink(c.reqDec, c.writeSpec, FEEDBACK[0], "不满意");
+        backLink(c.hldDec, c.tech, FEEDBACK[1], "不满意");
+
+        var backX = left(c.devPlan) - 110;
+        link(c.amend, c.devPlan, {
+          back: true,
+          from: "bottom",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: midX(c.amend), y: BOTTOM_CORRIDOR },
+            { x: backX, y: BOTTOM_CORRIDOR },
+            { x: backX, y: midY(c.devPlan) }
+          ]
+        });
+        tag("回到规划", (midX(c.amend) + backX) / 2, BOTTOM_CORRIDOR, danger);
+
+        // 正向标注：只标有条件分叉的位置
+        tag("满意", right(c.reqGate) + 32, midY(c.reqGate) + 14, muted);
+        tag("满意", right(c.reqDec) + 26, midY(c.reqDec) - 12, muted);
+        tag("满意", right(c.hldDec) + 30, (midY(c.hldDec) + top(c.devPlan)) / 2, muted);
+        tag("满意", right(c.planGate) + 30, midY(c.planGate) - 12, muted);
+        tag("满意", right(c.planDec) + 30, (midY(c.planDec) + midY(c.runner)) / 2, muted);
+        tag("满意", right(c.buildDec) + 38, (midY(c.buildDec) + midY(c.handoff)) / 2, muted);
+        tag("不满意", midX(c.buildDec) + 38, (bottom(c.buildDec) + top(c.amendIn)) / 2, danger);
+        tag("本批结束", between(c.devBuild, c.buildDec), (midY(c.devBuild) + midY(c.buildDec)) / 2, muted);
+
+        // 阶段带
+        function boundaryX(index) {
+          return originX + index * PITCH - (PITCH - COLW) / 2;
+        }
+        var stages = [
+          { from: GUTTER, to: boundaryX(6), title: "1  需求澄清" },
+          { from: boundaryX(6), to: boundaryX(8), title: "2  技术设计" },
+          { from: boundaryX(8), to: laneWidth, title: "3  开发构建" }
+        ];
+        stages.forEach(function (stage) {
+          caption(stage.title, (stage.from + stage.to) / 2, stage.to - stage.from);
+        });
+        separator(boundaryX(6));
+        separator(boundaryX(8));
+
+        // 适配与缩放
+        var MIN_SCALE = 0.1;
+        var MAX_SCALE = 2.5;
+        var autoFit = true;
+        var scaleEl = document.getElementById("scale");
+
+        function updateScale() {
+          scaleEl.textContent = Math.round(paper.scale().sx * 100) + "%";
+        }
+
+        function sizePaper() {
+          paper.setDimensions(stageEl.clientWidth, stageEl.clientHeight);
+          paperEl.style.width = "100%";
+          paperEl.style.height = "100%";
+        }
+
+        function fit(keepAuto) {
+          var b = graph.getBBox();
+          var w = stageEl.clientWidth;
+          var h = stageEl.clientHeight;
+          if (!b || !b.width || !w || !h) return;
+          var pad = 28;
+          var s = Math.min((w - pad * 2) / b.width, (h - pad * 2) / b.height, 1);
+          s = Math.max(MIN_SCALE, s);
+          paper.scale(s, s);
+          paper.translate(
+            (w - b.width * s) / 2 - b.x * s,
+            (h - b.height * s) / 2 - b.y * s
+          );
+          updateScale();
+          if (keepAuto !== false) autoFit = true;
+        }
+
+        function reset100() {
+          var b = graph.getBBox();
+          var w = stageEl.clientWidth;
+          var h = stageEl.clientHeight;
+          if (!b) return;
+          paper.scale(1, 1);
+          paper.translate(
+            (w - b.width) / 2 - b.x,
+            (h - b.height) / 2 - b.y
+          );
+          updateScale();
+          autoFit = false;
+        }
+
+        function zoomAt(px, py, factor) {
+          var oldScale = paper.scale().sx;
+          var next = Math.min(MAX_SCALE, Math.max(MIN_SCALE, oldScale * factor));
+          if (next === oldScale) return;
+          var t = paper.translate();
+          var tx = px - (px - t.tx) * next / oldScale;
+          var ty = py - (py - t.ty) * next / oldScale;
+          paper.scale(next, next);
+          paper.translate(tx, ty);
+          updateScale();
+          autoFit = false;
+        }
+
+        document.querySelectorAll("#tools button").forEach(function (button) {
+          button.addEventListener("click", function () {
+            var act = button.getAttribute("data-act");
+            if (act === "fit") { fit(); return; }
+            if (act === "reset") { reset100(); return; }
+            zoomAt(stageEl.clientWidth / 2, stageEl.clientHeight / 2, act === "in" ? 1.2 : 1 / 1.2);
+          });
+        });
+
+        paperEl.addEventListener("wheel", function (event) {
+          event.preventDefault();
+          var rect = paperEl.getBoundingClientRect();
+          zoomAt(event.clientX - rect.left, event.clientY - rect.top, event.deltaY < 0 ? 1.12 : 1 / 1.12);
+        }, { passive: false });
+
+        var panning = false;
+        var last = null;
+        paperEl.addEventListener("pointerdown", function (event) {
+          if (event.button !== 0) return;
+          panning = true;
+          last = { x: event.clientX, y: event.clientY };
+          paperEl.classList.add("panning");
+          if (paperEl.setPointerCapture) paperEl.setPointerCapture(event.pointerId);
+        });
+        paperEl.addEventListener("pointermove", function (event) {
+          if (!panning || !last) return;
+          var t = paper.translate();
+          paper.translate(t.tx + event.clientX - last.x, t.ty + event.clientY - last.y);
+          last = { x: event.clientX, y: event.clientY };
+          autoFit = false;
+        });
+        function endPan() {
+          panning = false;
+          last = null;
+          paperEl.classList.remove("panning");
+        }
+        paperEl.addEventListener("pointerup", endPan);
+        paperEl.addEventListener("pointercancel", endPan);
+        paperEl.addEventListener("dblclick", function () { fit(); });
+
+        if (window.ResizeObserver) {
+          var pending = false;
+          new ResizeObserver(function () {
+            if (pending) return;
+            pending = true;
+            requestAnimationFrame(function () {
+              pending = false;
+              sizePaper();
+              if (autoFit) fit();
+            });
+          }).observe(stageEl);
+        }
+
         paper.unfreeze();
-        paper.fitToContent({ padding: 20, allowNewOrigin: "any" });
-        document.getElementById("paper").setAttribute("data-ready", "1");
+        requestAnimationFrame(function () {
+          sizePaper();
+          fit();
+          paperEl.setAttribute("data-ready", "1");
+        });
       } catch (err) {
         status.hidden = false;
         status.textContent = err && err.message ? err.message : String(err);
