@@ -26,7 +26,7 @@
 ### 预设
 
 - 新增 `qa-write-cases`（需求决策的并行侧分支）与 `qa-run-e2e`（汇入点）。
-- `handoff` 由终点改为里程碑，新增终点 `accepted`（测试通过）。
+- `handoff` 由终点改为里程碑，新增终点 `accepted`（人工补测）。
 - 新增 `test-decision`，选项 `修订` / `通过` / `打回开发`。
 - 新回路 `e2e`（修订重跑，上限 3）；`dev` 回路增加 `e2e-reject` 打回边。
 - `dev-plan` 增加 `note`，说明详细设计、任务清单、自测用例。

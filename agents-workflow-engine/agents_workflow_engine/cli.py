@@ -131,7 +131,7 @@ def build_parser() -> argparse.ArgumentParser:
     render_cmd.add_argument("--output", default="", help="写入的文件。缺省打印到标准输出")
     render_cmd.set_defaults(func=cmd_render)
 
-    run_cmd = sub.add_parser("run", help="主会话按图执行到测试通过")
+    run_cmd = sub.add_parser("run", help="主会话按图执行到人工补测")
     run_cmd.add_argument("--answers", default="", help="人的答案 YAML")
     run_cmd.add_argument("--agent", default="", help="子 agent 命令")
     run_cmd.add_argument("--master-model", default=os.environ.get("MODEL_MASTER", "master"), help="主会话模型，子 agent 未配置时沿用")

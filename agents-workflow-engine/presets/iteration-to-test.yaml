@@ -60,7 +60,7 @@ nodes:
   - { id: handoff, actor: master, kind: milestone, title: 提测 }
   - { id: qa-run-e2e, actor: subagent, kind: action, skill: qa-run-e2e, title: 编写并运行 E2E 测试, join: true, model: writer }
   - { id: test-decision, actor: human, kind: decision, title: 测试决策, options: [修订, 通过, 打回开发] }
-  - { id: accepted, actor: master, kind: end, title: 测试通过 }
+  - { id: accepted, actor: master, kind: end, title: 人工补测 }
 edges:
   - { id: e0, from: graph-start, to: start-version }
   - { id: e1, from: start-version, to: pm-start-iteration }

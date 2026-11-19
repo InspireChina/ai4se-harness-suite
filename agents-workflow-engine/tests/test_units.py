@@ -78,7 +78,7 @@ class PresetTest(unittest.TestCase):
         self.assertIn("start-version[/开始版本/]", text)
         self.assertIn("requirement-decision{需求决策}", text)
         self.assertIn("handoff([提测 · 里程碑])", text)
-        self.assertIn("accepted([测试通过])", text)
+        self.assertIn("accepted([人工补测])", text)
         self.assertIn("graph-start{{会话启动}}", text)
         self.assertIn("后端 TDD", text)
         self.assertIn("-.->|不满意|", text)

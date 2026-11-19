@@ -35,7 +35,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | **工具链安装器**       | [`tool-chain-installer/`](tool-chain-installer/)                                     | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态                            | skill + 工具清单 + 脚本 |
 | **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门                                       | 文档                |
 | **持续运行面板** | [`overnight-runner/`](overnight-runner/) | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，多队列各自独立，决策全程留痕 | skill + Python 实现 |
-| **工作流引擎** | [`agents-workflow-engine/`](agents-workflow-engine/) | 主会话按泳道图调度子 agent，从版本启动到 E2E 测试通过。子 agent 可绑不同模型做对抗验证 | Python 实现 |
+| **工作流引擎** | [`agents-workflow-engine/`](agents-workflow-engine/) | 主会话按泳道图调度子 agent，从版本启动到人工补测。子 agent 可绑不同模型做对抗验证 | Python 实现 |
 | **参考实现**         | [`example-project/`](example-project/)                                               | 一份完整、可跑、已填满规范的全栈参考项目（Vue 3 + Spring Boot + DDD 四层），用来对照与教学                                    | 示例项目              |
 
 ## 关系图

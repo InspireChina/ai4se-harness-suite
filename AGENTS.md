@@ -31,7 +31,7 @@ team-harness-suite/
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
-├── agents-workflow-engine/ # 主会话按泳道图调度子 agent，到测试通过为止
+├── agents-workflow-engine/ # 主会话按泳道图调度子 agent，到人工补测为止
 ├── team-workflow-guide/  # 团队流程与角色手册（纯文档）
 ├── example-project/      # 全栈参考实现（被这套 harness 管理的样子）
 └── opencode.jsonc        # 注册本仓库的 skills 路径
@@ -246,7 +246,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | `harness-installer/` | 铺 `AGENTS.md` + `docs/` 骨架 | 不填 `AGENTS.md` 里的 TODO（那是人填的） |
 | `tool-chain-installer/` | 装 MCP 工具链 | 不装 npm/pip 依赖 |
 | `overnight-runner/` | 无人值守跑 plan 的运行时 | 不判断 plan 质量（人的责任） |
-| `agents-workflow-engine/` | 主会话按泳道图调度子 agent，跑到测试通过 | 不实现 QA 流水线本身（由对应 skill 负责），不拆 `dev-build` 内部六步 |
+| `agents-workflow-engine/` | 主会话按泳道图调度子 agent，跑到人工补测 | 不实现 QA 流水线本身（由对应 skill 负责），不拆 `dev-build` 内部六步 |
 | `team-workflow-guide/` | 流程与角色约定 | 不含可执行代码 |
 | `example-project/` | 参考实现 | 不参与本仓库的验证脚本 |
 
