@@ -318,14 +318,14 @@ elif [ -z "$PY" ]; then
 else
   # overnight-runner 零依赖，用系统 python 即可
   if "$PY" overnight-runner/tests/test_units.py > /tmp/orn-units.log 2>&1; then
-    tail -1 /tmp/orn-units.log | sed 's/^/  \033[32m✔\033[0m 单元测试 /'
+    tail -1 /tmp/orn-units.log | while IFS= read -r line; do printf '  \033[32m✔\033[0m 单元测试 %s\n' "$line"; done
     PASSED=$((PASSED + 1))
   else
     sed 's/^/  /' /tmp/orn-units.log
     bad "单元测试"
   fi
   if "$PY" overnight-runner/tests/test_smoke.py > /tmp/orn-smoke.log 2>&1; then
-    tail -1 /tmp/orn-smoke.log | sed 's/^/  \033[32m✔\033[0m 冒烟测试 /'
+    tail -1 /tmp/orn-smoke.log | while IFS= read -r line; do printf '  \033[32m✔\033[0m 冒烟测试 %s\n' "$line"; done
     PASSED=$((PASSED + 1))
   else
     sed 's/^/  /' /tmp/orn-smoke.log
@@ -445,12 +445,21 @@ if [ -z "$PY" ]; then
   skip "找不到 python"
 else
   if "$PY" agents-workflow-engine/tests/test_units.py > /tmp/awe-units.log 2>&1 && grep -q '^OK$' /tmp/awe-units.log; then
-    grep '^Ran ' /tmp/awe-units.log | sed 's/^/  \033[32m✔\033[0m /'
+    grep '^Ran ' /tmp/awe-units.log | while IFS= read -r line; do printf '  \033[32m✔\033[0m %s\n' "$line"; done
     PASSED=$((PASSED + 1))
   else
     sed 's/^/  /' /tmp/awe-units.log
     bad "单元测试"
   fi
+fi
+
+# 版本号：version.py 是唯一事实源，CHANGELOG 最新一节必须与之一致
+VER_ENGINE="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' agents-workflow-engine/agents_workflow_engine/version.py 2>/dev/null)"
+VER_LOG="$(grep -m1 '^## \[' agents-workflow-engine/CHANGELOG.md 2>/dev/null | sed 's/^## \[\([^]]*\)\].*/\1/')"
+if [ -n "$VER_ENGINE" ] && [ "$VER_ENGINE" = "$VER_LOG" ]; then
+  ok "引擎版本一致: $VER_ENGINE"
+else
+  bad "引擎版本不一致: version.py=${VER_ENGINE:-空} CHANGELOG=${VER_LOG:-空}"
 fi
 
 # ── 汇总 ───────────────────────────────────────────────────────────

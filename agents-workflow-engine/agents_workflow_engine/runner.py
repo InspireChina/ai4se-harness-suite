@@ -11,10 +11,13 @@ from typing import List
 from typing import Optional
 from typing import Tuple
 
+from . import models
 from .errors import GraphError
 from .errors import NeedInput
-from .validate import REVIEW_PAIRS
+from .prompts import build_prompt
 from .validate import node_map
+from .version import __schema__
+from .version import __version__
 
 Token = Tuple[str, str]
 
@@ -75,14 +78,7 @@ def _take_answer(answers: Dict[str, List[str]], node_id: str) -> str:
 
 
 def _resolve_model(graph: dict, node: dict, master_model: str) -> str:
-    key = node.get("model")
-    models = graph.get("models") or {}
-    if not key or key not in models:
-        return master_model
-    spec = models[key]
-    if isinstance(spec, dict) and spec.get("env"):
-        return os.environ.get(str(spec["env"]), "") or master_model
-    return str(spec) or master_model
+    return models.resolve(graph, node, master_model)[1]
 
 
 def _verdict(text: str) -> str:
@@ -126,6 +122,10 @@ class Runner:
 
     def run(self) -> str:
         # 一条 token 就是一股独立的执行流；决策的 parallel 分支会各分出一股。
+        # 第一行记引擎版本 + 预设格式代次：事后能对上是哪版跑出来的，
+        # 也能查「项目里装的是哪版」（预设与引擎必须成对升级）。
+        self.log.append({"event": "engine", "version": __version__, "schema": __schema__})
+        self._check_models()
         work = [(self.current, "")]
         guard = 0
         while work:
@@ -160,7 +160,6 @@ class Runner:
                 work = tokens + work
                 continue
             if kind == "gate":
-                self._warn_pair(node)
                 result = self._call(node, None)
                 verdict = _verdict(result)
                 self.log.append({"node": current, "event": "gate", "verdict": verdict, "model": _resolve_model(self.graph, node, self.master_model)})
@@ -205,24 +204,17 @@ class Runner:
         model = _resolve_model(self.graph, node, self.master_model)
         return self.agent(node, model, task)
 
-    def _warn_pair(self, reviewer: dict) -> None:
-        for writer_id, reviewer_id in REVIEW_PAIRS:
-            if reviewer["id"] != reviewer_id:
-                continue
-            writer = self.nodes.get(writer_id)
-            if not writer:
-                return
-            left = _resolve_model(self.graph, writer, self.master_model)
-            right = _resolve_model(self.graph, reviewer, self.master_model)
-            if not left or not right or left == right:
-                self.log.append({
-                    "node": reviewer["id"],
-                    "event": "model-check",
-                    "warning": "未做对抗验证",
-                    "writer": writer_id,
-                    "writerModel": left,
-                    "reviewerModel": right,
-                })
+    def _check_models(self) -> None:
+        """两个模型配成同一个，等于没做对抗验证，开场记一笔。"""
+        left = models.model_of(self.graph, "executor") or self.master_model
+        right = models.model_of(self.graph, "gate") or self.master_model
+        if not left or not right or left == right:
+            self.log.append({
+                "event": "model-check",
+                "warning": "未做对抗验证",
+                "executorModel": left,
+                "gateModel": right,
+            })
 
     def _decision_tokens(self, node_id: str, answer: str) -> List[Token]:
         matches = _when_edges(self.edges, node_id, answer)
@@ -284,23 +276,46 @@ class Runner:
         return (chosen[0]["to"], chosen[0]["id"])
 
 
-def spawn_agent(command: str, node: dict, model: str, task: Optional[str]) -> str:
+def _argv(command: str, prompt: str, model: str) -> List[str]:
+    """拼子 agent 的命令行。模板里有 {prompt} 就放那里，没有就追在后面。"""
+    items = shlex.split(command)
+    template = " ".join(items)
+    if "{prompt}" in template:
+        argv = [item.replace("{prompt}", prompt).replace("{model}", model) for item in items]
+        if "{model}" not in template:
+            argv.extend(["--model", model])
+        return argv
+    argv = [item.replace("{model}", model) for item in items]
+    if "{model}" not in template:
+        argv.extend(["--model", model])
+    argv.append(prompt)
+    return argv
+
+
+def spawn_agent(command: str, node: dict, model: str, task: Optional[str], project: str = ".") -> str:
+    """拉起一个独立 agent 进程：提示词进去，stdout 出来。"""
     if not command.strip():
-        raise GraphError("没有配置子 agent 命令。run 时加上 --agent，例如 --agent 'opencode run'")
+        raise GraphError(
+            "没有配置独立 agent 命令。run 时加 --agent，例如 --agent 'qoder -p'；"
+            "不想拉起进程就用 --manual 输出执行清单"
+        )
+    prompt = build_prompt(node, model, task)
     env = os.environ.copy()
     env["WORKFLOW_SKILL"] = str(node.get("skill") or "")
     env["WORKFLOW_NODE"] = node["id"]
     env["WORKFLOW_MODEL"] = model
     env["WORKFLOW_TASK"] = task or ""
-    argv = shlex.split(command) + ["--skill", str(node.get("skill") or ""), "--node", node["id"], "--model", model]
-    if task:
-        argv.extend(["--task", task])
+    env["WORKFLOW_PROMPT"] = prompt
+    argv = _argv(command, prompt, model)
     try:
-        completed = subprocess.run(argv, env=env, text=True, capture_output=True, check=False)
+        completed = subprocess.run(
+            argv, env=env, text=True, capture_output=True, check=False, cwd=project
+        )
     except OSError as exc:
-        raise GraphError("启动子 agent 失败：%s。命令是：%s" % (exc, command)) from exc
+        raise GraphError("启动独立 agent 失败：%s。命令是：%s" % (exc, command)) from exc
     if completed.returncode != 0:
         raise GraphError(
-            "子 agent 退出码 %s，节点 %s。stderr：%s" % (completed.returncode, node["id"], completed.stderr.strip()[:400])
+            "独立 agent 退出码 %s，节点 %s。stderr：%s"
+            % (completed.returncode, node["id"], completed.stderr.strip()[:400])
         )
     return completed.stdout

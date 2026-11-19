@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import os
 import sys
 import tempfile
@@ -14,9 +16,16 @@ sys.path.insert(0, ROOT)
 from agents_workflow_engine.errors import GraphError  # noqa: E402
 from agents_workflow_engine.load import load_preset  # noqa: E402
 from agents_workflow_engine.merge import merge  # noqa: E402
+from agents_workflow_engine.models import model_of  # noqa: E402
+from agents_workflow_engine.models import resolve  # noqa: E402
+from agents_workflow_engine.models import role_of  # noqa: E402
+from agents_workflow_engine.prompts import build_prompt  # noqa: E402
 from agents_workflow_engine.render_mermaid import render  # noqa: E402
 from agents_workflow_engine.runner import Runner  # noqa: E402
+from agents_workflow_engine.runner import spawn_agent  # noqa: E402
 from agents_workflow_engine.validate import validate  # noqa: E402
+from agents_workflow_engine.version import __schema__  # noqa: E402
+from agents_workflow_engine.version import __version__  # noqa: E402
 
 
 def happy_answers():
@@ -33,6 +42,15 @@ def happy_answers():
     }
 
 
+def write_answers(folder):
+    """把 happy_answers 写成 answers.yaml，返回路径。"""
+    path = os.path.join(folder, "answers.yaml")
+    text = "\n".join("%s: %s" % (key, value[0]) for key, value in happy_answers().items()) + "\n"
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write(text)
+    return path
+
+
 def fake_agent(calls):
     def run(node, model, task):
         calls.append((node["id"], model, task))
@@ -46,23 +64,23 @@ def fake_agent(calls):
 
 
 class PresetTest(unittest.TestCase):
-    def test_preset_valid_and_warns_when_model_unset(self):
+    def test_preset_ships_two_distinct_models(self):
         graph = load_preset()
         errors, warnings = validate(graph)
         self.assertEqual(errors, [])
-        self.assertTrue(any("未配置对抗模型" in item for item in warnings))
+        self.assertEqual(model_of(graph, "executor"), "DeepSeek-V4.1-Flash-1017")
+        self.assertEqual(model_of(graph, "gate"), "GLM-5.3-Flash")
+        self.assertFalse(any("未配置对抗模型" in item for item in warnings))
+        self.assertFalse(any("未做对抗验证" in item for item in warnings))
 
-    def test_distinct_models_have_no_same_model_warning(self):
-        os.environ["MODEL_WRITER"] = "writer-a"
-        os.environ["MODEL_REVIEWER"] = "reviewer-b"
+    def test_env_override_can_make_models_equal(self):
+        os.environ["MODEL_GATE"] = "DeepSeek-V4.1-Flash-1017"
         try:
             errors, warnings = validate(load_preset())
         finally:
-            del os.environ["MODEL_WRITER"]
-            del os.environ["MODEL_REVIEWER"]
+            del os.environ["MODEL_GATE"]
         self.assertEqual(errors, [])
-        self.assertFalse(any("未做对抗验证" in item for item in warnings))
-        self.assertFalse(any("未配置对抗模型" in item for item in warnings))
+        self.assertTrue(any("未做对抗验证" in item for item in warnings))
 
     def test_render_shapes(self):
         text = render(load_preset())
@@ -270,29 +288,24 @@ class RunTest(unittest.TestCase):
         self.assertIn("start-version", str(caught.exception))
 
     def test_same_model_is_logged(self):
-        os.environ["MODEL_WRITER"] = "same"
-        os.environ["MODEL_REVIEWER"] = "same"
+        os.environ["MODEL_GATE"] = "DeepSeek-V4.1-Flash-1017"
         log = []
         try:
             Runner(load_preset(), happy_answers(), fake_agent([]), "master", log).run()
         finally:
-            del os.environ["MODEL_WRITER"]
-            del os.environ["MODEL_REVIEWER"]
+            del os.environ["MODEL_GATE"]
         self.assertTrue(any(item.get("warning") == "未做对抗验证" for item in log))
 
     def test_cli_run_writes_jsonl(self):
         from agents_workflow_engine.cli import main
 
         with tempfile.TemporaryDirectory() as folder:
-            answers = os.path.join(folder, "answers.yaml")
-            text = "\n".join("%s: %s" % (key, value[0]) for key, value in happy_answers().items()) + "\n"
-            with open(answers, "w", encoding="utf-8") as handle:
-                handle.write(text)
+            answers = write_answers(folder)
             agent = os.path.join(folder, "agent.sh")
             with open(agent, "w", encoding="utf-8") as handle:
                 handle.write(
                     "#!/bin/sh\n"
-                    "case \"$2\" in\n"
+                    "case \"$WORKFLOW_SKILL\" in\n"
                     "  dev-plan) printf 'TASK: a\\nTASK: b\\n' ;;\n"
                     "  ba-requirement-review|dev-plan-review) printf '满意\\n' ;;\n"
                     "  *) printf 'ok\\n' ;;\n"
@@ -308,6 +321,264 @@ class RunTest(unittest.TestCase):
             self.assertIn('"node": "handoff"', body)
             self.assertIn('"node": "accepted"', body)
             self.assertIn('"task": "b"', body)
+
+    def test_cli_manual_writes_prompts_not_decisions(self):
+        from agents_workflow_engine.cli import main
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            code = main(["--project", folder, "run", "--answers", answers, "--manual"])
+            self.assertEqual(code, 0)
+            prompts = os.path.join(folder, ".agents", "workflow", "prompts.md")
+            self.assertTrue(os.path.isfile(prompts))
+            with open(prompts, encoding="utf-8") as handle:
+                body = handle.read()
+            self.assertIn("skill `dev-build`", body)
+            self.assertIn("引擎 %s" % __version__, body)
+            self.assertIn("能开子 agent 就开", body)
+            self.assertIn("假定通过", body)
+            self.assertIn("执行者（DeepSeek-V4.1-Flash-1017）", body)
+            self.assertIn("门禁（GLM-5.3-Flash）", body)
+            self.assertFalse(os.path.exists(os.path.join(folder, ".agents", "workflow", "decisions.jsonl")))
+
+    def test_cli_without_agent_and_not_tty_falls_back_to_manual(self):
+        from agents_workflow_engine.cli import main
+
+        class NotATTY(object):
+            def isatty(self):
+                return False
+
+            def readline(self):
+                raise AssertionError("非 TTY 不应该等输入")
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            saved, sys.stdin = sys.stdin, NotATTY()
+            try:
+                code = main(["--project", folder, "run", "--answers", answers])
+            finally:
+                sys.stdin = saved
+            self.assertEqual(code, 0)
+            self.assertTrue(os.path.isfile(os.path.join(folder, ".agents", "workflow", "prompts.md")))
+
+    def test_cli_tty_default_keeps_work_in_session(self):
+        """支持子 agent（回车）→ 不拉进程，只出清单。"""
+        import builtins
+
+        from agents_workflow_engine.cli import main
+
+        class TTY(object):
+            def isatty(self):
+                return True
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            saved_stdin, saved_input = sys.stdin, builtins.input
+            sys.stdin, builtins.input = TTY(), (lambda prompt="": "")
+            try:
+                code = main(["--project", folder, "run", "--answers", answers])
+            finally:
+                sys.stdin, builtins.input = saved_stdin, saved_input
+            self.assertEqual(code, 0)
+            work = os.path.join(folder, ".agents", "workflow")
+            self.assertTrue(os.path.isfile(os.path.join(work, "prompts.md")))
+            self.assertFalse(os.path.exists(os.path.join(work, "decisions.jsonl")))
+
+    def test_cli_tty_without_subagent_needs_agent_command(self):
+        """选 3（独立 agent）又没给 --agent → 报错，而不是静默走清单。"""
+        import builtins
+
+        from agents_workflow_engine.cli import main
+
+        class TTY(object):
+            def isatty(self):
+                return True
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            saved_stdin, saved_input = sys.stdin, builtins.input
+            sys.stdin, builtins.input = TTY(), (lambda prompt="": "3")
+            try:
+                code = main(["--project", folder, "run", "--answers", answers])
+            finally:
+                sys.stdin, builtins.input = saved_stdin, saved_input
+            self.assertEqual(code, 1)
+            work = os.path.join(folder, ".agents", "workflow")
+            self.assertFalse(os.path.exists(os.path.join(work, "prompts.md")))
+
+    def test_cli_tty_pick_solo(self):
+        """选 2（不支持、用主会话）→ 清单里要求主会话自己干。"""
+        import builtins
+
+        from agents_workflow_engine.cli import main
+
+        class TTY(object):
+            def isatty(self):
+                return True
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            saved_stdin, saved_input = sys.stdin, builtins.input
+            sys.stdin, builtins.input = TTY(), (lambda prompt="": "2")
+            try:
+                code = main(["--project", folder, "run", "--answers", answers])
+            finally:
+                sys.stdin, builtins.input = saved_stdin, saved_input
+            self.assertEqual(code, 0)
+            with open(os.path.join(folder, ".agents", "workflow", "prompts.md"), encoding="utf-8") as handle:
+                body = handle.read()
+            self.assertIn("会话内 · 只用主会话", body)
+            self.assertIn("不要开子 agent", body)
+            self.assertNotIn("能开子 agent 就开", body)
+
+    def test_cli_solo_flag_skips_the_question(self):
+        from agents_workflow_engine.cli import main
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            code = main(["--project", folder, "run", "--answers", answers, "--solo"])
+            self.assertEqual(code, 0)
+            with open(os.path.join(folder, ".agents", "workflow", "prompts.md"), encoding="utf-8") as handle:
+                body = handle.read()
+            self.assertIn("不要开子 agent", body)
+
+    def test_cli_rejects_two_mode_flags(self):
+        from agents_workflow_engine.cli import main
+
+        with tempfile.TemporaryDirectory() as folder:
+            answers = write_answers(folder)
+            code = main(["--project", folder, "run", "--answers", answers, "--manual", "--solo"])
+            self.assertEqual(code, 1)
+            self.assertFalse(os.path.exists(os.path.join(folder, ".agents", "workflow", "prompts.md")))
+
+
+class ModelTest(unittest.TestCase):
+    def test_role_follows_kind(self):
+        self.assertEqual(role_of({"id": "g", "kind": "gate"}), "gate")
+        self.assertEqual(role_of({"id": "a", "kind": "action"}), "executor")
+
+    def test_node_level_literal_model_wins(self):
+        graph = load_preset()
+        node = {"id": "dev-build", "kind": "action", "model": "my-own-model"}
+        role, model = resolve(graph, node, "master")
+        self.assertEqual(role, "executor")
+        self.assertEqual(model, "my-own-model")
+
+    def test_missing_role_falls_back_to_master(self):
+        graph = {"models": {}, "nodes": []}
+        role, model = resolve(graph, {"id": "x", "kind": "gate"}, "master")
+        self.assertEqual((role, model), ("gate", "master"))
+
+
+class PromptTest(unittest.TestCase):
+    def test_action_prompt_mentions_skill_file(self):
+        text = build_prompt({"id": "dev-build", "kind": "action", "skill": "dev-build", "title": "构建与自测", "note": ["后端 TDD"]}, "M")
+        self.assertIn("skill `dev-build`", text)
+        self.assertIn(".agents/skills/dev-build/SKILL.md", text)
+        self.assertIn("- 后端 TDD", text)
+        self.assertIn("执行者（M）", text)
+
+    def test_gate_prompt_asks_for_verdict(self):
+        text = build_prompt({"id": "dev-plan-review", "kind": "gate", "skill": "dev-plan-review", "title": "plan 质量门"}, "M")
+        self.assertIn("门禁（M）", text)
+        self.assertIn("满意", text)
+        self.assertIn("不满意", text)
+
+    def test_batch_prompt_commands_task_lines(self):
+        text = build_prompt({"id": "dev-plan", "kind": "action", "skill": "dev-plan", "batch": True}, "M")
+        self.assertIn("TASK: <id>", text)
+
+    def test_prompt_without_skill_still_builds(self):
+        text = build_prompt({"id": "m", "kind": "milestone", "title": "提测"}, "M")
+        self.assertNotIn("skill `", text)
+        self.assertIn("提测", text)
+
+    def test_manual_prompt_offers_subagent(self):
+        text = build_prompt({"id": "dev-build", "kind": "action", "skill": "dev-build"}, "M", manual=True)
+        self.assertIn("能开子 agent 就开", text)
+
+    def test_solo_prompt_forbids_subagent(self):
+        text = build_prompt({"id": "dev-build", "kind": "action", "skill": "dev-build"}, "M",
+                            manual=True, allow_subagent=False)
+        self.assertIn("不要开子 agent", text)
+        self.assertNotIn("能开子 agent 就开", text)
+
+
+class SpawnTest(unittest.TestCase):
+    def test_spawn_passes_prompt_and_runs_in_project(self):
+        with tempfile.TemporaryDirectory() as folder:
+            agent = os.path.join(folder, "agent.sh")
+            dump = os.path.join(folder, "argv.txt")
+            script = (
+                "#!/bin/sh\n"
+                "printf '%s\\n' \"$PWD\" \"$@\" > '" + dump + "'\n"
+                "printf 'ok\\n'\n"
+            )
+            with open(agent, "w", encoding="utf-8") as handle:
+                handle.write(script)
+            os.chmod(agent, 0o755)
+            node = {"id": "dev-build", "kind": "action", "skill": "dev-build", "title": "构建与自测"}
+            out = spawn_agent(agent, node, "M", None, folder)
+            self.assertIn("ok", out)
+            with open(dump, encoding="utf-8") as handle:
+                lines = handle.read().splitlines()
+            self.assertEqual(os.path.realpath(lines[0]), os.path.realpath(folder))
+            self.assertNotIn("--skill", lines)
+            self.assertTrue(any("skill `dev-build`" in line for line in lines))
+            self.assertIn("--model", lines)
+            self.assertIn("M", lines)
+
+    def test_spawn_placeholders_are_replaced(self):
+        with tempfile.TemporaryDirectory() as folder:
+            agent = os.path.join(folder, "agent.sh")
+            dump = os.path.join(folder, "argv.txt")
+            script = (
+                "#!/bin/sh\n"
+                "printf '%s\\n' \"$@\" > '" + dump + "'\n"
+                "printf 'ok\\n'\n"
+            )
+            with open(agent, "w", encoding="utf-8") as handle:
+                handle.write(script)
+            os.chmod(agent, 0o755)
+            node = {"id": "dev-plan-review", "kind": "gate", "skill": "dev-plan-review"}
+            spawn_agent(agent + " -p {prompt} --model {model}", node, "GLM", None, folder)
+            with open(dump, encoding="utf-8") as handle:
+                body = handle.read()
+            lines = body.splitlines()
+            self.assertEqual(lines[0], "-p")
+            self.assertIn("GLM", lines)
+            self.assertNotIn("{prompt}", body)
+            self.assertTrue(any("门禁（GLM）" in line for line in lines))
+
+    def test_spawn_failure_raises(self):
+        with tempfile.TemporaryDirectory() as folder:
+            agent = os.path.join(folder, "agent.sh")
+            with open(agent, "w", encoding="utf-8") as handle:
+                handle.write("#!/bin/sh\nexit 3\n")
+            os.chmod(agent, 0o755)
+            with self.assertRaises(GraphError) as caught:
+                spawn_agent(agent, {"id": "x", "kind": "action"}, "M", None, folder)
+            self.assertIn("退出码 3", str(caught.exception))
+
+
+class VersionTest(unittest.TestCase):
+    def test_run_logs_engine_version_first(self):
+        log = []
+        Runner(load_preset(), happy_answers(), fake_agent([]), "master", log).run()
+        first = log[0]
+        self.assertEqual(first.get("event"), "engine")
+        self.assertEqual(first.get("version"), __version__)
+        self.assertEqual(first.get("schema"), __schema__)
+
+    def test_version_flag_prints_version(self):
+        from agents_workflow_engine.cli import main
+
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            with self.assertRaises(SystemExit) as caught:
+                main(["--version"])
+        self.assertEqual(caught.exception.code, 0)
+        self.assertIn(__version__, buf.getvalue())
 
 
 if __name__ == "__main__":

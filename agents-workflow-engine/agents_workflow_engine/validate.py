@@ -2,15 +2,10 @@
 
 from __future__ import annotations
 
-import os
-from typing import Any
+from . import models
 
 WORK_KINDS = ("action", "gate", "decision", "human_input", "milestone")
 ACTORS = ("human", "master", "subagent")
-REVIEW_PAIRS = (
-    ("ba-write-spec", "ba-requirement-review"),
-    ("dev-plan", "dev-plan-review"),
-)
 
 
 def node_map(graph: dict) -> dict:
@@ -162,17 +157,12 @@ def validate(graph: dict) -> tuple:
         if stranded:
             errors.append("这些节点从入口走不到：%s。覆盖可能把图切断了" % "、".join(stranded))
 
-    for writer_id, reviewer_id in REVIEW_PAIRS:
-        writer = by_id.get(writer_id)
-        reviewer = by_id.get(reviewer_id)
-        if not writer or not reviewer:
-            continue
-        left = _model_value(graph, writer)
-        right = _model_value(graph, reviewer)
-        if not left or not right:
-            warnings.append("未配置对抗模型：%s 与 %s 将沿用主会话模型" % (writer_id, reviewer_id))
-        elif left == right:
-            warnings.append("未做对抗验证：%s 与 %s 使用了同一个模型" % (writer_id, reviewer_id))
+    executor_model = models.model_of(graph, "executor")
+    gate_model = models.model_of(graph, "gate")
+    if not executor_model or not gate_model:
+        warnings.append("未配置模型：执行者或门禁没写 model，将沿用主会话模型")
+    elif executor_model == gate_model:
+        warnings.append("未做对抗验证：执行者与门禁用了同一个模型（%s）" % executor_model)
     return errors, warnings
 
 
@@ -192,14 +182,3 @@ def _reachable(entry: str, edges: list) -> set:
             if edge.get("from") == current:
                 stack.append(edge.get("to"))
     return seen
-
-
-def _model_value(graph: dict, node: dict) -> str:
-    key = node.get("model")
-    models = graph.get("models") or {}
-    if not key or key not in models:
-        return ""
-    spec: Any = models[key]
-    if isinstance(spec, dict) and spec.get("env"):
-        return os.environ.get(str(spec["env"]), "")
-    return str(spec)

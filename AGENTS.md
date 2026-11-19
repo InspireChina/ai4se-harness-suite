@@ -247,7 +247,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | `harness-installer/` | 铺 `AGENTS.md` + `docs/` 骨架 | 不填 `AGENTS.md` 里的 TODO（那是人填的） |
 | `tool-chain-installer/` | 装 MCP 工具链 | 不装 npm/pip 依赖 |
 | `overnight-runner/` | 无人值守跑 plan 的运行时 | 不判断 plan 质量（人的责任） |
-| `agents-workflow-engine/` | 主会话按泳道图调度子 agent，跑到可上线（含人读图 `graph.html`） | 不实现 QA 流水线本身（由对应 skill 负责），不拆 `dev-build` 内部六步 |
+| `agents-workflow-engine/` | 主会话按泳道图执行：会话内开子 agent（默认）/ 只用主会话 / 拉独立 agent 三选一；执行者/门禁两个模型，跑到可上线（含人读图 `graph.html`） | 不实现 QA 流水线本身（由对应 skill 负责），不拆 `dev-build` 内部六步 |
 | `team-workflow-guide/` | 流程与角色约定（含角色 × 阶段泳道图 `flow.html`） | 不含运行时逻辑 |
 | `example-project/` | 参考实现 | 不参与本仓库的验证脚本 |
 
@@ -345,6 +345,8 @@ pending ──▶ running ──┬──▶ success
 | 安装后无残留占位符 | 见验证脚本 |
 | overnight-runner 单元测试 | `overnight-runner/tests/test_units.py`（44 个用例：YAML 子集 + 终端宽度 + 队列路径/迁移 + 决策 + 锁 + 按键读取） |
 | overnight-runner 行为 | `overnight-runner/tests/test_smoke.py`（13 个用例，假 agent 驱动） |
+| agents-workflow-engine 单元测试 | `agents-workflow-engine/tests/test_units.py`（46 个用例：图校验/调度/回路、提示词、两个模型、独立 agent 命令行、三种执行方式、版本号） |
+| 引擎版本号一致 | `version.py` ↔ `CHANGELOG.md` 最新一节（见验证脚本） |
 
 一条命令跑全部：
 
@@ -365,6 +367,14 @@ pending ──▶ running ──┬──▶ success
   **中文按键原样读出**、**汉字被拆到两次读里仍能还原**
 - 假 agent 要 **记录每次调用的命令行**（断言"续跑时带了 `--session`"要用）
 - 断言要具体（状态、重试次数、记录内容），不要只断言"没崩"
+
+### `agents-workflow-engine` 的测试规范
+
+- 用**假 agent 脚本**（临时 `.sh`）验证命令行：把它收到的 argv 与 `pwd` 写到临时文件再断言
+- 断言要断到结构上：参数里**没有** `--skill`、提示词里有 `skill \`<名字>\`` 与 `.agents/skills/<名字>/SKILL.md`、`cwd` 等于 `--project`
+- 提示词是纯函数（`prompts.build_prompt`），单独测，不跑整张图
+- 清单模式（`--manual`）断言两件事：生成了 `prompts.md`、**没有** 生成 `decisions.jsonl`
+- 非 TTY 场景用一个 `isatty()` 返回 False 的假 stdin，确保不会卡在 `input()`
 
 ### `example-project` 的测试
 
@@ -401,6 +411,7 @@ pending ──▶ running ──┬──▶ success
 - [ ] 产物里 **没有** 安装机的绝对路径
 - [ ] 跑过 `./.agents/verify.sh`
 - [ ] 改了 `overnight-runner` 的行为 → 单元测试 44/44 + 冒烟测试 13/13 通过
+- [ ] 改了 `agents-workflow-engine` 的行为 → bump `version.py` + 补 `CHANGELOG.md`，单元测试 46/46 通过
 - [ ] 文档里的相对链接有效
 - [ ] 没提交 `.venv/`、`__pycache__/`、运行时状态（`.overnight-runner/queue/*/state.json`、`logs/`、`.lock`）
 
@@ -448,11 +459,12 @@ team-harness-suite/
 │
 ├── agents-workflow-engine/
 │   ├── README.md
+│   ├── CHANGELOG.md                # 版本 → 变更；每版写清能不能装到项目
 │   ├── graph.html                  # 迭代编排图（人读版：三泳道 × 五阶段，JointJS）
 │   ├── presets/iteration-to-test.yaml  # 预设图：版本启动 → 可上线
 │   ├── schema/graph.schema.json
 │   ├── scripts/install.sh
-│   ├── agents_workflow_engine/     # Python 实现（零第三方依赖）
+│   ├── agents_workflow_engine/     # Python 实现（零第三方依赖；version.py 是版本唯一事实源）
 │   └── tests/test_units.py
 │
 ├── team-workflow-guide/

@@ -12,6 +12,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PRESET="$ROOT/presets/iteration-to-test.yaml"
+VERSION="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' "$ROOT/agents_workflow_engine/version.py" 2>/dev/null || true)"
 DRY_RUN=0
 FORCE=0
 TARGET=""
@@ -45,9 +46,27 @@ PROJECT="$(cd "$TARGET" && pwd)"
 DEST="$PROJECT/.agents/workflow"
 FILE="$DEST/preset.yaml"
 
-echo "agents-workflow-engine 安装器"
+if [ -n "$VERSION" ]; then
+  echo "agents-workflow-engine 安装器（引擎 ${VERSION}）"
+else
+  echo "agents-workflow-engine 安装器"
+fi
 echo "  预设: $PRESET"
 echo "  目标: $FILE"
+
+# 预设与引擎要成对升级：项目里装了引擎就对比一下版本，不对就提醒。
+INSTALLED="$PROJECT/.agents/workflow/engine/agents_workflow_engine/version.py"
+HAVE=""
+if [ -f "$INSTALLED" ]; then
+  HAVE="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' "$INSTALLED" 2>/dev/null || true)"
+  if [ -n "$HAVE" ] && [ "$HAVE" = "$VERSION" ]; then
+    echo "  引擎: 项目里是 ${HAVE}，与本预设一致"
+  else
+    echo "  引擎: 项目里是 ${HAVE:-未知}，本预设要 ${VERSION} —— 不一致，别只装预设" >&2
+  fi
+else
+  echo "  引擎: 项目里没有 .agents/workflow/engine（或 0.1.x，没有 version.py），预设的图级 models 会被忽略" >&2
+fi
 
 if [ "$DRY_RUN" -eq 1 ]; then
   if [ -f "$FILE" ] && [ "$FORCE" -eq 0 ]; then

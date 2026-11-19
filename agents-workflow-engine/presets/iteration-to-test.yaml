@@ -5,8 +5,10 @@ lanes:
   - { id: master, title: graph-master }
   - { id: subagent, title: 子 agent }
 models:
-  writer: { env: MODEL_WRITER }
-  reviewer: { env: MODEL_REVIEWER }
+  # 两个模型就够：执行者干所有 action，门禁做所有 gate 的判定。
+  # 环境变量有值时优先，CI 换模型不用改这个文件。
+  executor: { model: DeepSeek-V4.1-Flash-1017, env: MODEL_EXECUTOR }
+  gate: { model: GLM-5.3-Flash, env: MODEL_GATE }
 loops:
   - id: spec
     maxIterations: 3
@@ -23,15 +25,15 @@ loops:
 nodes:
   - { id: graph-start, actor: master, kind: entry, title: 会话启动 }
   - { id: start-version, actor: human, kind: human_input, title: 开始版本 }
-  - { id: pm-start-iteration, actor: subagent, kind: action, skill: pm-start-iteration, title: 开始迭代, model: writer }
+  - { id: pm-start-iteration, actor: subagent, kind: action, skill: pm-start-iteration, title: 开始迭代 }
   - { id: write-spec, actor: human, kind: human_input, title: 编写规格 }
-  - { id: ba-write-spec, actor: subagent, kind: action, skill: ba-write-spec, title: 需求规格, model: writer }
-  - { id: ba-write-prototype, actor: subagent, kind: action, skill: ba-write-prototype, title: 原型, once: true, model: writer }
-  - { id: ba-requirement-review, actor: subagent, kind: gate, skill: ba-requirement-review, title: 需求质量门, model: reviewer }
+  - { id: ba-write-spec, actor: subagent, kind: action, skill: ba-write-spec, title: 需求规格 }
+  - { id: ba-write-prototype, actor: subagent, kind: action, skill: ba-write-prototype, title: 原型, once: true }
+  - { id: ba-requirement-review, actor: subagent, kind: gate, skill: ba-requirement-review, title: 需求质量门 }
   - { id: requirement-decision, actor: human, kind: decision, title: 需求决策, options: [满意, 不满意] }
-  - { id: qa-write-cases, actor: subagent, kind: action, skill: qa-write-cases, title: 编写 QA 用例, model: writer }
+  - { id: qa-write-cases, actor: subagent, kind: action, skill: qa-write-cases, title: 编写 QA 用例 }
   - { id: tech-brief, actor: human, kind: human_input, title: 技术高阶 }
-  - { id: tl-high-level-design, actor: subagent, kind: action, skill: tl-high-level-design, title: 技术高阶设计, once: true, model: writer }
+  - { id: tl-high-level-design, actor: subagent, kind: action, skill: tl-high-level-design, title: 技术高阶设计, once: true }
   - { id: hld-decision, actor: human, kind: decision, title: 高阶决策, options: [满意, 不满意] }
   - id: dev-plan
     actor: subagent
@@ -39,12 +41,11 @@ nodes:
     skill: dev-plan
     title: 详细规划
     batch: true
-    model: writer
     note: [详细设计（API/DB 字段、文件改动）, 任务清单, 自测用例（DST）]
-  - { id: dev-plan-review, actor: subagent, kind: gate, skill: dev-plan-review, title: plan 质量门, model: reviewer }
+  - { id: dev-plan-review, actor: subagent, kind: gate, skill: dev-plan-review, title: plan 质量门 }
   - { id: plan-confirm, actor: human, kind: human_input, title: plan 确认 }
   - { id: plan-decision, actor: human, kind: decision, title: plan 决策, options: [满意, 不满意] }
-  - { id: overnight-runner, actor: subagent, kind: action, skill: overnight-runner, title: 排本批顺序, model: writer }
+  - { id: overnight-runner, actor: subagent, kind: action, skill: overnight-runner, title: 排本批顺序 }
   - id: dev-build
     actor: subagent
     kind: action
@@ -52,17 +53,16 @@ nodes:
     title: 构建与自测
     sealed: true
     repeatsBatch: dev-plan
-    model: writer
     note: [后端 TDD, 前端 TDD, 构建/Lint, 前端 UI review, API 测试, 浏览器自测]
   - { id: build-decision, actor: human, kind: decision, title: 构建决策, options: [满意, 不满意] }
   - { id: amend-input, actor: human, kind: human_input, title: 修订输入 }
-  - { id: dev-plan-amend, actor: subagent, kind: action, skill: dev-plan-amend, title: 规划修订, model: writer }
+  - { id: dev-plan-amend, actor: subagent, kind: action, skill: dev-plan-amend, title: 规划修订 }
   - { id: handoff, actor: master, kind: milestone, title: 提测 }
-  - { id: qa-run-e2e, actor: subagent, kind: action, skill: qa-run-e2e, title: 编写并运行 E2E 测试, join: true, model: writer }
+  - { id: qa-run-e2e, actor: subagent, kind: action, skill: qa-run-e2e, title: 编写并运行 E2E 测试, join: true }
   - { id: test-decision, actor: human, kind: decision, title: 测试决策, options: [修订, 通过, 打回开发] }
   - { id: accepted, actor: master, kind: milestone, title: 人工补测 }
-  - { id: ba-gen-facts, actor: subagent, kind: action, skill: ba-gen-facts, title: 刷新事实文档, model: writer }
-  - { id: dev-release-plan, actor: subagent, kind: action, skill: dev-release-plan, title: 准备上线, model: writer }
+  - { id: ba-gen-facts, actor: subagent, kind: action, skill: ba-gen-facts, title: 刷新事实文档 }
+  - { id: dev-release-plan, actor: subagent, kind: action, skill: dev-release-plan, title: 准备上线 }
   - { id: shipped, actor: master, kind: end, title: 可上线 }
 edges:
   - { id: e0, from: graph-start, to: start-version }
