@@ -33,10 +33,30 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，26 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/)                                           | 为任意项目铺好工程底座：`AGENTS.md` + `docs/`（含 `architecture/` 高阶意图骨架、features / facts / standards） | skill + 模板 + 脚本   |
 | **工具链安装器**       | [`tool-chain-installer/`](tool-chain-installer/)                                     | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态                            | skill + 工具清单 + 脚本 |
-| **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门                                       | 文档                |
+| **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 角色泳道图 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门；**L3 · 人编排**                                       | 文档                |
 | **持续运行面板** | [`overnight-runner/`](overnight-runner/) | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，多队列各自独立，决策全程留痕 | skill + Python 实现 |
-| **工作流引擎** | [`agents-workflow-engine/`](agents-workflow-engine/) | 主会话按泳道图调度子 agent，从版本启动到人工补测。子 agent 可绑不同模型做对抗验证 | Python 实现 |
+| **工作流引擎** | [`agents-workflow-engine/`](agents-workflow-engine/) | 主会话按泳道图调度子 agent，从版本启动到可上线；**L4 · 人决策**。子 agent 可绑不同模型做对抗验证 | Python 实现 |
 | **参考实现**         | [`example-project/`](example-project/)                                               | 一份完整、可跑、已填满规范的全栈参考项目（Vue 3 + Spring Boot + DDD 四层），用来对照与教学                                    | 示例项目              |
+
+## 两种协作模式：L3 与 L4
+
+同一套 26 个 skill、同一个 SDD 流程，有两种跑法。区别只在 **人站在哪一环**。
+
+| | [`team-workflow-guide/`](team-workflow-guide/) | [`agents-workflow-engine/`](agents-workflow-engine/) |
+|---|---|---|
+| AI4SE 成熟度 | **L3** | **L4** |
+| 人机关系 | **Human in the loop** —— 人在环内 | **Human on the loop** —— 人看着环 |
+| 人的角色 | **编排者**：决定做什么、交给谁、什么时候推进 | **决策者**：只在闸门与异常处拍板 |
+| AI 的角色 | 执行被点名的那一步 | 按图调度子 agent，节点之间自动往下走 |
+| 谁在调度 | 人在会话里按阶段点名 skill | 图按 `presets/*.yaml` 的节点与连线调度 |
+| 上下文在哪 | 会话 + 仓库文档，靠人带下去 | 图实例目录（`state.json` / `decisions.jsonl` / `outputs/`），换会话也能接着跑 |
+| 适合 | **敏捷团队**：多角色、节奏由人定，随时插需求 | **FTE 工作者**：一人扛完整条线，追求单位时间产出 |
+| 开始用 | 打开 [`index.html`](team-workflow-guide/index.html)，按阶段调 skill | `workflow start --instance <名字>` → `submit` 推进 → `status` 看卡点 |
+| 看哪张图 | 泳道 [`flow.html`](team-workflow-guide/flow.html) · [Pages](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 编排 [`graph.html`](agents-workflow-engine/graph.html) · [Pages](https://inspirechina.github.io/ai4se-harness-suite/agents-workflow-engine/graph.html) |
+
+一句话：**L3 由人决定下一步做什么；L4 由人决定要不要停。**
+
+两种模式不互斥，产物落在同一个仓库的 `docs/` 里：团队日常走 L3，个人把自己整条线交给 L4 的图。
 
 ## 关系图
 

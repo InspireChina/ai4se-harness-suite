@@ -78,7 +78,10 @@ class PresetTest(unittest.TestCase):
         self.assertIn("start-version[/开始版本/]", text)
         self.assertIn("requirement-decision{需求决策}", text)
         self.assertIn("handoff([提测 · 里程碑])", text)
-        self.assertIn("accepted([人工补测])", text)
+        self.assertIn("accepted([人工补测 · 里程碑])", text)
+        self.assertIn("ba-gen-facts(刷新事实文档)", text)
+        self.assertIn("dev-release-plan(准备上线)", text)
+        self.assertIn("shipped([可上线])", text)
         self.assertIn("graph-start{{会话启动}}", text)
         self.assertIn("后端 TDD", text)
         self.assertIn("-.->|不满意|", text)
@@ -106,7 +109,7 @@ class PresetTest(unittest.TestCase):
         self.assertEqual(errors, [])
         calls = []
         end = Runner(graph, happy_answers(), fake_agent(calls), "master", []).run()
-        self.assertEqual(end, "accepted")
+        self.assertEqual(end, "shipped")
         self.assertNotIn("qa-write-cases", [item[0] for item in calls])
 
     def test_edge_into_sealed_step_fails(self):
@@ -180,7 +183,7 @@ class RunTest(unittest.TestCase):
         calls = []
         log = []
         end = Runner(load_preset(), happy_answers(), fake_agent(calls), "master", log).run()
-        self.assertEqual(end, "accepted")
+        self.assertEqual(end, "shipped")
         build_calls = [item for item in calls if item[0] == "dev-build"]
         self.assertEqual([item[2] for item in build_calls], ["a", "b"])
         self.assertTrue(any(item.get("event") == "batch" for item in log))
@@ -189,7 +192,7 @@ class RunTest(unittest.TestCase):
         calls = []
         log = []
         end = Runner(load_preset(), happy_answers(), fake_agent(calls), "master", log).run()
-        self.assertEqual(end, "accepted")
+        self.assertEqual(end, "shipped")
         order = [item[0] for item in calls]
         self.assertLess(order.index("qa-write-cases"), order.index("tl-high-level-design"))
         self.assertEqual(order.count("qa-write-cases"), 1)
@@ -206,17 +209,29 @@ class RunTest(unittest.TestCase):
         answers["write-spec"] = ["第一稿", "第二稿"]
         answers["requirement-decision"] = ["不满意", "满意"]
         end = Runner(load_preset(), answers, fake_agent(calls), "master", []).run()
-        self.assertEqual(end, "accepted")
+        self.assertEqual(end, "shipped")
         self.assertEqual(sum(1 for item in calls if item[0] == "ba-write-spec"), 2)
         self.assertEqual(sum(1 for item in calls if item[0] == "ba-write-prototype"), 1)
         self.assertEqual(sum(1 for item in calls if item[0] == "qa-write-cases"), 1)
+
+    def test_tail_runs_facts_then_release(self):
+        calls = []
+        log = []
+        end = Runner(load_preset(), happy_answers(), fake_agent(calls), "master", log).run()
+        self.assertEqual(end, "shipped")
+        order = [item[0] for item in calls]
+        self.assertLess(order.index("qa-run-e2e"), order.index("ba-gen-facts"))
+        self.assertLess(order.index("ba-gen-facts"), order.index("dev-release-plan"))
+        self.assertEqual(order[-1], "dev-release-plan")
+        milestones = [item["title"] for item in log if item.get("event") == "milestone"]
+        self.assertEqual(milestones, ["提测", "人工补测"])
 
     def test_e2e_revise_then_pass(self):
         answers = happy_answers()
         answers["test-decision"] = ["修订", "通过"]
         calls = []
         end = Runner(load_preset(), answers, fake_agent(calls), "master", []).run()
-        self.assertEqual(end, "accepted")
+        self.assertEqual(end, "shipped")
         self.assertEqual(sum(1 for item in calls if item[0] == "qa-run-e2e"), 2)
 
     def test_e2e_reject_returns_to_dev(self):
@@ -228,7 +243,7 @@ class RunTest(unittest.TestCase):
         answers["test-decision"] = ["打回开发", "通过"]
         calls = []
         end = Runner(load_preset(), answers, fake_agent(calls), "master", []).run()
-        self.assertEqual(end, "accepted")
+        self.assertEqual(end, "shipped")
         self.assertEqual(sum(1 for item in calls if item[0] == "dev-plan"), 2)
         self.assertEqual(sum(1 for item in calls if item[0] == "dev-plan-amend"), 1)
         self.assertEqual(sum(1 for item in calls if item[0] == "dev-build"), 4)

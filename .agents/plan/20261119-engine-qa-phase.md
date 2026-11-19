@@ -2,7 +2,7 @@
 
 ## 背景
 
-预览图 [iteration-to-test.html](iteration-to-test.html) 已经调整到新流程：
+预览图 [graph.html](../../agents-workflow-engine/graph.html) 已经调整到新流程：
 
 1. 需求决策后，`qa-write-cases` 与技术高阶并行；
 2. `dev-plan` 节点说明里列出详细设计（API/DB 字段、文件改动）、任务清单、自测用例（DST）；

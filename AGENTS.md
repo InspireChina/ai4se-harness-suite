@@ -31,8 +31,8 @@ team-harness-suite/
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
-├── agents-workflow-engine/ # 主会话按泳道图调度子 agent，到人工补测为止
-├── team-workflow-guide/  # 团队流程与角色手册（纯文档）
+├── agents-workflow-engine/ # 主会话按泳道图调度子 agent，到可上线为止
+├── team-workflow-guide/  # 团队流程与角色手册（纯文档 + 角色泳道图）
 ├── example-project/      # 全栈参考实现（被这套 harness 管理的样子）
 └── opencode.jsonc        # 注册本仓库的 skills 路径
 ```
@@ -149,7 +149,8 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
   唯一允许的跨模块引用是 **文档里的路径**。
 - `example-project/` 是 **被管理的对象**，不是本仓库的实现的一部分。
   它的代码不参与本仓库的验证脚本（除了 skill 一致性检查）。
-- `team-workflow-guide/` 是 **纯文档**，不包含可执行代码。
+- `team-workflow-guide/` 是 **纯文档**：Markdown + 静态 HTML 页面（页面脚本只做渲染、缩放与平移），
+  不提供运行时能力，不参与构建与验证流程。
 
 ## 4. 清单是唯一事实源
 
@@ -246,8 +247,8 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | `harness-installer/` | 铺 `AGENTS.md` + `docs/` 骨架 | 不填 `AGENTS.md` 里的 TODO（那是人填的） |
 | `tool-chain-installer/` | 装 MCP 工具链 | 不装 npm/pip 依赖 |
 | `overnight-runner/` | 无人值守跑 plan 的运行时 | 不判断 plan 质量（人的责任） |
-| `agents-workflow-engine/` | 主会话按泳道图调度子 agent，跑到人工补测 | 不实现 QA 流水线本身（由对应 skill 负责），不拆 `dev-build` 内部六步 |
-| `team-workflow-guide/` | 流程与角色约定 | 不含可执行代码 |
+| `agents-workflow-engine/` | 主会话按泳道图调度子 agent，跑到可上线（含人读图 `graph.html`） | 不实现 QA 流水线本身（由对应 skill 负责），不拆 `dev-build` 内部六步 |
+| `team-workflow-guide/` | 流程与角色约定（含角色 × 阶段泳道图 `flow.html`） | 不含运行时逻辑 |
 | `example-project/` | 参考实现 | 不参与本仓库的验证脚本 |
 
 ### 数据流
@@ -445,9 +446,19 @@ team-harness-suite/
 │   ├── overnight_runner/          # Python 实现
 │   └── tests/{test_units,test_smoke}.py
 │
+├── agents-workflow-engine/
+│   ├── README.md
+│   ├── graph.html                  # 迭代编排图（人读版：三泳道 × 五阶段，JointJS）
+│   ├── presets/iteration-to-test.yaml  # 预设图：版本启动 → 可上线
+│   ├── schema/graph.schema.json
+│   ├── scripts/install.sh
+│   ├── agents_workflow_engine/     # Python 实现（零第三方依赖）
+│   └── tests/test_units.py
+│
 ├── team-workflow-guide/
-│   ├── index.html                 # 主文档（HTML 单页：总览矩阵 + 三阶段 + 测试 + 角色）
-│   └── README.md                  # 入口说明（指向 index.html）
+│   ├── index.html                 # 主文档（HTML 单页：总览矩阵 + 三阶段 + 测试 + 角色；首屏 iframe 嵌 flow.html）
+│   ├── flow.html                  # 角色 × 阶段泳道图（JointJS，滚轮缩放 / 拖拽）
+│   └── README.md                  # 入口说明（指向 index.html / flow.html）
 │
 └── example-project/               # 全栈参考实现（被管理的样子）
 ```
@@ -458,7 +469,8 @@ team-harness-suite/
 - 加了占位符 → 同步 `agile-team-sdd/placeholders.md`
 - 加了 skill → 同步 `catalog.json` + `agile-team-sdd/SKILL.md` + `README.md` + 根 `README.md`
 - 改了模块职责 → 同步本文件 §3 与 §8
-- 改了流程 / 角色协作 / 测试分类 → 同步 `team-workflow-guide/index.html`；测试分类同时同步 `example-project/docs/standards/test.md`
+- 改了流程 / 角色协作 / 测试分类 → 同步 `team-workflow-guide/index.html`（角色与交接同步 `flow.html`）；测试分类同时同步 `example-project/docs/standards/test.md`
+- 改了预设节点 / 连线 → 同步 `agents-workflow-engine/graph.html`（HTML 是手工人读版，`render` 只出 Mermaid）
 
 ### 执行检查点
 

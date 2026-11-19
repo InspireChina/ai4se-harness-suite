@@ -176,6 +176,44 @@
   .legend .l-pre { background: var(--pre); }
   .legend .l-mid { background: var(--mid); }
 
+  /* ===== 嵌入的泳道图 ===== */
+  .figure {
+    margin: 6px 0 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .figure-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .figure-bar a { font-weight: 600; }
+  .figure iframe {
+    display: block;
+    width: 100%;
+    height: 560px;
+    border: 0;
+    background: #f4f4f1;
+  }
+  .figure-hint {
+    margin: 0;
+    padding: 10px 14px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  @media (max-width: 900px) {
+    .figure iframe { height: 420px; }
+  }
+
   /* ===== Workflow matrix ===== */
   .matrix-scroller {
     overflow-x: auto;
@@ -525,19 +563,36 @@
   <a href="#testing">4. 测试归属</a>
   <a href="#roles">5. 角色手册</a>
   <a href="#skills">6. Skill 对照</a>
+  <a href="#lane">角色协作图（嵌入）</a>
 </nav>
 
 <div class="wrap">
 
 <header class="doc-head">
   <h1>团队 AI 编程工作流指南</h1>
-  <p class="lead">团队级协作手册：项目怎么准备、迭代前怎么设计、迭代中怎么开发。规范硬约束在项目 <code>AGENTS.md</code>；本页讲<strong>人怎么配合</strong>，AI 只做执行。</p>
+  <p class="lead">团队级协作手册：项目怎么准备、迭代前怎么设计、迭代中怎么开发。规范硬约束在项目 <code>AGENTS.md</code>；本页讲<strong>人怎么配合</strong>，AI 只做执行。 <a href="#lane">先看角色 × 阶段泳道图 →</a></p>
 </header>
+
+<section id="lane">
+  <h2>角色 × 阶段泳道图</h2>
+  <p class="goal">行是角色，列是时间：谁在哪一列动手、把什么交给谁、在哪儿被打回。整条迭代压到一张图上。</p>
+  <p class="note">3 条打回边、3 道人工闸门。两处细节：<code>dev-build</code> 的四步 LOOP（实现 → 自测 → UI 对照 → 代码评审，不绿就继续改）写在节点里；<code>overnight-runner</code> 的队列用卡片堆表示——可以一直追加，但只收已确认的 Plan。</p>
+
+  <div class="figure">
+    <div class="figure-bar">
+      <span>滚轮缩放 · 拖拽平移 · 双击适应窗口</span>
+      <a href="flow.html" target="_blank" rel="noopener">在新窗口打开 ↗</a>
+    </div>
+    <iframe src="flow.html" title="角色 × 阶段泳道图（可缩放、可拖拽）" loading="lazy"></iframe>
+    <p class="figure-hint">双框带 ★ 的是人工闸门，红色虚线是打回边。如果这里没有加载（断网或缺 JointJS CDN），直接<a href="flow.html">打开 flow.html</a>。</p>
+  </div>
+</section>
 
 <section id="overview">
   <h2>0. 团队工作流程</h2>
   <p class="goal">一张图看清：谁在哪个阶段、用什么 skill、吃什么输入、吐什么产物。</p>
   <p class="note">原则：人做决策，AI 做执行。规格确认后，TL 高阶技术方案与 QA 文本用例可并行；迭代中由 DEV 编写 Plan 再实现。</p>
+  <p class="note">这是 <strong>L3 · Human in the loop</strong> 的跑法：人按阶段点名 skill、人工过闸门。要让图自己往下走（<strong>L4 · Human on the loop</strong>，人只在岔路口决策），用 <a href="../agents-workflow-engine/graph.html"><code>agents-workflow-engine</code> 的编排图</a>；两者共用同一套 skill。</p>
 
   <div class="matrix-scroller" role="region" aria-label="团队工作流矩阵" tabindex="0">
     <table class="matrix">
@@ -955,7 +1010,7 @@
       </div>
     </div>
   </div>
-  <div class="callout">Plan 未确认<strong>不得写实现</strong>。overnight-runner 只跑<strong>已确认</strong>的 Plan；不做 Plan / TRD 闸门本身。</div>
+  <div class="callout">Plan 未确认<strong>不得写实现</strong>。<code>overnight-runner</code> 的队列可以<strong>一直追加</strong>已确认 Plan，但它只跑已确认的 Plan；不做 Plan / TRD 闸门本身。</div>
 
   <h3>3.2 并行边界</h3>
   <ul>

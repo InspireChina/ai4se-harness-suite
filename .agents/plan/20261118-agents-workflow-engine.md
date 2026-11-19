@@ -4,7 +4,7 @@
 > 状态：**已完成**（图已确认；三期在本 plan 内做完）
 > 方向：新模块 + 五个 skill 模板。确认人授权连续实现，不满意再开下一份 plan 调整。
 
-主会话 `graph-master` 从版本启动调度到提测。图按三道横向泳道画：人、graph-master、子 agent。人只在输入和决策处动手。skill 全部由子 agent 执行，主会话不直接调用 skill。子 agent 可以绑定不同模型，用来做对抗验证。`dev-plan` 是批量节点，产出一批任务；`dev-build` 按这一批逐条循环。六步写在 `dev-build` 节点里面，不另立节点。同一泳道里前后相连的节点竖排。开发自测通过即到达终点「提测」。QA 仍是以后的扩展，要先有流水线环境，本版不连、不渲染。图是数据，项目可以改自己的图。预览页用 JointJS，见 [iteration-to-test.html](iteration-to-test.html)。
+主会话 `graph-master` 从版本启动调度到提测。图按三道横向泳道画：人、graph-master、子 agent。人只在输入和决策处动手。skill 全部由子 agent 执行，主会话不直接调用 skill。子 agent 可以绑定不同模型，用来做对抗验证。`dev-plan` 是批量节点，产出一批任务；`dev-build` 按这一批逐条循环。六步写在 `dev-build` 节点里面，不另立节点。同一泳道里前后相连的节点竖排。开发自测通过即到达终点「提测」。QA 仍是以后的扩展，要先有流水线环境，本版不连、不渲染。图是数据，项目可以改自己的图。预览页用 JointJS，见 [graph.html](../../agents-workflow-engine/graph.html)。
 
 本 plan 覆盖第 1、2、3 期，不拆开做。默认：回路上限 `N` / `n` 为 3；plan 质量门和 plan 决策的「不满意」仍不补边（草图没画）。
 

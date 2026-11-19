@@ -60,7 +60,10 @@ nodes:
   - { id: handoff, actor: master, kind: milestone, title: 提测 }
   - { id: qa-run-e2e, actor: subagent, kind: action, skill: qa-run-e2e, title: 编写并运行 E2E 测试, join: true, model: writer }
   - { id: test-decision, actor: human, kind: decision, title: 测试决策, options: [修订, 通过, 打回开发] }
-  - { id: accepted, actor: master, kind: end, title: 人工补测 }
+  - { id: accepted, actor: master, kind: milestone, title: 人工补测 }
+  - { id: ba-gen-facts, actor: subagent, kind: action, skill: ba-gen-facts, title: 刷新事实文档, model: writer }
+  - { id: dev-release-plan, actor: subagent, kind: action, skill: dev-release-plan, title: 准备上线, model: writer }
+  - { id: shipped, actor: master, kind: end, title: 可上线 }
 edges:
   - { id: e0, from: graph-start, to: start-version }
   - { id: e1, from: start-version, to: pm-start-iteration }
@@ -94,3 +97,6 @@ edges:
   - { id: e2e-revise, from: test-decision, to: qa-run-e2e, when: 修订, back: true }
   - { id: e2e-pass, from: test-decision, to: accepted, when: 通过 }
   - { id: e2e-reject, from: test-decision, to: amend-input, when: 打回开发, back: true }
+  - { id: accepted-to-facts, from: accepted, to: ba-gen-facts }
+  - { id: facts-to-release, from: ba-gen-facts, to: dev-release-plan }
+  - { id: release-to-shipped, from: dev-release-plan, to: shipped }

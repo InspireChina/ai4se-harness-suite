@@ -1,14 +1,23 @@
 # agents-workflow-engine
 
-一个人用主会话把一条迭代从启动调度到人工补测。图是 YAML。人、graph-master、子 agent 分三道泳道。子 agent 调用 skill，并且可以绑不同模型做对抗验证。
+一个人用主会话把一条迭代从启动调度到可上线。图是 YAML。人、graph-master、子 agent 分三道泳道。子 agent 调用 skill，并且可以绑不同模型做对抗验证。
 
-预设的主线：
+## 图
+
+三行泳道（人 / graph-master / 子 agent）× 五个阶段，从「开始版本」到「可上线」。节点与连线由 `presets/iteration-to-test.yaml` 渲染，**图不手改**。
+
+- **在线交互版**（缩放 / 拖拽 / 适应窗口）：<https://inspirechina.github.io/ai4se-harness-suite/agents-workflow-engine/graph.html>
+- **本地打开**：[`graph.html`](graph.html)（双击即可，需联网加载 JointJS CDN）
+
+改完 YAML 后 `render` 只出 Mermaid；`graph.html` 是这张预设的**人读版**，改预设时要顺手把图对齐。
+
+## 预设的主线
 
 ```
-需求规格 → 需求质量门 → 需求决策 ─┬─ 编写 QA 用例（并行侧分支）────────┐
+需求规格 → 需求质量门 → 需求决策 ─┬─ 编写 QA 用例（并行侧分支）────────────┐
                                   └─ 技术高阶 → 迭代 HLD → 详细规划 → 开发 → 提测
-                                                                          │
-                                            人工补测 ← 测试决策 ← 编写并运行 E2E ←┘
+                                                                              │
+      准备上线 ← 刷新事实文档 ← 人工补测 ← 测试决策 ← 编写并运行 E2E ←────────┘
 ```
 
 ## 用法
@@ -35,7 +44,7 @@ PYTHONPATH=agents-workflow-engine python -m agents_workflow_engine run \
 
 | 字段 | 用在哪 | 含义 |
 |---|---|---|
-| `kind: milestone` | 主会话节点 | 里程碑，只记一条日志，不调子 agent（预设里的「提测」） |
+| `kind: milestone` | 主会话节点 | 里程碑，只记一条日志，不调子 agent（预设里的「提测」「人工补测」） |
 | `join: true` | 节点 | 等所有向前入边都到过再执行；打回边直接放行 |
 | `parallel: true` | 决策的出边 | 与同选项的主出边并行，成为一个独立分支 |
 | `batch: true` | 子 agent 节点 | 输出 `TASK:` 清单，交给后续节点逐条消费 |
@@ -69,4 +78,4 @@ PYTHONPATH=agents-workflow-engine python -m agents_workflow_engine run \
 
 ## 维护
 
-预设在 `presets/iteration-to-test.yaml`。形状说明在 `schema/graph.schema.json`。泳道预览在仓库 `.agents/plan/iteration-to-test.html`。
+预设在 `presets/iteration-to-test.yaml`。形状说明在 `schema/graph.schema.json`。泳道预览在 [`graph.html`](graph.html)，与预设手工保持同步。

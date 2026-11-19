@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
-  <title>版本到提测</title>
+  <title>迭代编排图 · agents-workflow-engine</title>
   <style>
     :root {
       --fg: #1b1b1b;
@@ -64,6 +64,7 @@
     header { flex: 0 0 auto; padding: 14px 20px 0; }
     .head-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     h1 { margin: 0 0 6px; font-size: 18px; font-weight: 600; letter-spacing: 0.2px; }
+    h1 .sub { margin-left: 10px; font-size: 12.5px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
     .legend {
       display: flex;
       flex-wrap: wrap;
@@ -155,7 +156,7 @@
 <body>
   <header>
     <div class="head-row">
-      <h1>版本到提测</h1>
+      <h1>迭代编排图 <span class="sub">从需求到可上线 · 主会话按图调度子 agent（L4 · 人只在岔路口决策）</span></h1>
       <div id="tools">
         <button type="button" data-act="fit" title="缩放到完整图">适应窗口</button>
         <button type="button" data-act="reset" title="原始大小">100%</button>
@@ -272,7 +273,7 @@
           size: { width: NODEW, height: 60 },
           attrs: {
             outer: { refWidth: "100%", refHeight: "100%", stroke: fg, strokeWidth: 1.5, fill: nodeGate },
-            inner: { refX: 4, refY: 4, refWidth: "calc(w - 8)", refHeight: "calc(h - 8)", stroke: fg, strokeWidth: 1, fill: "none" },
+            inner: { x: 4, y: 4, width: NODEW - 8, height: 52, stroke: fg, strokeWidth: 1, fill: "none" },
             title: {
               text: "", refX: "50%", refY: "36%",
               textAnchor: "middle", textVerticalAnchor: "middle",
@@ -490,7 +491,10 @@
           handoff: endNode("提测"),
           e2eRun: box("编写并运行 E2E 测试", "/qa-run-e2e", { batch: true }),
           e2eDec: poly(diamond, "测试决策", 120, 76, nodeDecision),
-          e2eDone: endNode("人工补测")
+          e2eDone: endNode("人工补测"),
+          facts: box("/ba-gen-facts", "刷新事实文档"),
+          release: box("/dev-release-plan", "准备上线"),
+          shipped: endNode("可上线")
         };
 
         var columns = [
@@ -512,7 +516,10 @@
           [{ lane: "master", ids: ["handoff"] }],
           [{ lane: "sub", ids: ["e2eRun"] }],
           [{ lane: "human", ids: ["e2eDec"] }],
-          [{ lane: "master", ids: ["e2eDone"] }]
+          [{ lane: "master", ids: ["e2eDone"] }],
+          [{ lane: "sub", ids: ["facts"] }],
+          [{ lane: "sub", ids: ["release"] }],
+          [{ lane: "master", ids: ["shipped"] }]
         ];
 
         var originX = GUTTER + 32;
@@ -741,6 +748,35 @@
           ]
         });
 
+        // 人工补测后：收尾两节点（刷新事实文档 → 准备上线）
+        link(c.e2eDone, c.facts, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.e2eDone) + 22, y: midY(c.e2eDone) },
+            { x: right(c.e2eDone) + 22, y: midY(c.facts) }
+          ]
+        });
+        link(c.facts, c.release, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.facts) + 14, y: midY(c.facts) },
+            { x: right(c.facts) + 14, y: midY(c.release) }
+          ]
+        });
+        link(c.release, c.shipped, {
+          from: "right",
+          to: "left",
+          router: { name: "normal" },
+          vertices: [
+            { x: right(c.release) + 22, y: midY(c.release) },
+            { x: right(c.release) + 22, y: midY(c.shipped) }
+          ]
+        });
+
         // 用例先行：与技术高阶并行产出，提测后汇入 E2E
         link(c.qaCase, c.e2eRun, {
           from: "bottom",
@@ -837,7 +873,8 @@
           { from: GUTTER, to: boundaryX(6), title: "1  需求澄清" },
           { from: boundaryX(6), to: boundaryX(8), title: "2  技术设计" },
           { from: boundaryX(8), to: boundaryX(13), title: "3  开发构建" },
-          { from: boundaryX(13), to: laneWidth, title: "4  测试验收" }
+          { from: boundaryX(13), to: boundaryX(16), title: "4  测试验收" },
+          { from: boundaryX(16), to: laneWidth, title: "5  交付准备" }
         ];
         stages.forEach(function (stage) {
           caption(stage.title, (stage.from + stage.to) / 2, stage.to - stage.from);
@@ -845,6 +882,7 @@
         separator(boundaryX(6));
         separator(boundaryX(8));
         separator(boundaryX(13));
+        separator(boundaryX(16));
 
         // 适配与缩放
         var MIN_SCALE = 0.1;
