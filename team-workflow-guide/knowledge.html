@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>④ 知识回流 · AI-Native 全流程</title>
+<style>
+  :root {
+    --bg: #fafaf7; --ink: #23251f; --muted: #6d6f68; --hair: #e4e2da; --card-line: #d8d6cc;
+    --card: #ffffff;
+    --gold: #a5770e; --gold-soft: #fdf6e3;
+    --green: #2e6e4c; --green-soft: #eef5f0;
+    --danger: #a84a34;
+    --master: #f2f1ec; --pill: #f3f2ec;
+    --edge: #8b8d84;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  header { position: relative; padding: 16px 26px 0; }
+  h1 { margin: 0 0 4px; font-size: 17px; font-weight: 650; letter-spacing: 0.2px; }
+  .sub { margin: 0; color: var(--muted); font-size: 12.5px; }
+  nav { position: absolute; top: 18px; right: 26px; display: flex; gap: 2px; margin: 0;
+    padding: 3px; background: var(--pill); border-radius: 999px; font-size: 12.5px; }
+  nav a { color: var(--muted); text-decoration: none; padding: 5px 14px; border-radius: 999px; }
+  nav a.cur { color: #fff; background: var(--ink); font-weight: 600; }
+  nav a:not(.cur):hover { color: var(--ink); background: var(--hair); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center;
+    margin: 9px 0 0; color: var(--muted); font-size: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .sw { width: 18px; height: 12px; border: 1px solid var(--card-line); border-radius: 4px; background: var(--card); }
+  .sw.master { background: var(--master); border-color: var(--hair); }
+  .sw.line { width: 24px; height: 0; border: none; border-top: 1.6px solid var(--edge); border-radius: 0; background: none; }
+  .sw.line.gold { border-top-color: var(--gold); }
+  .star { color: var(--gold); font-weight: 700; }
+  .hotl { color: var(--green); font-weight: 700; }
+  .wrap { padding: 8px 22px 14px; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; }
+  .tt  { font-size: 14px; font-weight: 650; fill: var(--ink); }
+  .tm  { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+  .t   { font-size: 12px; fill: var(--ink); }
+  .ts  { font-size: 11px; fill: var(--muted); }
+  .tc  { font-size: 10px; fill: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .gd  { font-size: 12px; font-weight: 600; fill: var(--gold); }
+  .gds { font-size: 11px; font-weight: 600; fill: var(--gold); }
+  .ht  { font-size: 11px; font-weight: 600; fill: var(--green); }
+  .n-card { fill: var(--card); stroke: var(--card-line); stroke-width: 1; }
+  .n-action { fill: var(--green-soft); stroke: #cfdccf; stroke-width: 1; }
+  .n-master { fill: var(--master); stroke: var(--hair); stroke-width: 1; }
+  .n-pill { fill: var(--pill); }
+  .lift { filter: url(#soft); }
+  .edge { stroke: var(--edge); stroke-width: 1.4; fill: none; stroke-linejoin: round; stroke-linecap: round; marker-end: url(#arr); }
+  .edge-gold { stroke: var(--gold); stroke-width: 1.8; fill: none; stroke-linejoin: round; marker-end: url(#arrG); }
+  a:hover .n-card, a:hover .n-action, a:hover .n-master { filter: brightness(0.97); }
+</style>
+</head>
+<body>
+<header>
+  <h1>④ 知识回流 —— 三层节奏：逐 Story / Epic 收尾 / 版本收尾</h1>
+  <p class="sub">业务与技术双列回流进底座，底座再作为下一轮迭代的开工必读 —— 知识在闭环里增值，而不是散落在聊天记录里</p>
+  <nav>
+    <a href="overview.html">总览</a>
+    <a href="init.html">① 初始化</a>
+    <a href="requirement.html">② 需求分析</a>
+    <a href="delivery.html">③ 开发 · 测试</a>
+    <a class="cur" href="knowledge.html">④ 知识回流</a>
+  </nav>
+  <p class="legend">
+    <span><i class="sw"></i>迭代环节</span>
+    <span><i class="sw master"></i>知识资产</span>
+    <span><i class="sw line"></i>正向流转</span>
+    <span><i class="sw line gold"></i>知识流动</span>
+    <span class="hotl">◎ 全自动</span>
+    <span class="star">★ 人工确认</span>
+  </p>
+</header>
+<div class="wrap">
+<svg viewBox="0 30 1600 730" role="img" aria-label="知识回流闭环">
+  <defs>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="2.5" flood-color="#23251f" flood-opacity="0.09"/>
+    </filter>
+    <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#8b8d84"/>
+    </marker>
+    <marker id="arrG" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#a5770e"/>
+    </marker>
+  </defs>
+
+  <!-- 本页自主度徽章 -->
+  <text class="gds" x="1556" y="64" text-anchor="end">本页自主度：★ 2 处人工确认（Epic / 版本收尾）｜ ◎ 逐 Story 全自动</text>
+
+  <!-- 顶部：版本迭代循环 -->
+  <g>
+    <rect class="n-action lift" x="140" y="120" width="200" height="80" rx="12"/>
+    <text class="tm" x="240" y="152" text-anchor="middle">需求分析</text>
+    <text class="ts" x="240" y="172" text-anchor="middle">Epic 批</text>
+
+    <rect class="n-action lift" x="370" y="120" width="200" height="80" rx="12"/>
+    <text class="tm" x="470" y="152" text-anchor="middle">技术设计</text>
+    <text class="ts" x="470" y="172" text-anchor="middle">HLD · 一次</text>
+
+    <rect class="n-action lift" x="600" y="120" width="200" height="80" rx="12"/>
+    <text class="tm" x="700" y="152" text-anchor="middle">开发 · 测试</text>
+    <text class="ts" x="700" y="172" text-anchor="middle">Story 闭环 × N</text>
+
+    <rect class="n-action lift" x="830" y="120" width="200" height="80" rx="12"/>
+    <text class="tm" x="930" y="152" text-anchor="middle">交付归档</text>
+    <text class="ts" x="930" y="172" text-anchor="middle">同步 · 归档 · 复盘</text>
+
+    <path class="edge" d="M340 160 H370"/>
+    <path class="edge" d="M570 160 H600"/>
+    <path class="edge" d="M800 160 H830"/>
+  </g>
+
+  <!-- 迭代产出下沉 -->
+  <path class="edge-gold" d="M930 202 V240 H660 V286"/>
+
+  <!-- 三层回流节奏 -->
+  <g>
+    <rect class="n-card lift" x="320" y="290" width="680" height="92" rx="12"/>
+    <text class="tm" x="340" y="318">① 逐 Story（每次变更归档前）</text>
+    <text class="ht" x="980" y="318" text-anchor="end">◎ 全自动 · 无人工</text>
+    <text class="t" x="340" y="346">技术：增量规格同步 → 主规格库（后续 Story 读到最新口径）</text>
+    <text class="ts" x="340" y="368">业务：不在此层回流，避免中间态污染基线</text>
+    <rect class="n-pill" x="914" y="352" width="60" height="18" rx="9"/>
+    <text class="tc" x="922" y="365">tl-sync</text>
+
+    <rect class="n-card lift" x="320" y="402" width="680" height="116" rx="12"/>
+    <text class="tm" x="340" y="430">② Epic 收尾（全部 Story 归档后）</text>
+    <text class="gd" x="980" y="430" text-anchor="end">★ 人工确认</text>
+    <text class="t" x="340" y="456">业务：流程 L* · 领域模型 BC / CAP · 蓝图 SB-* · 术语表（只追加）</text>
+    <text class="t" x="340" y="478">技术：数据模型 TBL-* · 接口目录 API-* · 设计系统 · 决策记录</text>
+    <text class="ts" x="340" y="502">逐项判定：无变化也要显式记录 no-op，不静默跳过</text>
+    <rect class="n-pill" x="856" y="492" width="118" height="18" rx="9"/>
+    <text class="tc" x="864" y="505">tl-baseline-sync</text>
+
+    <rect class="n-card lift" x="320" y="538" width="680" height="96" rx="12"/>
+    <text class="tm" x="340" y="566">③ 版本收尾</text>
+    <text class="gd" x="980" y="566" text-anchor="end">★ 复盘确认</text>
+    <text class="t" x="340" y="592">业务：路线图刷新 —— 只改顺序与结论，不改历史</text>
+    <text class="t" x="340" y="616">技术：度量台账（耗时 / 缺陷）→ 成为下一版本的输入</text>
+    <rect class="n-pill" x="842" y="604" width="132" height="18" rx="9"/>
+    <text class="tc" x="850" y="617">tl-roadmap-refresh</text>
+  </g>
+
+  <!-- 节奏 → 底座 -->
+  <path class="edge-gold" d="M1000 336 H1075"/>
+  <path class="edge-gold" d="M1000 460 H1075"/>
+  <path class="edge-gold" d="M1000 586 H1075"/>
+
+  <!-- 知识资产底座 -->
+  <rect class="n-master" x="1080" y="120" width="460" height="520" rx="16"/>
+  <text class="tt" x="1106" y="154">知识资产底座</text>
+  <text class="ts" x="1106" y="176">唯一事实来源 · 锚点只增不改名</text>
+
+  <rect class="n-card lift" x="1105" y="196" width="410" height="196" rx="12"/>
+  <text class="tm" x="1127" y="224">业务基线</text>
+  <text class="t" x="1127" y="252">· 业务流程 L*</text>
+  <text class="t" x="1127" y="276">· 领域模型 BC / CAP</text>
+  <text class="t" x="1127" y="300">· 服务蓝图 SB-*</text>
+  <text class="t" x="1127" y="324">· 统一语言术语表</text>
+  <text class="t" x="1127" y="348">· 产品定位 · 版本路线图</text>
+  <text class="ts" x="1127" y="374">规则与硬约束随 Epic 回流</text>
+
+  <rect class="n-card lift" x="1105" y="412" width="410" height="204" rx="12"/>
+  <text class="tm" x="1127" y="440">技术基线</text>
+  <text class="t" x="1127" y="468">· 主规格库（行为规格）</text>
+  <text class="t" x="1127" y="492">· 数据模型 TBL-* · 接口目录 API-*</text>
+  <text class="t" x="1127" y="516">· 设计系统 DS-*</text>
+  <text class="t" x="1127" y="540">· 架构决策 ADR · 技术规范</text>
+  <text class="t" x="1127" y="564">· 度量台账（耗时 · 缺陷）</text>
+  <text class="ts" x="1127" y="594">研发通用知识资产在初始化一次就位</text>
+
+  <!-- 底座反哺下一轮（闭环） -->
+  <path class="edge-gold" d="M1310 642 V700 H240 V204"/>
+  <text class="gds" x="760" y="692" text-anchor="middle">下一轮迭代开工必读 · 上下文注入每个环节（只消费，不重造）</text>
+
+  <!-- 底部铁律 -->
+  <text class="t" x="140" y="744">铁律：锚点只追加不改名；每个结论都能回查到文件；没有变化时显式记录 no-op，不静默跳过。</text>
+</svg>
+</div>
+</body>
+</html>
