@@ -50,7 +50,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | AI 的角色 | 执行被点名的那一步 | 按图调度子 agent，节点之间自动往下走 |
 | 谁在调度 | 人在会话里按阶段点名 skill | 图按 `presets/*.yaml` 的节点与连线调度 |
 | 上下文在哪 | 会话 + 仓库文档，靠人带下去 | 图实例目录（`state.json` / `decisions.jsonl` / `outputs/`），换会话也能接着跑 |
-| 适合 | **敏捷团队**：多角色、节奏由人定，随时插需求 | **FTE 工作者**：一人扛完整条线，追求单位时间产出 |
+| 适合 | **敏捷团队**：多角色、节奏由人定，随时插需求 | **FDE 工作者**：一人扛完整条线，追求单位时间产出 |
 | 开始用 | 打开 [`index.html`](team-workflow-guide/index.html)，按阶段调 skill | `workflow start --instance <名字>` → `submit` 推进 → `status` 看卡点 |
 | 看哪张图 | 泳道 [`flow.html`](team-workflow-guide/flow.html) · [Pages](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 编排 [`graph.html`](agents-workflow-engine/graph.html) · [Pages](https://inspirechina.github.io/ai4se-harness-suite/agents-workflow-engine/graph.html) |
 

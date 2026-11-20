@@ -16,7 +16,7 @@
 同时把两种成熟度写进 README，避免选型时把两张图、两个模块看混：
 
 - `team-workflow-guide`：AI4SE **L3**，Human in the loop，**人是编排者**，适合敏捷团队
-- `agents-workflow-engine`：AI4SE **L4**，Human on the loop，**人是决策者**，适合 FTE 工作者
+- `agents-workflow-engine`：AI4SE **L4**，Human on the loop，**人是决策者**，适合 FDE 工作者
 
 ## 改动
 
