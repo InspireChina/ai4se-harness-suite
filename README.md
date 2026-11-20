@@ -58,6 +58,31 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 
 两种模式不互斥，产物落在同一个仓库的 `docs/` 里：团队日常走 L3，个人把自己整条线交给 L4 的图。
 
+## 版本与同步
+
+套件只有一个版本号：仓库根 [`VERSION`](VERSION)，变更记在 [`CHANGELOG.md`](CHANGELOG.md)。两者对不上，`./.agents/verify.sh` 会报。
+
+只有两个模块自带版本号 —— 它们会被整目录复制进目标项目，而且有自己的兼容面（引擎 ↔ 预设格式、runner 运行时）：
+
+| 模块 | 版本源 |
+|---|---|
+| `agents-workflow-engine` | `agents_workflow_engine/version.py`（另有 `__schema__` 标预设格式代次） |
+| `overnight-runner` | `overnight_runner/__init__.py` 的 `__version__` |
+
+其余模块（`agile-team-sdd`、`harness-installer`、`tool-chain-installer`）跟随套件版本：它们同一次安装装完，没有独立升级通道，各自编号只会多几处要同步的地方。
+
+**装完之后看清单。** 每个安装器往目标项目写一份自己那份：
+
+```
+<目标项目>/.agents/harness/<模块>.json
+```
+
+```json
+{ "module": "agile-team-sdd", "version": "0.3.0", "suite": "0.3.0", "installedAt": "2026-11-20T03:01:50Z" }
+```
+
+一个模块一个文件、谁安装谁写自己那份，所以不需要合并，也不会互相覆盖。清单里的 `suite` 落后于仓库根 `VERSION`，就是这个模块该重装了。
+
 ## 关系图
 
 ```
@@ -238,6 +263,8 @@ team-harness-suite/
 - OpenWiki
 - ArchUnit
 - CodeGraph
+- BDD 验收规格
+- Agent Cluster
 
 ## License
 

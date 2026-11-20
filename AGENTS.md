@@ -226,6 +226,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | 不写绝对路径到产物 | 安装到目标项目的文件里 **不能** 出现安装机的路径 |
 | 不碰目标项目的业务代码 | 只写自己约定的文件（`.agents/skills/`、`docs/`、配置文件…） |
 | 密钥不落盘 | 需要密钥的配置写 `{env:VAR}` 引用，真值由使用者注入 |
+| 写安装清单 | 每个模块写 `<目标项目>/.agents/harness/<模块>.json`（`module` / `version` / `suite` / `installedAt`），**谁安装谁写自己那份**，不合并；清单版本只在文件真的升级时才改 |
 
 ## 7. 错误处理
 
@@ -340,13 +341,15 @@ pending ──▶ running ──┬──▶ success
 | Node 语法 | `node --check <file>` |
 | JSON / YAML 可解析 | 解析一遍 |
 | skill 名/目录一致、无重名 | 见验证脚本 |
-| 清单 ↔ 模板 ↔ 已安装 三方一致 | 见验证脚本 |
+| 清单 ↔ 模板 ↔ 已安装 三方一致 | 见验证脚本（名字一致 **且** 逐行正文一致——模板改了没重装会被抓出来） |
 | Markdown 相对链接有效 | 见验证脚本 |
-| 安装后无残留占位符 | 见验证脚本 |
+| 安装后无残留占位符 | 见验证脚本（占位符名含数字，如 `{{E2E_RUNNER}}`，正则要用 `[A-Z0-9_]+`） |
 | overnight-runner 单元测试 | `overnight-runner/tests/test_units.py`（44 个用例：YAML 子集 + 终端宽度 + 队列路径/迁移 + 决策 + 锁 + 按键读取） |
 | overnight-runner 行为 | `overnight-runner/tests/test_smoke.py`（13 个用例，假 agent 驱动） |
 | agents-workflow-engine 单元测试 | `agents-workflow-engine/tests/test_units.py`（46 个用例：图校验/调度/回路、提示词、两个模型、独立 agent 命令行、三种执行方式、版本号） |
 | 引擎版本号一致 | `version.py` ↔ `CHANGELOG.md` 最新一节（见验证脚本） |
+| 套件版本号一致 | 根 `VERSION` ↔ 根 `CHANGELOG.md` 最新一节（见验证脚本） |
+| 安装清单一致 | `example-project/.agents/harness/*.json` ↔ 源码版本：套件版本落后就说明该重跑安装器 |
 
 一条命令跑全部：
 
@@ -412,6 +415,7 @@ pending ──▶ running ──┬──▶ success
 - [ ] 跑过 `./.agents/verify.sh`
 - [ ] 改了 `overnight-runner` 的行为 → 单元测试 44/44 + 冒烟测试 13/13 通过
 - [ ] 改了 `agents-workflow-engine` 的行为 → bump `version.py` + 补 `CHANGELOG.md`，单元测试 46/46 通过
+- [ ] 改了任意模块的行为 → bump 根 `VERSION` + 补根 `CHANGELOG.md` 一节（版本对不上 `verify.sh` 会报）
 - [ ] 文档里的相对链接有效
 - [ ] 没提交 `.venv/`、`__pycache__/`、运行时状态（`.overnight-runner/queue/*/state.json`、`logs/`、`.lock`）
 
@@ -421,6 +425,8 @@ pending ──▶ running ──┬──▶ success
 team-harness-suite/
 ├── README.md                     # 仓库总览：目的 + 模块表 + 快速开始
 ├── AGENTS.md                     # 本文件：架构与工程规范
+├── VERSION                       # 套件版本（唯一事实源，跟着根 CHANGELOG 走）
+├── CHANGELOG.md                  # 套件变更记录（模块自带版本号时另外记）
 ├── opencode.jsonc                # 注册本仓库的 skills 路径
 │
 ├── .agents/

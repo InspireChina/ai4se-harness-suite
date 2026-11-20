@@ -50,6 +50,59 @@ fi
 PROJECT_ROOT="$(cd "$TARGET" && pwd)"
 DEST="$PROJECT_ROOT/$TARGET_DIR"
 PKG_DEST="$DEST/overnight_runner"
+
+# ── 安装清单 ────────────────────────────────────────────────────────
+# 一个模块一个文件，谁安装谁写自己那份：不需要合并，也不需要跨模块共享列表。
+MANIFEST_MODULE="overnight-runner"
+MANIFEST_DIR="$PROJECT_ROOT/.agents/harness"
+MANIFEST_FILE="$MANIFEST_DIR/$MANIFEST_MODULE.json"
+SUITE_VERSION="$(sed -n '1s/[[:space:]]*$//;1p' "$INSTALLER_DIR/../VERSION" 2>/dev/null || true)"
+MANIFEST_VERSION="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' "$PKG_DIR/__init__.py" 2>/dev/null || true)"
+if [ -z "$SUITE_VERSION" ]; then
+  echo "错误：读不到仓库根的 VERSION（$INSTALLER_DIR/../VERSION）" >&2
+  exit 1
+fi
+if [ -z "$MANIFEST_VERSION" ]; then
+  echo "错误：读不到 overnight_runner/__init__.py 里的 __version__" >&2
+  exit 1
+fi
+
+# 从清单里取字段值：{ "version": "0.3.0", ... }
+manifest_field() {
+  sed -n "s/.*\"$2\": *\"\([^\"]*\)\".*/\1/p" "$1" 2>/dev/null | head -1
+}
+
+# 已装版本没变就不动文件（installedAt 保持首次安装时间）；变了自己又没 --force 就不许改清单
+write_manifest() {
+  if [ -f "$MANIFEST_FILE" ]; then
+    old_version="$(manifest_field "$MANIFEST_FILE" version)"
+    old_suite="$(manifest_field "$MANIFEST_FILE" suite)"
+    if [ "$old_version" = "$MANIFEST_VERSION" ] && [ "$old_suite" = "$SUITE_VERSION" ]; then
+      echo "  [清单] ${MANIFEST_MODULE} ${MANIFEST_VERSION}（未变）"
+      return 0
+    fi
+    if [ "$FORCE" -eq 0 ]; then
+      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${MANIFEST_VERSION}（套件 ${SUITE_VERSION}）；文件是跳过模式，清单未改，要升级加 --force" >&2
+      return 0
+    fi
+  fi
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "  [计划] 写清单 ${MANIFEST_FILE}（${MANIFEST_MODULE} ${MANIFEST_VERSION} / 套件 ${SUITE_VERSION}）"
+    return 0
+  fi
+  mkdir -p "$MANIFEST_DIR"
+  tmp="$MANIFEST_FILE.tmp.$$"
+  {
+    printf '{\n'
+    printf '  "module": "%s",\n' "$MANIFEST_MODULE"
+    printf '  "version": "%s",\n' "$MANIFEST_VERSION"
+    printf '  "suite": "%s",\n' "$SUITE_VERSION"
+    printf '  "installedAt": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    printf '}\n'
+  } > "$tmp"
+  mv "$tmp" "$MANIFEST_FILE"
+  echo "  [清单] ${MANIFEST_MODULE} ${MANIFEST_VERSION}（套件 ${SUITE_VERSION}）→ ${MANIFEST_FILE}"
+}
 LAUNCHER="$DEST/overnight-runner"
 LAUNCHER_CMD="$DEST/overnight-runner.cmd"
 RUNNER_CFG="$DEST/overnight-runner.yaml"
@@ -199,6 +252,8 @@ if [ "$NO_CONFIG" -eq 0 ]; then
     echo "     **/.overnight-runner/queue/*/.lock"
   fi
 fi
+
+write_manifest
 
 echo ""
 echo "完成。"

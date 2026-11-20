@@ -124,7 +124,7 @@ fi
 head_ "6. 清单 ↔ 模板 ↔ 已安装 一致"
 if [ -n "$PY" ]; then
   "$PY" - <<'PYEOF'
-import json, pathlib, sys
+import json, pathlib, re, sys
 
 bad = []
 catalog_path = pathlib.Path('agile-team-sdd/catalog.json')
@@ -147,8 +147,40 @@ if listed != templates:
 if listed != installed:
     print(f'  \033[31m✘\033[0m 清单与已安装不一致：{sorted(listed ^ installed)}')
     bad.append('catalog/installed')
-if not bad:
-    print(f'  \033[32m✔\033[0m 三方一致（{len(listed)} 个 skill）')
+
+# 名字对上还不够：模板改了没重装，装进去的就是旧正文。
+# 逐行比对，占位符渲染成路径 / 端口 / 分支名，所以按通配比对；TEMPLATE-ONLY 块安装时已删掉。
+TPL_ONLY = re.compile(r'<!-- TEMPLATE-ONLY -->.*?<!-- /TEMPLATE-ONLY -->\n\n?', re.S)
+PH_SPLIT = re.compile(r'(\{\{[A-Z0-9_]+\}\})')
+
+def line_matches(tpl_line, got_line):
+    parts = PH_SPLIT.split(tpl_line)[::2]
+    return re.fullmatch('.+?'.join(re.escape(p) for p in parts), got_line) is not None
+
+stale = 0
+for d in sorted(tpl_root.iterdir()):
+    if not d.is_dir():
+        continue
+    tpl_name = d.name
+    skill = tpl_name[:-len('-template')] if tpl_name.endswith('-template') else tpl_name
+    for f in sorted(p for p in d.rglob('*') if p.is_file()):
+        target = installed_root / skill / f.relative_to(d)
+        if not target.exists():
+            print(f'  \033[31m✘\033[0m 项目里缺 {target}（模板有）')
+            stale += 1
+            continue
+        text = TPL_ONLY.sub('', f.read_text(encoding='utf-8')).replace(f'name: {tpl_name}\n', f'name: {skill}\n')
+        exp = text.splitlines()
+        got = target.read_text(encoding='utf-8').splitlines()
+        idx = next((i for i in range(min(len(exp), len(got))) if not line_matches(exp[i], got[i])), None)
+        if idx is not None or len(exp) != len(got):
+            where = f'第 {idx + 1} 行' if idx is not None else f'行数 {len(exp)} vs {len(got)}'
+            print(f'  \033[31m✘\033[0m {target} 落后于模板（{where}）—— 重跑 install.sh --force')
+            stale += 1
+if stale:
+    bad.append('stale-installed')
+elif not bad:
+    print(f'  \033[32m✔\033[0m 三方一致（{len(listed)} 个 skill），已安装正文与模板一致')
 sys.exit(1 if bad else 0)
 PYEOF
   if [ $? -eq 0 ]; then PASSED=$((PASSED + 1)); else FAILED=$((FAILED + 1)); fi
@@ -164,10 +196,10 @@ import pathlib, re, sys
 
 used = set()
 for f in pathlib.Path('agile-team-sdd/skills').rglob('*.md'):
-    used |= set(re.findall(r'\{\{([A-Z_]+)\}\}', f.read_text(encoding='utf-8')))
+    used |= set(re.findall(r'\{\{([A-Z0-9_]+)\}\}', f.read_text(encoding='utf-8')))
 
 doc = pathlib.Path('agile-team-sdd/placeholders.md')
-declared = set(re.findall(r'\{\{([A-Z_]+)\}\}', doc.read_text(encoding='utf-8'))) if doc.exists() else set()
+declared = set(re.findall(r'\{\{([A-Z0-9_]+)\}\}', doc.read_text(encoding='utf-8'))) if doc.exists() else set()
 
 missing = sorted(used - declared)
 if missing:
@@ -182,12 +214,12 @@ for f in tpl.rglob('*'):
     if not f.is_file():
         continue
     try:
-        harness_used |= set(re.findall(r'\{\{([A-Z_]+)\}\}', f.read_text(encoding='utf-8')))
+        harness_used |= set(re.findall(r'\{\{([A-Z0-9_]+)\}\}', f.read_text(encoding='utf-8')))
     except UnicodeDecodeError:
         continue
 
 script = pathlib.Path('harness-installer/scripts/init-harness.sh').read_text(encoding='utf-8')
-substituted = set(re.findall(r'^\s*"([A-Z_]+)=', script, re.M))
+substituted = set(re.findall(r'^\s*"([A-Z0-9_]+)=', script, re.M))
 
 problems = []
 for ph in sorted(harness_used - substituted):
@@ -215,7 +247,7 @@ bad = []
 files = sorted(root.rglob('*.md')) if root.exists() else []
 for f in files:
     text = f.read_text(encoding='utf-8')
-    for ph in re.findall(r'\{\{[A-Z_]+\}\}', text):
+    for ph in re.findall(r'\{\{[A-Z0-9_]+\}\}', text):
         print(f'  \033[31m✘\033[0m {f} — 残留占位符 {ph}')
         bad.append(f)
     for m in re.findall(r'/(?:Users|home)/[^\s`"\')]+', text):
@@ -461,6 +493,53 @@ if [ -n "$VER_ENGINE" ] && [ "$VER_ENGINE" = "$VER_LOG" ]; then
 else
   bad "引擎版本不一致: version.py=${VER_ENGINE:-空} CHANGELOG=${VER_LOG:-空}"
 fi
+
+# ── 13. 版本与安装清单 ─────────────────────────────────────────────
+head_ "13. 版本与安装清单"
+
+# 仓库根 VERSION 是套件版本的唯一事实源，CHANGELOG 最新一节必须与之一致
+VER_SUITE="$(sed -n '1s/[[:space:]]*$//;1p' VERSION 2>/dev/null)"
+VER_SUITE_LOG="$(grep -m1 '^## \[' CHANGELOG.md 2>/dev/null | sed 's/^## \[\([^]]*\)\].*/\1/')"
+if [ -n "$VER_SUITE" ] && [ "$VER_SUITE" = "$VER_SUITE_LOG" ]; then
+  ok "套件版本一致: $VER_SUITE"
+else
+  bad "套件版本不一致: VERSION=${VER_SUITE:-空} CHANGELOG=${VER_SUITE_LOG:-空}"
+fi
+
+# 每个模块装进目标项目时写一份 .agents/harness/<模块>.json；这里比对「已安装副本 ↔ 源码」
+manifest_field() {
+  sed -n "s/.*\"$2\": *\"\([^\"]*\)\".*/\1/p" "$1" 2>/dev/null | head -1
+}
+manifest_count=0
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  manifest_count=$((manifest_count + 1))
+  module="$(basename "$f" .json)"
+  got="$(manifest_field "$f" suite)"
+  if [ "$got" = "$VER_SUITE" ]; then
+    ok "清单 $module 套件 $got"
+  else
+    bad "清单 $module 套件 ${got:-空} ≠ 源码 $VER_SUITE（重跑该模块安装器）"
+  fi
+done < <(find example-project/.agents/harness -name "*.json" 2>/dev/null | sort)
+if [ "$manifest_count" -eq 0 ]; then
+  skip "example-project 还没有安装清单（跑完安装器就会出现）"
+fi
+
+# 自带版本号的模块：清单里的 version 必须等于它自己的版本源
+check_manifest_version() {
+  f="example-project/.agents/harness/$1.json"
+  [ -f "$f" ] || return 0
+  got="$(manifest_field "$f" version)"
+  if [ "$got" = "$2" ]; then
+    ok "清单 $1 版本 $got"
+  else
+    bad "清单 $1 版本 ${got:-空} ≠ 源码 ${2:-空}"
+  fi
+}
+VER_RUNNER="$(sed -n 's/^__version__ = "\(.*\)"$/\1/p' overnight-runner/overnight_runner/__init__.py 2>/dev/null)"
+check_manifest_version overnight-runner "$VER_RUNNER"
+check_manifest_version agents-workflow-engine "$VER_ENGINE"
 
 # ── 汇总 ───────────────────────────────────────────────────────────
 printf '\n\033[1m%s\033[0m\n' "────────────────────────────"

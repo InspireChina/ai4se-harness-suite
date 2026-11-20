@@ -70,6 +70,55 @@ if (!fs.existsSync(target)) {
 
 const PROJECT_ROOT = fs.realpathSync(target)
 
+// ── 安装清单 ────────────────────────────────────────────────────────
+// 一个模块一个文件，谁安装谁写自己那份：不需要合并，也不需要跨模块共享列表。
+const MANIFEST_MODULE = "tool-chain-installer"
+const MANIFEST_DIR = path.join(PROJECT_ROOT, ".agents", "harness")
+const MANIFEST_FILE = path.join(MANIFEST_DIR, `${MANIFEST_MODULE}.json`)
+const SUITE_VERSION = (() => {
+  try {
+    return fs.readFileSync(path.join(HERE, "..", "..", "VERSION"), "utf8").trim()
+  } catch {
+    return ""
+  }
+})()
+if (!SUITE_VERSION) {
+  console.error("错误：读不到仓库根的 VERSION")
+  process.exit(1)
+}
+
+function readManifestField(file, field) {
+  const hit = fs.readFileSync(file, "utf8").match(new RegExp(`"${field}"\\s*:\\s*"([^"]*)"`))
+  return hit ? hit[1] : ""
+}
+
+// 这个安装器没有「跳过」模式（每次都合并进配置），所以版本变了一定要如实更新清单。
+function writeManifest() {
+  if (fs.existsSync(MANIFEST_FILE)) {
+    const oldVersion = readManifestField(MANIFEST_FILE, "version")
+    const oldSuite = readManifestField(MANIFEST_FILE, "suite")
+    if (oldVersion === SUITE_VERSION && oldSuite === SUITE_VERSION) {
+      console.log(`  [清单] ${MANIFEST_MODULE} ${SUITE_VERSION}（未变）`)
+      return
+    }
+  }
+  if (opts.dryRun) {
+    console.log(`  [计划] 写清单 ${MANIFEST_FILE}（${MANIFEST_MODULE} ${SUITE_VERSION}）`)
+    return
+  }
+  fs.mkdirSync(MANIFEST_DIR, { recursive: true })
+  const body = {
+    module: MANIFEST_MODULE,
+    version: SUITE_VERSION,
+    suite: SUITE_VERSION,
+    installedAt: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
+  }
+  const tmp = `${MANIFEST_FILE}.tmp.${process.pid}`
+  fs.writeFileSync(tmp, JSON.stringify(body, null, 2) + "\n")
+  fs.renameSync(tmp, MANIFEST_FILE)
+  console.log(`  [清单] ${MANIFEST_MODULE} ${SUITE_VERSION} → ${MANIFEST_FILE}`)
+}
+
 // ── 选择工具 ────────────────────────────────────────────────────────
 const selected = []
 if (opts.all) {
@@ -198,6 +247,8 @@ if (writeOpencode) {
     console.log(`  [写入] ${opencodePath}`)
   }
 }
+
+writeManifest()
 
 // ── 报告 ────────────────────────────────────────────────────────────
 console.log("")
