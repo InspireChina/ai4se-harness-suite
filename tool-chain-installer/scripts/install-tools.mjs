@@ -10,6 +10,7 @@
 //   --dry-run           只打印将要发生的改动
 //   --format <fmt>      写入格式：both(默认) | mcp-json | opencode
 //   --list              列出所有可用工具并退出
+//   --manifest-only     只更新 .agents/harness 清单，不动 MCP 配置
 
 import fs from "node:fs"
 import path from "node:path"
@@ -20,7 +21,7 @@ const CATALOG_PATH = path.join(HERE, "..", "catalog", "mcp-catalog.json")
 
 // ── 参数解析 ────────────────────────────────────────────────────────
 const args = process.argv.slice(2)
-const opts = { tools: [], groups: [], all: false, dryRun: false, format: "both", list: false }
+const opts = { tools: [], groups: [], all: false, dryRun: false, format: "both", list: false, manifestOnly: false }
 let target = null
 
 for (let i = 0; i < args.length; i++) {
@@ -32,6 +33,7 @@ for (let i = 0; i < args.length; i++) {
     case "--dry-run": opts.dryRun = true; break
     case "--format": opts.format = args[++i] || "both"; break
     case "--list": opts.list = true; break
+    case "--manifest-only": opts.manifestOnly = true; break
     case "-h": case "--help": printUsage(0); break
     default:
       if (a.startsWith("-")) { console.error(`未知参数: ${a}`); printUsage(1) }
@@ -40,7 +42,7 @@ for (let i = 0; i < args.length; i++) {
 }
 
 function printUsage(code) {
-  console.log(fs.readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 11).map(l => l.replace(/^#\s?/, "")).join("\n"))
+  console.log(fs.readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 13).map(l => l.replace(/^\/\/\s?/, "")).join("\n"))
   process.exit(code)
 }
 
@@ -117,6 +119,14 @@ function writeManifest() {
   fs.writeFileSync(tmp, JSON.stringify(body, null, 2) + "\n")
   fs.renameSync(tmp, MANIFEST_FILE)
   console.log(`  [清单] ${MANIFEST_MODULE} ${SUITE_VERSION} → ${MANIFEST_FILE}`)
+}
+
+// 只更新清单：MCP 配置已手动对齐，不想再叠一遍写入
+if (opts.manifestOnly) {
+  writeManifest()
+  console.log("")
+  console.log("（--manifest-only：只写了清单，MCP 配置未改动）")
+  process.exit(0)
 }
 
 // ── 选择工具 ────────────────────────────────────────────────────────

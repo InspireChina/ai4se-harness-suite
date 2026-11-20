@@ -30,7 +30,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 
 | 模块               | 目录                                                                                   | 目的                                                                                            | 形态                |
 | ---------------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- | ----------------- |
-| **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，26 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
+| **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，27 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/)                                           | 为任意项目铺好工程底座：`AGENTS.md` + `docs/`（含 `architecture/` 高阶意图骨架、features / facts / standards） | skill + 模板 + 脚本   |
 | **工具链安装器**       | [`tool-chain-installer/`](tool-chain-installer/)                                     | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态                            | skill + 工具清单 + 脚本 |
 | **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 角色泳道图 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门；**L3 · 人编排**                                       | 文档                |
@@ -40,7 +40,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 
 ## 两种协作模式：L3 与 L4
 
-同一套 26 个 skill、同一个 SDD 流程，有两种跑法。区别只在 **人站在哪一环**。
+同一套 27 个 skill、同一个 SDD 流程，有两种跑法。区别只在 **人站在哪一环**。
 
 | | [`team-workflow-guide/`](team-workflow-guide/) | [`agents-workflow-engine/`](agents-workflow-engine/) |
 |---|---|---|
@@ -92,7 +92,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
         ┌───────────────────────┼───────────────────────┐
         │                       │                       │
  harness-installer       agile-team-sdd       tool-chain-installer
-  AGENTS.md 规范          26 个 SDD skill        MCP 工具链
+  AGENTS.md 规范          27 个 SDD skill        MCP 工具链
   docs/ 含 architecture   BA·TL·Dev·QA·PM 全流程
         │                       │                       │
         └───────────────────────┼───────────────────────┘
@@ -102,17 +102,18 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
                      （参考实现 · 已装好全套）
 ```
 
-## SDD 技能套件（26 个）
+## SDD 技能套件（27 个）
 
 | 组 | Skill | 作用 |
 |---|---|---|
-| **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
+| **BA** | `ba-arch-plan` | 项目准备起草业务架构意图：产品边界、术语基线、核心聚合、迭代规划 |
+| | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
 | | `ba-write-spec` | 编写需求规格；维护项目级术语表（`docs/architecture/business/glossary.md`） |
 | | `ba-write-prototype` | 按 spec 做原型，放到该迭代 prototypes |
 | | `ba-requirement-review` | 用另一个模型审查 spec，只回答满意或不满意 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | | `ba-arch-sync-back` | 业务侧对齐：术语 / 核心领域 / 产品 ↔ features 与 facts |
-| **TL** | `tl-arch-plan` | 项目准备写/更新 `docs/architecture/`（C4、ADR 一句话表、与业务侧） |
+| **TL** | `tl-arch-plan` | 接手技术侧：`docs/architecture/tech/`（C4、ADR 一句话表），以业务核心聚合为切分依据 |
 | | `tl-arch-sync-back` | 技术侧对齐：ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 写技术方案（含 DST 自测 + 界面对照基线），等待确认 |
@@ -135,7 +136,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 流程串起来：
 
 ```
-项目准备：tl-arch-plan（BA/TL）→ docs/architecture/
+项目准备：ba-arch-plan（业务侧）→ tl-arch-plan（技术侧）→ docs/architecture/
 ba-grill-me → ba-write-spec → pm-estimate
                     ↓
         ┌───────────┴───────────┐
@@ -162,7 +163,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 | 团队流程手册 | 人怎么配合：总览矩阵、项目准备（含架构设计）→ 迭代前 → 迭代中；角色、测试归属与闸门 | [`team-workflow-guide/`](team-workflow-guide/index.html) |
 | Agent as Code | 所有 Harness（skills、AGENTS、docs 骨架、MCP、overnight-runner）可安装进代码仓库，换机器 clone 即可用 | [`harness-installer/`](harness-installer/) · [`tool-chain-installer/`](tool-chain-installer/) |
 | 文档三分法 | `architecture/` 高阶意图 · `features/` 过程 · `facts/` as-built | [architecture](example-project/docs/architecture/README.md) · [docs 总览](example-project/docs/README.md) |
-| 高阶设计 | 项目级 C4 / ADR 一句话表 / 核心领域模型 + 迭代 HLD；确认后再开 feature Plan | [`tl-arch-plan`](agile-team-sdd/skills/tl-arch-plan-template/SKILL.md) · [`tl-high-level-design`](agile-team-sdd/skills/tl-high-level-design-template/SKILL.md) |
+| 高阶设计 | 业务侧产品边界/术语/核心聚合（`ba-arch-plan`）→ 技术侧 C4/ADR（`tl-arch-plan`）→ 迭代 HLD；确认后再开 feature Plan | [`ba-arch-plan`](agile-team-sdd/skills/ba-arch-plan-template/SKILL.md) · [`tl-arch-plan`](agile-team-sdd/skills/tl-arch-plan-template/SKILL.md) · [`tl-high-level-design`](agile-team-sdd/skills/tl-high-level-design-template/SKILL.md) |
 | ADR | 跨迭代取舍写成一句话决策表（非长文） | [ADR 规范](example-project/docs/standards/adr.md) · [ADR 表](example-project/docs/architecture/tech/adr.md) |
 | 核心领域模型 | architecture 只维护核心聚合 + 关键字段；全量 as-built 在 facts | [core-domain-model](example-project/docs/architecture/business/core-domain-model.md) · [facts domain-model](example-project/docs/facts/domain-model.md) |
 | 代码打样 | 迭代内用独立 Vite 原型先把交互与页面打通，规格与验收对齐后再进实现 | [iteration1 原型](example-project/docs/features/iteration1/prototypes/README.md) |
@@ -178,7 +179,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 ```bash
 cd example-project
 cat AGENTS.md          # 一份填满的工程规范范本
-ls .agents/skills/      # 已安装的 26 个 SDD skills
+ls .agents/skills/      # 已安装的 27 个 SDD skills
 ```
 
 ### 装到自己的新项目
@@ -201,8 +202,9 @@ PATH_MODE=relative ./agile-team-sdd/install.sh ../my-project
 # 3. 装 MCP 工具链
 node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browser --group context
 
-# 4. 项目准备：填 docs/architecture/（C4、ADR、术语/产品/核心领域、迭代规划）
-#    对 Agent 说：用 tl-arch-plan（BA 协作）写高阶架构
+# 4. 项目准备：填 docs/architecture/
+#    先业务侧：对 Agent 说用 ba-arch-plan 起草 business/（边界、术语、核心聚合、迭代规划）
+#    再技术侧：对 Agent 说用 tl-arch-plan 接 C4 上下文/容器 + ADR（容器承载核心聚合）
 ```
 
 第 1 步之后，**必须有人补全** `AGENTS.md` **里的** `TODO` **段落** —— 规范不填满，装出来的只是空壳。  
@@ -224,7 +226,7 @@ node tool-chain-installer/scripts/install-tools.mjs ../my-project --group browse
 ```
 team-harness-suite/
 ├── AGENTS.md             # 本仓库的架构与工程规范（改代码前先读）
-├── agile-team-sdd/       # SDD 技能套件（26 个模板 + catalog.json + 安装脚本）
+├── agile-team-sdd/       # SDD 技能套件（27 个模板 + catalog.json + 安装脚本）
 ├── harness-installer/    # AGENTS.md / docs 骨架初始化
 ├── tool-chain-installer/ # MCP 工具链安装
 ├── team-workflow-guide/  # 团队流程与角色手册
@@ -250,7 +252,7 @@ team-harness-suite/
 
 | 模块 | 状态 |
 |---|---|
-| `agile-team-sdd/` | ✅ 可用（26 个 skill） |
+| `agile-team-sdd/` | ✅ 可用（27 个 skill） |
 | `harness-installer/` | ✅ 可用（`AGENTS.md` 模板含 TODO，需人工补全） |
 | `tool-chain-installer/` | ✅ 可用 |
 | `team-workflow-guide/` | ✅ 可用 |

@@ -2,11 +2,12 @@
 # 初始化项目的 harness：AGENTS.md + docs/ 文档骨架 + opencode 配置。
 #
 # 用法：
-#   ./init-harness.sh <目标项目目录> [--dry-run] [--force] [--no-agents]
+#   ./init-harness.sh <目标项目目录> [--dry-run] [--force] [--no-agents] [--manifest-only]
 #
-#   --dry-run     只打印将要发生的改动，不写文件
-#   --force       覆盖目标项目里已存在的 AGENTS.md / 文档文件
-#   --no-agents   不生成 AGENTS.md，只生成 docs/ 骨架
+#   --dry-run        只打印将要发生的改动，不写文件
+#   --force          覆盖目标项目里已存在的 AGENTS.md / 文档文件
+#   --no-agents      不生成 AGENTS.md，只生成 docs/ 骨架
+#   --manifest-only  只更新 .agents/harness 清单（模板改动已手工同步进目标项目时用）
 #
 #   PATH_MODE=relative  渲染项目相对路径（默认 absolute；与 agile-team-sdd 一致）
 
@@ -18,20 +19,22 @@ TEMPLATE_DIR="$INSTALLER_DIR/templates"
 DRY_RUN=0
 FORCE=0
 NO_AGENTS=0
+MANIFEST_ONLY=0
 # absolute（默认）：渲染成绝对路径，agent 在任意 cwd 下都可用
 # relative        ：渲染成项目相对路径，产物可随仓库分发（与 agile-team-sdd 的 PATH_MODE 一致）
 PATH_MODE="${PATH_MODE:-absolute}"
 
 usage() {
-  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --dry-run)   DRY_RUN=1 ;;
-    --force)     FORCE=1 ;;
-    --no-agents) NO_AGENTS=1 ;;
+    --dry-run)       DRY_RUN=1 ;;
+    --force)         FORCE=1 ;;
+    --no-agents)     NO_AGENTS=1 ;;
+    --manifest-only) MANIFEST_ONLY=1 ;;
     -h|--help)   usage 0 ;;
     -*)          echo "未知参数: $1" >&2; usage 1 ;;
     *)           TARGET="$1" ;;
@@ -78,8 +81,8 @@ write_manifest() {
       echo "  [清单] ${MANIFEST_MODULE} ${version}（未变）"
       return 0
     fi
-    if [ "$FORCE" -eq 0 ]; then
-      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${version}（套件 ${SUITE_VERSION}）；文件是跳过模式，清单未改，要升级加 --force" >&2
+    if [ "$FORCE" -eq 0 ] && [ "$MANIFEST_ONLY" -eq 0 ]; then
+      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${version}（套件 ${SUITE_VERSION}）；文件是跳过模式，清单未改，要升级加 --force（模板改动已手工同步过就加 --manifest-only）" >&2
       return 0
     fi
   fi
@@ -105,6 +108,14 @@ case "$PATH_MODE" in
   absolute|relative) ;;
   *) echo "错误：PATH_MODE 只能是 absolute 或 relative，当前为 $PATH_MODE" >&2; exit 1 ;;
 esac
+
+# 只更新清单：模板改动已手工同步进目标项目，不需要再刷一遍文件
+if [ "$MANIFEST_ONLY" -eq 1 ]; then
+  write_manifest "$SUITE_VERSION"
+  echo ""
+  echo "（--manifest-only：只写了清单，没有生成任何文件）"
+  exit 0
+fi
 
 # 把项目内路径拼成最终渲染值
 proj_path() {

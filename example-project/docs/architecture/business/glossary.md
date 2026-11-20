@@ -2,7 +2,7 @@
 
 > 项目级统一语言（Ubiquitous Language），落在 `docs/architecture/business/`。  
 > 各 feature 的规格、Plan、代码命名应对齐本表。  
-> 由 `ba-write-spec` 在写/改规格时维护；漂移时用 `ba-arch-sync-back` 对齐。不按 feature 拆分。
+> 由 `ba-arch-plan` 起草基线、`ba-write-spec` 在写/改规格时逐 feature 追加；漂移时用 `ba-arch-sync-back` 对齐。不按 feature 拆分。
 
 | 中文 | 英文 | 说明（可选） |
 |---|---|---|

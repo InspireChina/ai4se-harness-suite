@@ -1,6 +1,7 @@
 # 产品定义与高阶概念
 
-> 项目级产品边界。迭代范围见 [`iterations.md`](./iterations.md)；核心领域见 [`core-domain-model.md`](./core-domain-model.md)。
+> 项目级产品边界。迭代范围见 [`iterations.md`](./iterations.md)；核心领域见 [`core-domain-model.md`](./core-domain-model.md)。  
+> 维护：`ba-arch-plan` 起草；`ba-arch-sync-back` 迭代后对齐。
 
 ## 一句话
 

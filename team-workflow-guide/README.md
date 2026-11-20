@@ -30,7 +30,7 @@
 | 适合 | **敏捷团队**：多角色、节奏由人定 | **FDE 工作者**：一人扛完整条线 |
 | 看哪张图 | [`flow.html`](flow.html)（角色泳道） | [`graph.html`](../agents-workflow-engine/graph.html)（节点与闸门） |
 
-两者共用同一套 26 个 SDD skill，差别只在 **谁调度**：人拉（L3）还是图跑（L4）。
+两者共用同一套 27 个 SDD skill，差别只在 **谁调度**：人拉（L3）还是图跑（L4）。
 
 内容覆盖：
 

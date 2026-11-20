@@ -1,6 +1,7 @@
 # 迭代规划
 
-> 项目级里程碑与迭代意图。各迭代详细规格与 HLD 在 `docs/features/iterationN/`。
+> 项目级里程碑与迭代意图。各迭代详细规格与 HLD 在 `docs/features/iterationN/`。  
+> 维护：`ba-arch-plan` 起草；新迭代建目录后补索引（`ba-arch-sync-back` 对齐）。
 
 ## 里程碑（总览）
 

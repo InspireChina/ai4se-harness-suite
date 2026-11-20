@@ -4,8 +4,10 @@
 
 | 相对目录 | 内容 | 主责 |
 |---|---|---|
-| [`tech/`](./tech/) | C4 上下文/容器、ADR | TL（`tl-arch-plan`） |
-| [`business/`](./business/) | 术语表、产品定义、核心领域模型、迭代规划 | BA + TL |
+| [`business/`](./business/) | 术语表、产品定义、核心领域模型、迭代规划 | BA（`ba-arch-plan`）；TL 审 |
+| [`tech/`](./tech/) | C4 上下文/容器、ADR | TL（`tl-arch-plan`），以 `business/` 的核心聚合为切分依据 |
+
+顺序：**先业务后技术** —— `business/` 的边界与核心聚合定了，C4 容器才有切分依据；两步都完成后 architecture 才算可读。
 
 ## 与其它文档的关系
 

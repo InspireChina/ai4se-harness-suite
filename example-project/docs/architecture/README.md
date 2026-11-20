@@ -4,8 +4,10 @@
 
 | 相对目录 | 内容 | 主责 |
 |---|---|---|
-| [`tech/`](./tech/) | C4 上下文/容器、ADR | TL（`tl-arch-plan`） |
-| [`business/`](./business/) | 术语表、产品定义、核心领域模型、迭代规划 | BA + TL |
+| [`business/`](./business/) | 术语表、产品定义、核心领域模型、迭代规划 | BA（`ba-arch-plan`）；TL 审 |
+| [`tech/`](./tech/) | C4 上下文/容器、ADR | TL（`tl-arch-plan`），以 `business/` 的核心聚合为切分依据 |
+
+顺序：**先业务后技术** —— `business/` 的边界与核心聚合定了，C4 容器才有切分依据；两步都完成后 architecture 才算可读。
 
 ## 与其它文档的关系
 
@@ -20,7 +22,8 @@
 
 | Skill | 何时 |
 |---|---|
-| `tl-arch-plan` | 编写/更新本目录（C4、ADR、与迭代边界） |
+| `ba-arch-plan` | 起草业务侧（产品边界、术语基线、核心聚合、迭代规划） |
+| `tl-arch-plan` | 接手技术侧：C4、ADR、与迭代边界 |
 | `tl-arch-sync-back` | 实现演进后对齐技术 ADR ↔ facts 非 ADR 专题 |
 | `ba-arch-sync-back` | 对齐术语/领域/产品 ↔ features 与 `facts/domain-model.md`（as-built） |
 

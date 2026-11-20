@@ -27,7 +27,7 @@
 ```
 team-harness-suite/
 ├── .agents/              # 本仓库自用：verify.sh + plan/ + skills/
-├── agile-team-sdd/       # SDD 技能套件（26 个 skill 模板 + 安装器）
+├── agile-team-sdd/       # SDD 技能套件（27 个 skill 模板 + 安装器）
 ├── harness-installer/    # 初始化目标项目的 AGENTS.md + docs/ 骨架
 ├── tool-chain-installer/ # 安装 MCP 工具链到项目配置
 ├── overnight-runner/     # 无人值守跑 plan 的分屏面板 + 看门狗
@@ -130,7 +130,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ┌──▼──────────┐ ┌▼───────────┐ ┌▼──────────────────┐
 │harness-     │ │agile-team- │ │tool-chain-        │
 │installer/   │ │sdd/       │ │installer/         │
-│AGENTS.md    │ │26 个 skill │ │MCP 工具链          │
+│AGENTS.md    │ │27 个 skill │ │MCP 工具链          │
 │docs/ 骨架    │ │模板 + 安装器│ │                   │
 └─────────────┘ └┬───────────┘ └──────────────────┘
                  │ 装进
@@ -227,6 +227,7 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 | 不碰目标项目的业务代码 | 只写自己约定的文件（`.agents/skills/`、`docs/`、配置文件…） |
 | 密钥不落盘 | 需要密钥的配置写 `{env:VAR}` 引用，真值由使用者注入 |
 | 写安装清单 | 每个模块写 `<目标项目>/.agents/harness/<模块>.json`（`module` / `version` / `suite` / `installedAt`），**谁安装谁写自己那份**，不合并；清单版本只在文件真的升级时才改 |
+| `--manifest-only` | 模板改动已 **手工同步** 进目标项目时，只更新清单、不刷文件（默认不覆盖 → 想升清单又不该覆盖时用这个，别用 `--force`） |
 
 ## 7. 错误处理
 
@@ -255,7 +256,8 @@ agile-team-sdd/skills/dev-plan-template/SKILL.md   （frontmatter: name: dev-pla
 ### 数据流
 
 ```
-项目准备：tl-arch-plan（BA/TL）→ docs/architecture/（C4、ADR、术语、领域意图、迭代规划）
+项目准备：ba-arch-plan（业务侧：边界、术语、核心聚合、迭代规划 → docs/architecture/business/）
+           → tl-arch-plan（技术侧：C4、ADR，容器承载核心聚合 → docs/architecture/tech/）
 用户的一句话需求
   → ba-grill-me（拷问）
   → ba-write-spec（需求规格 docs/features/<迭代>/<CODE>-<slug>/spec.md；术语 → architecture/business/glossary.md）

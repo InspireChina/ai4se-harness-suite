@@ -519,7 +519,7 @@ while IFS= read -r f; do
   if [ "$got" = "$VER_SUITE" ]; then
     ok "清单 $module 套件 $got"
   else
-    bad "清单 $module 套件 ${got:-空} ≠ 源码 $VER_SUITE（重跑该模块安装器）"
+    bad "清单 $module 套件 ${got:-空} ≠ 源码 ${VER_SUITE}（重跑该模块安装器）"
   fi
 done < <(find example-project/.agents/harness -name "*.json" 2>/dev/null | sort)
 if [ "$manifest_count" -eq 0 ]; then

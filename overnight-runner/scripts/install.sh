@@ -2,11 +2,12 @@
 # 把 overnight-runner 安装到目标项目的 `.overnight-runner/`。
 #
 # 用法：
-#   ./install.sh <目标项目目录> [--dry-run] [--force] [--no-config]
+#   ./install.sh <目标项目目录> [--dry-run] [--force] [--no-config] [--manifest-only]
 #
-#   --dry-run     只打印将要发生的改动，不写文件
-#   --force       覆盖已存在的 runner 代码与启动脚本（不碰 queue / project.yaml）
-#   --no-config   不创建 overnight-runner.yaml 与 project.yaml
+#   --dry-run        只打印将要发生的改动，不写文件
+#   --force          覆盖已存在的 runner 代码与启动脚本（不碰 queue / project.yaml）
+#   --no-config      不创建 overnight-runner.yaml 与 project.yaml
+#   --manifest-only  只更新 .agents/harness 清单（不装代码与配置）
 #
 # 零依赖：只用 Python 3.9+ 标准库，不需要 pip install。
 
@@ -20,17 +21,19 @@ LEGACY_TOOLS="tools/overnight-runner"
 DRY_RUN=0
 FORCE=0
 NO_CONFIG=0
+MANIFEST_ONLY=0
 
 usage() {
-  sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
 while [ $# -gt 0 ]; do
   case "$1" in
-    --dry-run)   DRY_RUN=1 ;;
-    --force)     FORCE=1 ;;
-    --no-config) NO_CONFIG=1 ;;
+    --dry-run)       DRY_RUN=1 ;;
+    --force)         FORCE=1 ;;
+    --no-config)     NO_CONFIG=1 ;;
+    --manifest-only) MANIFEST_ONLY=1 ;;
     -h|--help)   usage 0 ;;
     -*)          echo "未知参数: $1" >&2; usage 1 ;;
     *)           TARGET="$1" ;;
@@ -81,8 +84,8 @@ write_manifest() {
       echo "  [清单] ${MANIFEST_MODULE} ${MANIFEST_VERSION}（未变）"
       return 0
     fi
-    if [ "$FORCE" -eq 0 ]; then
-      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${MANIFEST_VERSION}（套件 ${SUITE_VERSION}）；文件是跳过模式，清单未改，要升级加 --force" >&2
+    if [ "$FORCE" -eq 0 ] && [ "$MANIFEST_ONLY" -eq 0 ]; then
+      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${MANIFEST_VERSION}（套件 ${SUITE_VERSION}）；文件是跳过模式，清单未改，要升级加 --force（代码已手工同步过就加 --manifest-only）" >&2
       return 0
     fi
   fi
@@ -103,6 +106,15 @@ write_manifest() {
   mv "$tmp" "$MANIFEST_FILE"
   echo "  [清单] ${MANIFEST_MODULE} ${MANIFEST_VERSION}（套件 ${SUITE_VERSION}）→ ${MANIFEST_FILE}"
 }
+
+# 只更新清单：代码已经手工同步进目标项目，不需要再装一遍
+if [ "$MANIFEST_ONLY" -eq 1 ]; then
+  write_manifest
+  echo ""
+  echo "（--manifest-only：只写了清单，没有生成任何文件）"
+  exit 0
+fi
+
 LAUNCHER="$DEST/overnight-runner"
 LAUNCHER_CMD="$DEST/overnight-runner.cmd"
 RUNNER_CFG="$DEST/overnight-runner.yaml"

@@ -1,7 +1,7 @@
 # agile-team-sdd
 
 SDD（Spec-Driven Development）技能套件的 **模板源**，覆盖 **BA → TL → PM → 开发 → QA → 发布 → 复盘** 全流程，
-共 26 个 skill。
+共 27 个 skill。
 
 ```
 agile-team-sdd/
@@ -10,6 +10,7 @@ agile-team-sdd/
 ├── catalog.json          # 技能清单（分组 / 作用 / 触发时机 / 依赖）
 ├── placeholders.md       # 占位符字典
 └── skills/
+    ├── ba-arch-plan-template/     # 项目级业务架构意图（business/）
     ├── ba-grill-me-template/      # 拷问需求
     ├── ba-write-spec-template/    # 编写需求规格
     ├── ba-gen-facts-template/     # 生成事实文档
@@ -36,13 +37,14 @@ agile-team-sdd/
 
 | 组 | Skill | 作用 |
 |---|---|---|
-| **BA** | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
+| **BA** | `ba-arch-plan` | 起草项目级业务架构意图：产品边界、术语基线、核心聚合、迭代规划 |
+| | `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 |
 | | `ba-write-spec` | 编写需求规格：字段表、业务规则、权限矩阵、验收标准；维护项目级术语表 |
 | | `ba-write-prototype` | 按 spec 做原型 |
 | | `ba-requirement-review` | 用另一个模型审查 spec，只回答满意或不满意 |
 | | `ba-gen-facts` | 从代码生成/校准事实文档：API、库表、领域模型、专题 |
 | | `ba-arch-sync-back` | 业务侧对齐术语/领域意图/产品 ↔ features 与 facts |
-| **TL** | `tl-arch-plan` | 写/更新项目级 `docs/architecture/`（C4、ADR） |
+| **TL** | `tl-arch-plan` | 写/更新技术侧 `docs/architecture/tech/`（C4、ADR），承接业务核心聚合 |
 | | `tl-arch-sync-back` | 技术侧对齐 ADR/C4 ↔ 实现与 facts 专题 |
 | | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD），确认前不得开 Plan |
 | **Dev** | `dev-plan` | 实现前写技术方案（含 DST 自测用例与界面对照基线），等待人工确认 |
