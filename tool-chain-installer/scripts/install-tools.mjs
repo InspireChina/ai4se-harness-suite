@@ -10,6 +10,7 @@
 //   --dry-run           只打印将要发生的改动
 //   --format <fmt>      写入格式：both(默认) | mcp-json | opencode
 //   --list              列出所有可用工具并退出
+//   --manifest-only     只更新 .agents/harness 清单，不动 MCP 配置
 
 import fs from "node:fs"
 import path from "node:path"
@@ -20,7 +21,7 @@ const CATALOG_PATH = path.join(HERE, "..", "catalog", "mcp-catalog.json")
 
 // ── 参数解析 ────────────────────────────────────────────────────────
 const args = process.argv.slice(2)
-const opts = { tools: [], groups: [], all: false, dryRun: false, format: "both", list: false }
+const opts = { tools: [], groups: [], all: false, dryRun: false, format: "both", list: false, manifestOnly: false }
 let target = null
 
 for (let i = 0; i < args.length; i++) {
@@ -32,6 +33,7 @@ for (let i = 0; i < args.length; i++) {
     case "--dry-run": opts.dryRun = true; break
     case "--format": opts.format = args[++i] || "both"; break
     case "--list": opts.list = true; break
+    case "--manifest-only": opts.manifestOnly = true; break
     case "-h": case "--help": printUsage(0); break
     default:
       if (a.startsWith("-")) { console.error(`未知参数: ${a}`); printUsage(1) }
@@ -40,7 +42,7 @@ for (let i = 0; i < args.length; i++) {
 }
 
 function printUsage(code) {
-  console.log(fs.readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 11).map(l => l.replace(/^#\s?/, "")).join("\n"))
+  console.log(fs.readFileSync(fileURLToPath(import.meta.url), "utf8").split("\n").slice(1, 13).map(l => l.replace(/^\/\/\s?/, "")).join("\n"))
   process.exit(code)
 }
 
@@ -69,6 +71,63 @@ if (!fs.existsSync(target)) {
 }
 
 const PROJECT_ROOT = fs.realpathSync(target)
+
+// ── 安装清单 ────────────────────────────────────────────────────────
+// 一个模块一个文件，谁安装谁写自己那份：不需要合并，也不需要跨模块共享列表。
+const MANIFEST_MODULE = "tool-chain-installer"
+const MANIFEST_DIR = path.join(PROJECT_ROOT, ".agents", "harness")
+const MANIFEST_FILE = path.join(MANIFEST_DIR, `${MANIFEST_MODULE}.json`)
+const SUITE_VERSION = (() => {
+  try {
+    return fs.readFileSync(path.join(HERE, "..", "..", "VERSION"), "utf8").trim()
+  } catch {
+    return ""
+  }
+})()
+if (!SUITE_VERSION) {
+  console.error("错误：读不到仓库根的 VERSION")
+  process.exit(1)
+}
+
+function readManifestField(file, field) {
+  const hit = fs.readFileSync(file, "utf8").match(new RegExp(`"${field}"\\s*:\\s*"([^"]*)"`))
+  return hit ? hit[1] : ""
+}
+
+// 这个安装器没有「跳过」模式（每次都合并进配置），所以版本变了一定要如实更新清单。
+function writeManifest() {
+  if (fs.existsSync(MANIFEST_FILE)) {
+    const oldVersion = readManifestField(MANIFEST_FILE, "version")
+    const oldSuite = readManifestField(MANIFEST_FILE, "suite")
+    if (oldVersion === SUITE_VERSION && oldSuite === SUITE_VERSION) {
+      console.log(`  [清单] ${MANIFEST_MODULE} ${SUITE_VERSION}（未变）`)
+      return
+    }
+  }
+  if (opts.dryRun) {
+    console.log(`  [计划] 写清单 ${MANIFEST_FILE}（${MANIFEST_MODULE} ${SUITE_VERSION}）`)
+    return
+  }
+  fs.mkdirSync(MANIFEST_DIR, { recursive: true })
+  const body = {
+    module: MANIFEST_MODULE,
+    version: SUITE_VERSION,
+    suite: SUITE_VERSION,
+    installedAt: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
+  }
+  const tmp = `${MANIFEST_FILE}.tmp.${process.pid}`
+  fs.writeFileSync(tmp, JSON.stringify(body, null, 2) + "\n")
+  fs.renameSync(tmp, MANIFEST_FILE)
+  console.log(`  [清单] ${MANIFEST_MODULE} ${SUITE_VERSION} → ${MANIFEST_FILE}`)
+}
+
+// 只更新清单：MCP 配置已手动对齐，不想再叠一遍写入
+if (opts.manifestOnly) {
+  writeManifest()
+  console.log("")
+  console.log("（--manifest-only：只写了清单，MCP 配置未改动）")
+  process.exit(0)
+}
 
 // ── 选择工具 ────────────────────────────────────────────────────────
 const selected = []
@@ -198,6 +257,8 @@ if (writeOpencode) {
     console.log(`  [写入] ${opencodePath}`)
   }
 }
+
+writeManifest()
 
 // ── 报告 ────────────────────────────────────────────────────────────
 console.log("")

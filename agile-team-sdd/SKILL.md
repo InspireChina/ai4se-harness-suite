@@ -1,6 +1,6 @@
 ---
 name: agile-team-sdd
-description: 安装 Agile Team SDD 技能套件（26 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
+description: 安装 Agile Team SDD 技能套件（27 个 skill，覆盖 BA/TL/开发/QA/PM/runner）到指定项目。当用户说"安装 skills 到某个项目"、"把 SDD 流程装到 X 仓库"、"agile team sdd 安装"时使用。
 ---
 
 # Agile Team SDD：安装技能套件
@@ -8,7 +8,7 @@ description: 安装 Agile Team SDD 技能套件（26 个 skill，覆盖 BA/TL/�
 本目录是 **SDD（Spec-Driven Development）技能套件的模板源**。
 `skills/` 下每个子目录是一份带占位符的 `SKILL.md`，需要先渲染成目标项目的真实路径，再安装过去。
 
-## 技能清单（26 个）
+## 技能清单（27 个）
 
 完整元数据见 [`catalog.json`](catalog.json)。
 
@@ -16,7 +16,8 @@ description: 安装 Agile Team SDD 技能套件（26 个 skill，覆盖 BA/TL/�
 
 | Skill | 作用 | 触发时机 |
 |---|---|---|
-| `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时，写规格之前 |
+| `ba-arch-plan` | 起草项目级业务架构意图（产品边界、术语基线、核心领域模型、迭代规划） | 项目准备阶段 / 新增业务域，先把 `docs/architecture/business/` 立起来 |
+| `ba-grill-me` | 拷问需求，把模糊描述逼成可验收的规格 | 需求含糊、有多种理解时 ，写规格之前 |
 | `ba-write-spec` | 编写需求规格（字段表、业务规则、权限、验收标准），维护项目级术语表 | 需求已澄清，落成 `docs/features/<迭代>/<CODE>-<slug>/spec.md`；术语写入 `docs/architecture/business/glossary.md` |
 | `ba-write-prototype` | 按 spec 做一版原型 | 规格写完、需求质量门之前 |
 | `ba-requirement-review` | 用另一个模型审查 spec，只回答满意或不满意 | 规格写完、人做需求决策之前 |
@@ -49,7 +50,7 @@ description: 安装 Agile Team SDD 技能套件（26 个 skill，覆盖 BA/TL/�
 
 | Skill | 作用 | 触发时机 |
 |---|---|---|
-| `tl-arch-plan` | 写/更新项目级 `docs/architecture/`（C4、ADR） | 项目准备定技术边界，或跨迭代架构落盘 |
+| `tl-arch-plan` | 写/更新技术侧 `docs/architecture/tech/`（C4、ADR），承接业务核心聚合 | 项目准备业务边界已定、需要切技术边界时 |
 | `tl-arch-sync-back` | 技术侧对齐 ADR/C4 ↔ 实现与 facts 专题 | 实现推翻或细化跨迭代取舍时 |
 | `tl-high-level-design` | 写迭代高阶技术设计（HLD / TRD） | 规格齐备、写 feature Plan 之前 |
 
@@ -70,7 +71,7 @@ description: 安装 Agile Team SDD 技能套件（26 个 skill，覆盖 BA/TL/�
 ### 全流程串起来
 
 ```
-项目准备：tl-arch-plan（+ BA）→ docs/architecture/
+项目准备：ba-arch-plan（业务侧）→ tl-arch-plan（技术侧）→ docs/architecture/
 需求
  └─ ba-grill-me ──▶ ba-write-spec ──▶ pm-estimate
                                           │

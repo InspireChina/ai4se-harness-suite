@@ -47,6 +47,7 @@ node tool-chain-installer/scripts/install-tools.mjs <目标项目目录> --all -
 | `--all` | 安装全部 |
 | `--dry-run` | 只打印将要发生的改动 |
 | `--format <fmt>` | `both`(默认) \| `mcp-json` \| `opencode` |
+| `--manifest-only` | 只更新 `.agents/harness/tool-chain-installer.json`，不动 `.mcp.json` / `opencode.jsonc` |
 
 ## 写入哪些文件
 

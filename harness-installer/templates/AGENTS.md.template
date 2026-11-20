@@ -171,7 +171,7 @@ TODO：贴出核心状态机图，并写明状态流转由哪个 domain 守卫�
 
 ```
 {{DOCS_DIR}}/
-├── architecture/           # 高阶意图（项目准备：BA/TL）
+├── architecture/           # 高阶意图（项目准备：BA 起草 business/ → TL 接 tech/）
 │   ├── tech/               # C4 + adr.md（一句话表）
 │   └── business/           # glossary / product / core-domain-model / iterations
 ├── features/               # 需求规格 + 技术方案（过程文档）

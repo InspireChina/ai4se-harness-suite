@@ -32,6 +32,8 @@
 
 **零依赖**：只用 Python 3.9+ 标准库，不需要 `pip install`。
 
+常用参数：`--dry-run` 预览 · `--force` 覆盖已装代码 · `--no-config` 不碰配置文件 · `--manifest-only` 只更新 `.agents/harness/overnight-runner.json`。
+
 装完项目里会有：
 
 ```

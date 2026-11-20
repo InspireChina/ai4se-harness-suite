@@ -31,6 +31,7 @@ description: 初始化项目的工程 harness —— 生成/补齐 AGENTS.md（�
 | `--dry-run` | 只打印将要发生的改动，不写文件 |
 | `--force` | 覆盖已存在的 `AGENTS.md` 与文档文件 |
 | `--no-agents` | 只生成 `docs/` 骨架，不动 `AGENTS.md` |
+| `--manifest-only` | 只更新 `.agents/harness/harness-installer.json`（模板改动已手工同步进目标项目时用） |
 
 环境变量：
 

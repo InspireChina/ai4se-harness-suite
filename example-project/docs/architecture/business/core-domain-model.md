@@ -1,7 +1,8 @@
 # 核心领域模型（Core）
 
 > **意图侧**：只维护 **核心聚合 + 关键字段**（统一语言与边界），不写全量字段/行为/端口实现。  
-> **as-built**（全量）见 [`../../facts/domain-model.md`](../../facts/domain-model.md)；漂移时用 `ba-arch-sync-back` 对齐。
+> **as-built**（全量）见 [`../../facts/domain-model.md`](../../facts/domain-model.md)；漂移时用 `ba-arch-sync-back` 对齐。  
+> 维护：`ba-arch-plan` 起草（首次/新增业务域）；`ba-arch-sync-back` 对齐意图与 as-built。
 
 ## 核心聚合
 

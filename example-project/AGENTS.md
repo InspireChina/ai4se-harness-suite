@@ -249,7 +249,7 @@ cd e2e && npm run test:dev # 只跑开发自测用例
 
 ```
 docs/
-├── architecture/           # 高阶意图（项目准备：BA/TL）
+├── architecture/           # 高阶意图（项目准备：BA 起草 business/ → TL 接 tech/）
 │   ├── tech/
 │   │   ├── c4-context.md
 │   │   ├── c4-container.md

@@ -76,7 +76,58 @@ fi
 PROJECT_ROOT="$(cd "$TARGET" && pwd)"
 PROJECT_NAME="${PROJECT_NAME:-$(basename "$PROJECT_ROOT")}"
 
+# ── 安装清单 ────────────────────────────────────────────────────────
+# 一个模块一个文件，谁安装谁写自己那份：不需要合并，也不需要跨模块共享列表。
+MANIFEST_MODULE="agile-team-sdd"
+MANIFEST_DIR="$PROJECT_ROOT/.agents/harness"
+MANIFEST_FILE="$MANIFEST_DIR/$MANIFEST_MODULE.json"
+SUITE_VERSION="$(sed -n '1s/[[:space:]]*$//;1p' "$SKILL_DIR/../VERSION" 2>/dev/null || true)"
+if [ -z "$SUITE_VERSION" ]; then
+  echo "错误：读不到仓库根的 VERSION（$SKILL_DIR/../VERSION）" >&2
+  exit 1
+fi
+
+# 从清单里取字段值：{ "version": "0.3.0", ... }
+manifest_field() {
+  sed -n "s/.*\"$2\": *\"\([^\"]*\)\".*/\1/p" "$1" 2>/dev/null | head -1
+}
+
+# 已装版本没变就不动文件（installedAt 保持首次安装时间）；变了自己又没 --force 就不许改清单
+write_manifest() {
+  version="$1"
+  if [ -f "$MANIFEST_FILE" ]; then
+    old_version="$(manifest_field "$MANIFEST_FILE" version)"
+    old_suite="$(manifest_field "$MANIFEST_FILE" suite)"
+    if [ "$old_version" = "$version" ] && [ "$old_suite" = "$SUITE_VERSION" ]; then
+      echo "  [清单] ${MANIFEST_MODULE} ${version}（未变）"
+      return 0
+    fi
+    if [ "$FORCE" -eq 0 ]; then
+      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${version}（套件 ${SUITE_VERSION}）；文件是跳过模式，清单未改，要升级加 --force" >&2
+      return 0
+    fi
+  fi
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "  [计划] 写清单 ${MANIFEST_FILE}（${MANIFEST_MODULE} ${version} / 套件 ${SUITE_VERSION}）"
+    return 0
+  fi
+  mkdir -p "$MANIFEST_DIR"
+  tmp="$MANIFEST_FILE.tmp.$$"
+  {
+    printf '{\n'
+    printf '  "module": "%s",\n' "$MANIFEST_MODULE"
+    printf '  "version": "%s",\n' "$version"
+    printf '  "suite": "%s",\n' "$SUITE_VERSION"
+    printf '  "installedAt": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    printf '}\n'
+  } > "$tmp"
+  mv "$tmp" "$MANIFEST_FILE"
+  echo "  [清单] ${MANIFEST_MODULE} ${version}（套件 ${SUITE_VERSION}）→ ${MANIFEST_FILE}"
+}
+
 # ── 目录与文件 ───────────────────────────────────────────────────────
+# PATH_MODE 下面还要用（E2E_RUNNER 要按它改相对路径），先兜个默认值
+PATH_MODE="${PATH_MODE:-absolute}"
 SKILLS_DIR="${SKILLS_DIR:-.agents/skills}"
 BACKEND_DIR="${BACKEND_DIR:-containers/backend}"
 FRONTEND_DIR="${FRONTEND_DIR:-containers/frontend}"
@@ -335,13 +386,16 @@ fi
 
 # ── 残留占位符检查 ───────────────────────────────────────────────────
 if [ "$DRY_RUN" -eq 0 ]; then
-  leftovers="$(grep -rhoE '\{\{[A-Z_]+\}\}' "$TARGET_SKILLS_DIR" 2>/dev/null | sort -u || true)"
+  # 占位符名里有数字（E2E_RUNNER / E2E_DIR / E2E_CASES_DIR），别只用 [A-Z_]
+  leftovers="$(grep -rhoE '\{\{[A-Z0-9_]+\}\}' "$TARGET_SKILLS_DIR" 2>/dev/null | sort -u || true)"
   if [ -n "$leftovers" ]; then
     echo ""
     echo "警告：以下占位符未被替换，请检查："
     echo "$leftovers" | sed 's/^/  - /'
   fi
 fi
+
+write_manifest "$SUITE_VERSION"
 
 echo ""
 echo "完成：安装 $installed 个 skill，跳过 $skipped 个。"

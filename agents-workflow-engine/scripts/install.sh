@@ -46,6 +46,54 @@ PROJECT="$(cd "$TARGET" && pwd)"
 DEST="$PROJECT/.agents/workflow"
 FILE="$DEST/preset.yaml"
 
+# ── 安装清单 ────────────────────────────────────────────────────────
+# 一个模块一个文件，谁安装谁写自己那份：不需要合并，也不需要跨模块共享列表。
+MANIFEST_MODULE="agents-workflow-engine"
+MANIFEST_DIR="$PROJECT/.agents/harness"
+MANIFEST_FILE="$MANIFEST_DIR/$MANIFEST_MODULE.json"
+SUITE_VERSION="$(sed -n '1s/[[:space:]]*$//;1p' "$ROOT/../VERSION" 2>/dev/null || true)"
+
+# 从清单里取字段值：{ "version": "0.2.0", ... }
+manifest_field() {
+  sed -n "s/.*\"$2\": *\"\([^\"]*\)\".*/\1/p" "$1" 2>/dev/null | head -1
+}
+
+# 已装版本没变就不动文件（installedAt 保持首次安装时间）；变了自己又没 --force 就不许改清单
+write_manifest() {
+  if [ -z "$VERSION" ]; then
+    echo "  清单: 读不到本仓库的引擎版本，跳过" >&2
+    return 0
+  fi
+  if [ -f "$MANIFEST_FILE" ]; then
+    old_version="$(manifest_field "$MANIFEST_FILE" version)"
+    old_suite="$(manifest_field "$MANIFEST_FILE" suite)"
+    if [ "$old_version" = "$VERSION" ] && [ "$old_suite" = "$SUITE_VERSION" ]; then
+      echo "  [清单] ${MANIFEST_MODULE} ${VERSION}（未变）"
+      return 0
+    fi
+    if [ "$FORCE" -eq 0 ]; then
+      echo "  清单: ${MANIFEST_FILE} 记着 ${MANIFEST_MODULE} ${old_version:-未知}（套件 ${old_suite:-未知}），本次源码是 ${VERSION}（套件 ${SUITE_VERSION}）；清单未改，要升级加 --force" >&2
+      return 0
+    fi
+  fi
+  if [ "$DRY_RUN" -eq 1 ]; then
+    echo "  [计划] 写清单 ${MANIFEST_FILE}（${MANIFEST_MODULE} ${VERSION} / 套件 ${SUITE_VERSION}）"
+    return 0
+  fi
+  mkdir -p "$MANIFEST_DIR"
+  tmp="$MANIFEST_FILE.tmp.$$"
+  {
+    printf '{\n'
+    printf '  "module": "%s",\n' "$MANIFEST_MODULE"
+    printf '  "version": "%s",\n' "$VERSION"
+    printf '  "suite": "%s",\n' "$SUITE_VERSION"
+    printf '  "installedAt": "%s"\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    printf '}\n'
+  } > "$tmp"
+  mv "$tmp" "$MANIFEST_FILE"
+  echo "  [清单] ${MANIFEST_MODULE} ${VERSION}（套件 ${SUITE_VERSION}）→ ${MANIFEST_FILE}"
+}
+
 if [ -n "$VERSION" ]; then
   echo "agents-workflow-engine 安装器（引擎 ${VERSION}）"
 else
@@ -75,12 +123,14 @@ if [ "$DRY_RUN" -eq 1 ]; then
     echo "  将写入 preset.yaml"
   fi
   echo "  不碰 overlay.yaml"
+  write_manifest
   exit 0
 fi
 
 mkdir -p "$DEST"
 if [ -f "$FILE" ] && [ "$FORCE" -eq 0 ]; then
   echo "  跳过: 已存在 $FILE"
+  echo "  清单没动：文件没升级，清单也不应该升级（要升级加 --force）"
   exit 0
 fi
 tmp="$FILE.tmp.$$"
@@ -88,3 +138,4 @@ cp "$PRESET" "$tmp"
 mv "$tmp" "$FILE"
 echo "  已写入 $FILE"
 echo "  未修改 overlay.yaml"
+write_manifest

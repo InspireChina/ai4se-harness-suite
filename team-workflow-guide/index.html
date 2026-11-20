@@ -608,7 +608,7 @@
       </thead>
       <tbody>
         <tr>
-          <th class="phase setup" rowspan="3" scope="rowgroup"><span class="phase-label">项目准备</span></th>
+          <th class="phase setup" rowspan="4" scope="rowgroup"><span class="phase-label">项目准备</span></th>
           <td class="role">TL<small>装机与定规</small></td>
           <td>
             <ul>
@@ -637,24 +637,45 @@
           </td>
         </tr>
         <tr>
-          <td class="role">BA / TL<small>架构设计</small></td>
+          <td class="role">BA<small>业务架构意图</small></td>
           <td>
             <ul>
-              <li>产品边界、术语与领域意图</li>
-              <li>C4 上下文/容器与跨迭代 ADR</li>
-              <li>迭代规划对齐</li>
+              <li>产品边界与「本期不做」</li>
+              <li>术语基线、核心聚合 + 关键字段</li>
+              <li>迭代规划与里程碑</li>
+            </ul>
+          </td>
+          <td>
+            <div class="tool-new"><code>ba-arch-plan</code></div>
+            <div><code>ba-arch-sync-back</code>（后续对齐）</div>
+          </td>
+          <td>业务目标、干系人访谈、现有系统边界</td>
+          <td>
+            <ul>
+              <li><code>docs/architecture/business/</code></li>
+              <li>product · glossary · core-domain-model · iterations</li>
+              <li>「核心聚合 → 建议容器」交接表</li>
+            </ul>
+          </td>
+        </tr>
+        <tr>
+          <td class="role">TL<small>技术架构</small></td>
+          <td>
+            <ul>
+              <li>C4 上下文/容器切分</li>
+              <li>跨迭代 ADR</li>
+              <li>容器能否承载核心聚合</li>
             </ul>
           </td>
           <td>
             <div class="tool-new"><code>tl-arch-plan</code></div>
-            <div><code>ba-arch-sync-back</code>（后续对齐）</div>
             <div><code>tl-arch-sync-back</code>（后续对齐）</div>
           </td>
-          <td>业务目标、技术选型、干系人约束</td>
+          <td>业务边界与核心聚合、技术选型、干系人约束</td>
           <td>
             <ul>
-              <li><code>docs/architecture/</code></li>
-              <li>C4 · ADR 一句话表 · glossary · product · core-domain-model · iterations</li>
+              <li><code>docs/architecture/tech/</code></li>
+              <li>C4 上下文/容器 · ADR 一句话表</li>
             </ul>
           </td>
         </tr>
@@ -837,7 +858,7 @@
 <section id="setup">
   <h2>1. 项目准备</h2>
   <p class="goal">目标：项目「可被 harness 管理」——规范、目录、工具齐；高阶架构意图落盘。</p>
-  <p><strong>协作口诀</strong>：TL 装机与定规矩，BA/TL 落 <code>docs/architecture/</code>，QA 定闸门，BA/PM 定方向。规矩与架构未定不进迭代。</p>
+  <p><strong>协作口诀</strong>：TL 装机与定规矩，BA 先落业务意图、TL 再接技术架构，QA 定闸门，BA/PM 定方向。规矩与架构未定不进迭代。</p>
 
   <h3>1.1 谁做什么</h3>
   <table class="data">
@@ -847,7 +868,8 @@
       <tr><td>安装 SDD skill</td><td>TL</td><td><code>.agents/skills/</code></td></tr>
       <tr><td>安装 MCP</td><td>TL</td><td><code>.mcp.json</code> / <code>opencode.jsonc</code></td></tr>
       <tr><td>定标准与事实骨架</td><td>TL</td><td><code>docs/standards/</code>、<code>docs/facts/</code></td></tr>
-      <tr><td>架构设计（产品/领域/C4/ADR）</td><td>BA / TL</td><td><code>docs/architecture/</code></td></tr>
+      <tr><td>业务架构意图（产品边界/术语/核心聚合/迭代规划）</td><td>BA</td><td><code>docs/architecture/business/</code></td></tr>
+      <tr><td>技术架构（C4/ADR，承载核心聚合）</td><td>TL</td><td><code>docs/architecture/tech/</code></td></tr>
       <tr><td>定测试闸门</td><td>QA + TL</td><td><code>test:qa</code> 进 CI</td></tr>
       <tr><td>业务目标与首迭范围</td><td>BA / PM</td><td><code>docs/architecture/business/iterations.md</code></td></tr>
     </tbody>
@@ -870,7 +892,10 @@
       <strong>（可选）装 overnight-runner</strong> — 需要夜跑 Plan 时，再让 Agent 安装并写好队列配置。
     </li>
     <li>
-      <strong>架构设计</strong> — 对 Agent 说：用 <code>tl-arch-plan</code>（BA 协作）填写 <code>docs/architecture/</code>（C4、ADR、术语/产品/领域意图、迭代规划）。可与定标准并行，但<strong>进迭代前须齐</strong>。
+      <strong>业务架构意图</strong> — 对 Agent 说：用 <code>ba-arch-plan</code> 起草 <code>docs/architecture/business/</code>（产品边界、术语基线、核心聚合、迭代规划），并给出「核心聚合 → 建议容器」交接表。
+    </li>
+    <li>
+      <strong>技术架构</strong> — 对 Agent 说：用 <code>tl-arch-plan</code> 接上一步，填 <code>docs/architecture/tech/</code>（C4 上下文/容器、跨迭代 ADR）；容器要能承载上一步的核心聚合。两步都完成，architecture 才算可读。
     </li>
   </ol>
   <div class="callout">装完 skill / MCP 后必须<strong>重启 opencode</strong>（或等价 IDE Agent），配置才生效。不要跳步：先有 <code>AGENTS.md</code> 与 <code>docs/</code>，再装 skills，路径才指向真实目录。</div>
@@ -880,7 +905,7 @@
     <li><code>AGENTS.md</code> 关键 TODO 已填</li>
     <li>skill + MCP 可用</li>
     <li>文档树与测试归属约定写清</li>
-    <li><code>docs/architecture/</code> 已有可读的 C4 / 术语或产品边界 / 首迭规划（可与装机并行，但进迭代前须齐）</li>
+    <li><code>docs/architecture/</code> 已有可读的：业务侧（product 边界 / 术语 / 核心聚合 / 首迭规划）+ 技术侧（C4 / ADR）（可与装机并行，但进迭代前须齐）</li>
     <li>团队对齐三条铁律（规范先于代码 / 测试先于实现 / 文档同批次）</li>
   </ul>
 </section>
@@ -1055,9 +1080,9 @@
 
   <div class="role-card">
     <h3>BA · 业务分析</h3>
-    <p class="goal">让开发不需要猜就能开始做。规格写「做什么」，不写表名/SQL；同步输出 HTML 原型图。本迭产物放在 <code>docs/features/iteration[n]/</code>。</p>
+    <p class="goal">让开发不需要猜就能开始做。项目准备阶段先立业务架构意图（边界 / 术语 / 核心聚合 / 迭代规划）；逐迭代写规格与 HTML 原型图，本迭产物放在 <code>docs/features/iteration[n]/</code>。规格写「做什么」，不写表名/SQL。</p>
     <div class="pill-row">
-      <span class="pill">ba-grill-me</span><span class="pill">ba-write-spec</span>
+      <span class="pill">ba-arch-plan</span><span class="pill">ba-grill-me</span><span class="pill">ba-write-spec</span>
     </div>
   </div>
 
@@ -1071,9 +1096,9 @@
 
   <div class="role-card">
     <h3>TL · 技术负责人</h3>
-    <p class="goal">装机定规；迭代前写高阶技术方案（TRD）并确认；迭代中做代码评审与发布清单。工具链与密钥不落盘也归 TL。</p>
+    <p class="goal">装机定规；项目准备阶段接 BA 的业务边界切 C4/ADR；迭代前写高阶技术方案（TRD）并确认；迭代中做代码评审与发布清单。工具链与密钥不落盘也归 TL。</p>
     <div class="pill-row">
-      <span class="pill">dev-code-review</span><span class="pill">ba-gen-facts</span><span class="pill">dev-release-plan</span>
+      <span class="pill">tl-arch-plan</span><span class="pill">tl-high-level-design</span><span class="pill">dev-code-review</span><span class="pill">ba-gen-facts</span><span class="pill">dev-release-plan</span>
     </div>
   </div>
 
@@ -1104,6 +1129,8 @@
   <table class="data">
     <thead><tr><th>步骤</th><th>阶段</th><th>skill</th><th>产出</th></tr></thead>
     <tbody>
+      <tr><td>业务架构意图</td><td>§1</td><td><code>ba-arch-plan</code></td><td><code>docs/architecture/business/</code>（product · glossary · core-domain-model · iterations）+ 「核心聚合 → 建议容器」</td></tr>
+      <tr><td>技术架构</td><td>§1</td><td><code>tl-arch-plan</code></td><td><code>docs/architecture/tech/</code>（C4 上下文/容器 · ADR）</td></tr>
       <tr><td>拷问</td><td>§2</td><td><code>ba-grill-me</code></td><td>澄清纪要</td></tr>
       <tr><td>写规格 + 原型</td><td>§2</td><td><code>ba-write-spec</code></td><td><code>docs/features/iteration[n]/&lt;CODE&gt;-&lt;slug&gt;/spec.md</code> + <code>prototypes/</code></td></tr>
       <tr><td>估算</td><td>§2</td><td><code>pm-estimate</code></td><td>点数与人日</td></tr>
