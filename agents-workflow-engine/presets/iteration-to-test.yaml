@@ -61,6 +61,7 @@ nodes:
   - { id: qa-run-e2e, actor: subagent, kind: action, skill: qa-run-e2e, title: 编写并运行 E2E 测试, join: true }
   - { id: test-decision, actor: human, kind: decision, title: 测试决策, options: [修订, 通过, 打回开发] }
   - { id: accepted, actor: master, kind: milestone, title: 人工补测 }
+  - { id: qa-write-manual-plan, actor: subagent, kind: action, skill: qa-write-manual-plan, title: 手动与冒烟用例, model: writer }
   - { id: ba-gen-facts, actor: subagent, kind: action, skill: ba-gen-facts, title: 刷新事实文档 }
   - { id: dev-release-plan, actor: subagent, kind: action, skill: dev-release-plan, title: 准备上线 }
   - { id: shipped, actor: master, kind: end, title: 可上线 }
@@ -95,7 +96,8 @@ edges:
   - { id: qa-cases-ready, from: qa-write-cases, to: qa-run-e2e }
   - { id: e2e-to-decision, from: qa-run-e2e, to: test-decision }
   - { id: e2e-revise, from: test-decision, to: qa-run-e2e, when: 修订, back: true }
-  - { id: e2e-pass, from: test-decision, to: accepted, when: 通过 }
+  - { id: e2e-pass, from: test-decision, to: qa-write-manual-plan, when: 通过 }
+  - { id: manual-to-accepted, from: qa-write-manual-plan, to: accepted }
   - { id: e2e-reject, from: test-decision, to: amend-input, when: 打回开发, back: true }
   - { id: accepted-to-facts, from: accepted, to: ba-gen-facts }
   - { id: facts-to-release, from: ba-gen-facts, to: dev-release-plan }
