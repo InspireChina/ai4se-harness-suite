@@ -21,17 +21,6 @@ def extension_ids(graph: dict) -> set:
     return found
 
 
-def _model_value(graph: dict, node: dict) -> str:
-    key = node.get("model")
-    models = graph.get("models") or {}
-    if not key or key not in models:
-        return ""
-    spec = models[key]
-    if isinstance(spec, dict) and spec.get("env"):
-        return os.environ.get(str(spec["env"]), "")
-    return str(spec)
-
-
 def validate(graph: dict) -> tuple:
     """返回 (errors, warnings)。errors 非空时图不能跑。"""
     errors = []
