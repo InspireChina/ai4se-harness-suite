@@ -45,6 +45,19 @@
     padding: .1em .35em;
     border-radius: 4px;
   }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin: 10px 0;
+    overflow-x: auto;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
   .wrap {
     max-width: 1120px;
     margin: 0 0 0 var(--nav-w);
@@ -308,6 +321,8 @@
   }
   table.data th { background: #f0f2f5; font-weight: 600; }
   table.data tr:nth-child(even) td { background: #fafbfc; }
+  /* 短列不折字（如形态名），长列仍正常换行 */
+  .nw { white-space: nowrap; }
 
   ul.check { padding-left: 1.2em; }
   ul.check li { margin: 4px 0; }
@@ -518,6 +533,8 @@
     text-align: center;
   }
   @media (max-width: 900px) {
+    /* 窄屏下目录变成 sticky 顶栏，锚点跳转要避开它 */
+    section { scroll-margin-top: 68px; }
     nav.toc {
       position: sticky;
       top: 0;
@@ -560,9 +577,10 @@
   <a href="#setup">1. 项目准备</a>
   <a href="#design">2. 迭代前设计</a>
   <a href="#dev">3. 迭代中开发</a>
-  <a href="#testing">4. 测试归属</a>
+  <a href="#testing">4. 测试策略</a>
   <a href="#roles">5. 角色手册</a>
   <a href="#skills">6. Skill 对照</a>
+  <a href="#repos">7. 仓库布局</a>
   <a href="#lane">角色协作图（嵌入）</a>
 </nav>
 
@@ -880,10 +898,11 @@
   <ol>
     <li>
       <strong>铺 harness</strong> — 对 Agent 说：用 <code>harness-installer</code> 给目标项目初始化 <code>AGENTS.md</code> 与 <code>docs/</code> 骨架。<br />
-      完成后由 <strong>TL</strong> 补全 <code>AGENTS.md</code> 里的业务 / 架构 TODO（Agent 可起草，人必须拍板）。
+      完成后由 <strong>TL</strong> 补全 <code>AGENTS.md</code> 里的业务 / 架构 TODO（Agent 可起草，人必须拍板）。<br />
+      多仓库项目<strong>先定布局</strong>（见 <a href="#repos">§7</a>）—— 布局决定 <code>AGENTS.md</code> 与文档里写哪些路径。
     </li>
     <li>
-      <strong>装 SDD skills</strong> — 对 Agent 说：用 <code>agile-team-sdd</code> 把 16 个流程 skill 安装到目标项目的 <code>.agents/skills/</code>。
+      <strong>装 SDD skills</strong> — 对 Agent 说：用 <code>agile-team-sdd</code> 把 27 个流程 skill 安装到目标项目的 <code>.agents/skills/</code>。
     </li>
     <li>
       <strong>装 MCP 工具链</strong> — 对 Agent 说：用 <code>tool-chain-installer</code> 把 MCP 配置写入项目（如 <code>.mcp.json</code> / <code>opencode.jsonc</code>）。
@@ -905,6 +924,7 @@
     <li><code>AGENTS.md</code> 关键 TODO 已填</li>
     <li>skill + MCP 可用</li>
     <li>文档树与测试归属约定写清</li>
+    <li>仓库布局已定：组件在 <code>containers/</code> 下就位（单仓 / 嵌套 / 并列三者之一，见 <a href="#repos">§7</a>）</li>
     <li><code>docs/architecture/</code> 已有可读的：业务侧（product 边界 / 术语 / 核心聚合 / 首迭规划）+ 技术侧（C4 / ADR）（可与装机并行，但进迭代前须齐）</li>
     <li>团队对齐三条铁律（规范先于代码 / 测试先于实现 / 文档同批次）</li>
   </ul>
@@ -1056,9 +1076,44 @@
 </section>
 
 <section id="testing">
-  <h2>4. 测试分层与归属</h2>
-  <p class="goal"><strong>开发自测</strong>对「我写的代码」负责；<strong>QA 测试</strong>对「需求有没有被实现」负责。</p>
+  <h2>4. 测试策略与归属</h2>
+  <p class="goal">目标：九层测试各有人管、各有落点、各有闸门 —— 少一层，缺陷就往下一层漏。</p>
+  <p>AI 写的用例便宜，但「<strong>不可信</strong>」才是默认状态。所以策略里既有「谁写」，也有「用例本身怎么被验证」—— 后者靠 4.2 的变异测试。</p>
 
+  <h3>4.1 策略阶梯</h3>
+  <table class="data">
+    <thead><tr><th class="nw">层</th><th class="nw">谁做</th><th>框架落点（skill · 命令 · 落盘）</th><th>不过会怎样</th></tr></thead>
+    <tbody>
+      <tr><td class="nw">Lint / 静态检查</td><td class="nw">DEV<br />（TL 定命令）</td><td><code>AGENTS.md</code> §10 写死命令 + CI 拦；<strong>无专属 skill</strong></td><td>不能提交</td></tr>
+      <tr><td class="nw">Code Review</td><td class="nw">DEV + AI 互评</td><td><code>dev-build</code> 第 ④ 步 <code>dev-code-review</code>：对照 AGENTS / standards / facts</td><td>不能开 MR</td></tr>
+      <tr><td class="nw">单元测试</td><td class="nw">DEV</td><td><code>dev-self-test</code>：<code>mvn test</code>（Domain / Application）、前端 <code>vitest</code></td><td>不进自测</td></tr>
+      <tr><td class="nw">API 测试</td><td class="nw">DEV</td><td><code>dev-self-test</code>：RestAssured 打 <code>localhost</code>（<code>*ControllerTest</code>），先起真实环境再跑</td><td>不进自测</td></tr>
+      <tr><td class="nw">研发自测 ·<br />MCP 浏览器走查</td><td class="nw">DEV</td><td><code>dev-build</code> 第 ③ 步 <code>dev-ui-review</code>：原型对照 + <code>chrome-devtools</code> MCP 走查，落盘 <code>{planStem}-ui-review.md</code></td><td>回第 ① 步改</td></tr>
+      <tr><td class="nw">QA · E2E</td><td class="nw">QA</td><td><code>qa-write-cases</code>（<code>TC-xxx</code> 文本用例）→ <code>qa-run-e2e</code>（<code>e2e/tests/qa/</code> + 规格覆盖核对）</td><td><strong>合并闸门</strong></td></tr>
+      <tr><td class="nw">QA · 变异测试</td><td class="nw">QA</td><td>跑在 E2E 之后，检查用例抓不抓得住缺陷；工具项目自选（Java 用 PIT / 前端用 Stryker）</td><td>回退重跑自测</td></tr>
+      <tr><td class="nw">QA · 人工补测</td><td class="nw">QA</td><td><code>qa-write-manual-plan</code>（<code>docs/test-cases/manual-cases/</code>）：自动化难覆盖 / 需人判断</td><td>不验收</td></tr>
+      <tr><td class="nw">QA · 冒烟</td><td class="nw">QA</td><td><code>qa-write-manual-plan</code>（<code>smoking-cases/</code>）：发版前 5 分钟跑完的最小集</td><td>不上线</td></tr>
+    </tbody>
+  </table>
+  <div class="note"><strong>迁移期规则</strong>：老项目里 <code>e2e/tests/dev/</code> 可以继续跑，但<strong>不再新增</strong>；新项目研发自测直接走 MCP 走查，E2E 只归 QA —— 同一件事两套 E2E，必然漂移。</div>
+
+  <h3>4.2 变异测试：验证用例「有没有牙」</h3>
+  <p>AI 可以写出很像样的 E2E，却只断言「页面上有个数字」—— 实现改坏了它照样绿。
+  <strong>用例存在 ≠ 用例能证伪</strong>，这是 AI 测试的默认风险，也是它需要单独一层防护的原因。</p>
+  <ul>
+    <li><strong>怎么做</strong>：往被测代码里注入小改动（改比较符、删一行校验、反转条件），再跑 E2E。
+      用例<strong>必须变红</strong>；没变红就说明这条用例抓不住这个缺陷</li>
+    <li><strong>判据</strong>：有效变异杀光（或达到项目约定阈值），E2E 才算可信；
+      <strong>不许</strong>登记成「已知债务」放行 —— 缺口不是债务</li>
+    <li><strong>别误用</strong>：环境不稳、数据没隔离会造成假「没杀死」，先排除不稳定再下结论</li>
+  </ul>
+  <div class="callout"><strong>变异测试失败 → 回研发自测</strong>，而不是把断言改一改了事。
+  失败的含义是「用例太弱，也就是自测那一步没做扎实」：回 <code>dev-self-test</code> / <code>dev-ui-review</code> 重跑，
+  把断言补到能证伪，再从第 ② / ③ 步回到 E2E —— 不让弱用例带着「全绿」进合并。</div>
+
+  <h3>4.3 归属判定</h3>
+  <p><strong>归属看谁定义、谁判定，不看谁敲的代码</strong>：<strong>开发自测</strong>对「我写的代码」负责；
+  <strong>QA 测试</strong>对「需求有没有被实现」负责。</p>
   <table class="data">
     <thead>
       <tr><th>维度</th><th>开发自测</th><th>QA 测试</th></tr>
@@ -1066,13 +1121,17 @@
     <tbody>
       <tr><td>验证什么</td><td>代码按 Plan 工作</td><td>系统符合需求规格</td></tr>
       <tr><td>判定人</td><td>开发本人</td><td><strong>QA</strong></td></tr>
-      <tr><td>编号</td><td>无</td><td><code>TC-xxx</code></td></tr>
-      <tr><td>位置</td><td>源码旁、<code>e2e/tests/dev/</code></td><td><code>docs/</code>、<code>e2e/tests/qa/</code></td></tr>
+      <tr><td>编号</td><td>无（用 <code>DST-xxx</code> 表达意图）</td><td><code>TC-xxx</code></td></tr>
+      <tr><td>位置</td><td>源码旁（<code>*Test.java</code>、<code>*.test.ts</code>）+ 项目同目录 <code>*-self-test.md</code></td><td><code>docs/</code> 用例库、<code>e2e/tests/qa/</code></td></tr>
       <tr><td>合并闸门</td><td>否</td><td><strong>是</strong></td></tr>
     </tbody>
   </table>
 
-  <p>编号映射：每条 <code>R-xxx</code>、<code>AC-xxx</code> 至少对应一条 <code>TC-xxx</code>。</p>
+  <h3>4.4 编号与追溯</h3>
+  <ul class="check">
+    <li>每条 <code>R-xxx</code> / <code>AC-xxx</code> → 至少一条 <code>TC-xxx</code>（QA 用例），文本用例与自动化用例共用编号</li>
+    <li>研发自测不编 <code>TC-</code> 号，按 Plan 的 <code>DST-xxx</code> 执行，结果落盘到 <code>{planStem}-self-test.md</code></li>
+  </ul>
 </section>
 
 <section id="roles">
@@ -1147,6 +1206,114 @@
       <tr><td>复盘</td><td>§3</td><td><code>pm-retro</code></td><td>改进 → harness</td></tr>
     </tbody>
   </table>
+</section>
+
+<section id="repos">
+  <h2>7. 仓库布局：单仓 / 嵌套 / 并列</h2>
+  <p class="goal">目标：harness 与业务代码怎么放，一开始就定下来 —— 装机时的目标路径、文档里的链接、CI 的 checkout 都依赖它。</p>
+  <div class="note"><strong>默认选方式二（嵌套）</strong>：主仓库装 harness，业务组件以 submodule 挂在 <code>containers/&lt;组件&gt;</code>。只有当「组件少、没人管权限」或「harness 要给多个产品复用」时才偏离。</div>
+
+  <h3>7.1 先选一种</h3>
+  <table class="data">
+    <thead><tr><th>你的情况</th><th>选</th><th>一句话理由</th></tr></thead>
+    <tbody>
+      <tr><td>一个产品，前后端 + 文档都是同一拨人</td><td>方式一 · 单仓</td><td>路径最简单，没有指针要维护</td></tr>
+      <tr><td>业务代码已有独立仓库 / 要按组件切权限与发布</td><td><strong>方式二 · 嵌套</strong>（推荐）</td><td>目录路径与单仓完全一致，skill 与占位符零改动</td></tr>
+      <tr><td>harness 是平台团队交付物，要服务 N 个产品</td><td>方式三 · 并列</td><td>解耦彻底，代价是 CI 与文档链接都要跨仓</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.2 三种形态对比</h3>
+  <table class="data">
+    <thead><tr><th>维度</th><th>一 · 单仓</th><th>二 · 嵌套（推荐）</th><th>三 · 并列</th></tr></thead>
+    <tbody>
+      <tr><td>目录长相</td><td>一个仓全装下</td><td>主仓 + <code>containers/*</code> 子模块</td><td>两个平级仓库，靠 <code>../</code> 关联</td></tr>
+      <tr><td>harness 在哪</td><td>同仓</td><td>主仓（与 <code>docs/</code> 同级）</td><td>独立仓</td></tr>
+      <tr><td>clone 后能不能直接跑</td><td>可以</td><td>要 <code>--recurse-submodules</code></td><td>要 clone 两个仓并保持目录结构</td></tr>
+      <tr><td>权限边界</td><td>无（全员全仓）</td><td>按组件仓切，主仓只放文档与 harness</td><td>按仓切，harness 可只读</td></tr>
+      <tr><td>agent 工作区</td><td>一个目录</td><td><strong>一个目录</strong>（子模块就在里面）</td><td>两个目录，agent 通常只能看一个</td></tr>
+      <tr><td>升级 harness</td><td>直接改</td><td>主仓单独一次提交</td><td>独立仓发版，各产品各自跟进</td></tr>
+      <tr><td>主要代价</td><td>仓库膨胀、CI 全量</td><td>指针要跟着子仓提交走</td><td>跨仓路径与链接极易断</td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.3 方式一 · 单仓（mono repo）</h3>
+  <pre><code>my-product/
+├── AGENTS.md        .agents/skills/        .mcp.json
+├── docs/             architecture · features · facts · standards
+├── containers/       backend/  frontend/      ← 就是普通目录
+└── e2e/</code></pre>
+  <ul>
+    <li><strong>何时选</strong>：单产品、组件 1–3 个、团队规模小；<strong>新项目起步的默认选择</strong></li>
+    <li><code>example-project/</code> 就是这个形态 —— 先按它长起来，撑不住再拆</li>
+    <li><strong>坑</strong>：仓库变大后 clone 慢、CI 每次全量、没法「后端仓只给后端同学写权限」</li>
+    <li><strong>何时该拆</strong>：单目录超过 ~2GB，或 CI 全量已超过 15 分钟</li>
+  </ul>
+
+  <h3>7.4 方式二 · 嵌套仓库（推荐）</h3>
+  <pre><code>my-product/                    ← 主仓库：harness + 文档 + 胶水
+├── AGENTS.md
+├── .agents/skills/            ← 27 个 skill（随主仓分发）
+├── docs/                      ← architecture / features / facts / standards
+├── containers/
+│   ├── backend/               ← submodule → git@…/svc-backend.git
+│   └── frontend/              ← submodule → git@…/web-app.git
+└── e2e/</code></pre>
+  <p><strong>为什么推荐</strong>：<code>containers/backend</code> 与单仓里的普通目录<strong>路径完全一样</strong>，
+  所以 <code>AGENTS.md</code>、27 个 skill、占位符（<code>BACKEND_DIR</code> / <code>FRONTEND_DIR</code>）、
+  测试命令（<code>cd containers/backend &amp;&amp; mvn test</code>）一个字都不用改；
+  <code>init-harness.sh</code> 的目录探测本来就优先 <code>containers/backend|frontend</code>。
+  权限与发布仍按子仓库走，而 agent 只要打开主仓<strong>一个</strong>工作区。</p>
+  <pre><code># 主仓里挂子仓（子仓必须已有远端仓库）
+git submodule add git@github.com:org/svc-backend.git containers/backend
+git submodule add git@github.com:org/web-app.git  containers/frontend
+
+# 新人 clone（漏了 --recursive 就补这一步）
+git clone --recurse-submodules git@github.com:org/my-product.git
+git submodule update --init --recursive</code></pre>
+  <p><strong>五条铁律</strong>：</p>
+  <ol>
+    <li><strong>先子仓、后主仓</strong>：代码改动必须先在 <code>containers/backend</code> 里 commit + push，
+      再回主仓 commit 那个指针。反了就等于「主仓指向一个没有你代码的 commit」</li>
+    <li><strong>指针钉 commit，不钉分支</strong>：要跟分支就显式 <code>git submodule update --remote</code>，并且知道 CI 会跟着漂</li>
+    <li><strong>文档只留主仓</strong>：<code>docs/features/</code>、<code>docs/architecture/</code> 不进子仓库 —— 否则同一份规格两处版本</li>
+    <li><strong>构建产物各自 ignore</strong>：<code>containers/*/target</code>、<code>node_modules</code>、<code>dist</code> 在各自仓里管</li>
+    <li><strong>子仓可见性</strong>：看不到子仓的人等于看不到代码；至少要读权限，CI 用机器账号拉</li>
+  </ol>
+
+  <h3>7.5 方式三 · 独立 harness 仓库（并列）</h3>
+  <pre><code>workspace/
+├── harness/     ← 上下文 + skills + 文档骨架（独立仓库，平台团队维护）
+└── product/     ← 业务代码（独立仓库）</code></pre>
+  <ul>
+    <li>关联靠<strong>相对位置</strong>：<code>../harness</code>、<code>../product</code></li>
+    <li>装进 <code>product</code> 的产物必须用 <code>PATH_MODE=relative</code> —— 绝对路径会把安装机的主目录写进 skill</li>
+    <li>适合：多个产品共用一套流程、harness 有独立发版节奏、harness 仓允许只读</li>
+    <li><strong>坑</strong>：CI 要 checkout 两次（<code>actions/checkout</code> 的 <code>path:</code> 参数）、
+      跨仓相对链接一改就断、MR 里看不到「流程改动 + 代码改动」的完整 diff</li>
+  </ul>
+  <div class="callout"><strong>最大的坑是 agent 的工作区边界</strong>：IDE Agent 通常只认打开的那个目录，
+  <code>../harness/docs/…</code> 多半读不到。现实中只有两种用法 ——
+  <strong>人切换目录</strong>（装机时站在 <code>product</code>，查架构文档时切到 <code>harness</code>），
+  或者<strong>把 harness 用符号链接 / submodule 挂进 <code>product</code></strong>（这时其实已经退化成方式二）。</div>
+
+  <h3>7.6 三种形态下怎么升级 harness</h3>
+  <table class="data">
+    <thead><tr><th class="nw">形态</th><th>升级动作</th><th>注意</th></tr></thead>
+    <tbody>
+      <tr><td class="nw">单仓</td><td>直接在仓里跑三个安装器</td><td>与业务改动在同一个 MR，容易一起评审</td></tr>
+      <tr><td class="nw">嵌套</td><td>在<strong>主仓</strong>跑三个安装器</td><td><strong>不要</strong>在 <code>containers/*</code> 里跑 —— 子仓里的 skill 副本是无效副本</td></tr>
+      <tr><td class="nw">并列</td><td>在 <code>harness</code> 仓改，再 <code>PATH_MODE=relative</code> 装进 <code>product</code></td><td>装完要提交 <code>product</code> 里的 <code>.agents/</code> 与 <code>docs/</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3>7.7 反模式</h3>
+  <ul class="check">
+    <li>把 harness <strong>复制</strong>进多个仓各自改 → 立刻漂移，同一套 skill 各有各的版本</li>
+    <li>跨仓用<strong>绝对路径</strong>（<code>/Users/…</code>、<code>/home/…</code>）引用 harness → 换机器即断</li>
+    <li>submodule 指向<strong>个人分支</strong> → 别人拉不到</li>
+    <li>子仓 A 里再挂子仓 B，深度超过两层 → 指针地狱，没人敢升级</li>
+  </ul>
 </section>
 
 <footer>

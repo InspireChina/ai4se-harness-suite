@@ -33,7 +33,7 @@ AI4SE 框架构想（框内元素仅为示例，可能会装入更多实践）:
 | **SDD 技能套件**     | [`agile-team-sdd/`](agile-team-sdd/)                                                 | 团队统一的开发流程 skill，27 个覆盖 BA→TL→PM→开发→QA→发布→复盘，含无前缀的 `overnight-runner`。模板带占位符，可安装到任意项目，并容易被调整修改 | skill + 安装脚本      |
 | **Harness 初始化器** | [`harness-installer/`](harness-installer/)                                           | 为任意项目铺好工程底座：`AGENTS.md` + `docs/`（含 `architecture/` 高阶意图骨架、features / facts / standards） | skill + 模板 + 脚本   |
 | **工具链安装器**       | [`tool-chain-installer/`](tool-chain-installer/)                                     | 把 MCP 工具链（chrome-devtools、playwright、context7…）写进项目配置，不依赖个人机器的全局状态                            | skill + 工具清单 + 脚本 |
-| **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 角色泳道图 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试归属、闸门；**L3 · 人编排**                                       | 文档                |
+| **团队工作流指南**      | [`团队工作流指南`](https://inspirechina.github.io/ai4se-harness-suite/team-workflow-guide/) | 团队级协作手册（HTML 单页）：总览矩阵 + 角色泳道图 + 项目准备 → 迭代前设计 → 迭代中开发；角色、测试策略、闸门；**L3 · 人编排**                                       | 文档                |
 | **持续运行面板** | [`overnight-runner/`](overnight-runner/) | 把一串 plan 交给 coding agent 跑：左边任务队列、右边 agent 实时输出，看门狗自动重试，多队列各自独立，决策全程留痕 | skill + Python 实现 |
 | **工作流引擎** | [`agents-workflow-engine/`](agents-workflow-engine/) | 主会话按泳道图调度子 agent，从版本启动到可上线；**L4 · 人决策**。子 agent 可绑不同模型做对抗验证 | Python 实现 |
 | **参考实现**         | [`example-project/`](example-project/)                                               | 一份完整、可跑、已填满规范的全栈参考项目（Vue 3 + Spring Boot + DDD 四层），用来对照与教学                                    | 示例项目              |
@@ -160,7 +160,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 |---|---|---|
 | 团队级 SDD 框架 | 适合团队协作和拓展修改的 SDD 框架；纯 skill 驱动，与具体 agent 无关 | [`agile-team-sdd/`](agile-team-sdd/) |
 | 夜间任务 | 把一串 plan 交给 coding agent 无人值守跑：多队列、看门狗重试、决策全程留痕（白天可弹窗、夜里自动兜底） | skill [`overnight-runner`](agile-team-sdd/skills/overnight-runner-template/SKILL.md) · 运行时 [`overnight-runner/`](overnight-runner/) |
-| 团队流程手册 | 人怎么配合：总览矩阵、项目准备（含架构设计）→ 迭代前 → 迭代中；角色、测试归属与闸门 | [`team-workflow-guide/`](team-workflow-guide/index.html) |
+| 团队流程手册 | 人怎么配合：总览矩阵、项目准备（含架构设计）→ 迭代前 → 迭代中；角色、测试策略与闸门 | [`team-workflow-guide/`](team-workflow-guide/index.html) |
 | Agent as Code | 所有 Harness（skills、AGENTS、docs 骨架、MCP、overnight-runner）可安装进代码仓库，换机器 clone 即可用 | [`harness-installer/`](harness-installer/) · [`tool-chain-installer/`](tool-chain-installer/) |
 | 文档三分法 | `architecture/` 高阶意图 · `features/` 过程 · `facts/` as-built | [architecture](example-project/docs/architecture/README.md) · [docs 总览](example-project/docs/README.md) |
 | 高阶设计 | 业务侧产品边界/术语/核心聚合（`ba-arch-plan`）→ 技术侧 C4/ADR（`tl-arch-plan`）→ 迭代 HLD；确认后再开 feature Plan | [`ba-arch-plan`](agile-team-sdd/skills/ba-arch-plan-template/SKILL.md) · [`tl-arch-plan`](agile-team-sdd/skills/tl-arch-plan-template/SKILL.md) · [`tl-high-level-design`](agile-team-sdd/skills/tl-high-level-design-template/SKILL.md) |
@@ -170,7 +170,7 @@ ba-grill-me → ba-write-spec → pm-estimate
 | 事实文档 | 实现后校准 `docs/facts/`（API、库表、全量领域、实现专题） | [`ba-gen-facts`](agile-team-sdd/skills/ba-gen-facts-template/SKILL.md) · [facts](example-project/docs/facts/README.md) |
 | 全栈端到端 Loop 开发 | Plan（含 DST）确认后 `dev-build`：实现 → 真实环境自测落盘 → 原型 UI 对照落盘 → 代码评审，以记录修到绿 | [`dev-build`](agile-team-sdd/skills/dev-build-template/SKILL.md) · [流程指南](team-workflow-guide/index.html) |
 | 团队上下文共享 | BA / DEV / QA 等角色的产出物（规格、Plan、用例、事实文档、架构）都进代码仓库，换人 clone 即可接上 | [`example-project/docs/`](example-project/docs/README.md) · [Agent as Code](harness-installer/) |
-| Mono repo | 统一仓库承载前后端、文档与 harness；客观条件限制时可用 submodule 拼出等价布局 | [`example-project/`](example-project/)（containers + docs + skills 同仓） |
+| 仓库布局 | 三种形态：单仓（前后端 + 文档 + harness 全放一起）· 嵌套（主仓装 harness，`containers/` 用 submodule 挂业务仓，**推荐**）· 并列（harness 独立仓与业务仓平级）；判据、命令与反模式见指南 §7 | [指南 §7](team-workflow-guide/index.html#repos) · [`example-project/`](example-project/)（单仓形态） |
 
 ## 快速开始
 
